@@ -32,6 +32,8 @@
   --orange-dark: #d96f06;
   --orange-wash: #fdf0e0;
   --navy: #051460;
+  /* rgba(5, 20, 96, .44) over white — the band their footer sits on. */
+  --periwinkle: #9198b9;
 
   --sans: "Work Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
@@ -328,9 +330,33 @@ textarea.input { min-height: 100px; resize: vertical; line-height: 1.55; }
 .banner-error { border-left-color: #c0392b; background: #fdeceb; color: #8c271c; }
 
 footer.site {
-  border-top: 1px solid var(--rule);
-  padding: 48px 0 64px;
-  margin-top: 48px;
+  background: var(--periwinkle);
+  padding: 56px 0 64px;
+  margin-top: 64px;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+}
+.footer-h { font-size: 18.5px; font-weight: 700; color: var(--ink); margin-bottom: 20px; }
+.footer-p { font-size: 15px; font-weight: 500; color: var(--ink); margin: 0 0 16px; }
+.footer-p strong { font-weight: 700; }
+.footer-p a, .footer-links a {
+  color: var(--orange);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.footer-links { display: flex; flex-direction: column; gap: 18px; align-items: flex-start; font-size: 15px; font-weight: 500; }
+.footer-note {
+  margin: 40px 0 0;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  opacity: .8;
+}
+@media (max-width: 760px) {
+  .footer-grid { grid-template-columns: 1fr; gap: 32px; }
 }
 
 /* ---------- responsive ---------- */
@@ -396,29 +422,21 @@ footer.site {
 
 .card-pad { padding: 24px; }
 
-/* pbha.org runs a row of social glyphs and the DONATE pill at the right of
-   the header. */
-.header-actions { margin-left: auto; display: flex; align-items: center; gap: 18px; }
-.social-row { display: flex; align-items: center; gap: 16px; }
-.social-row a { color: var(--ink); display: flex; }
-.social-row a:hover { color: var(--orange); }
-
-/* The alumni section's own nav, sitting under the site-wide one — the shape
-   any subsection of their site would take. */
-.subnav { border-bottom: 1px solid var(--rule); background: var(--white); }
-.subnav-inner { display: flex; align-items: center; gap: 24px; padding: 12px var(--pad); }
-.subnav button {
-  background: none; border: 0; padding: 4px 0; cursor: pointer;
-  font-size: 14px; font-weight: 500; color: var(--ink-mute);
-  border-bottom: 2px solid transparent;
+/* Chips, stamps, pills, and the cards themselves are controls, not copy.
+   Without this, dragging across a card or double-clicking a chip selects its
+   label and leaves it highlighted. Prose — bios, names on the profile page,
+   contact details — stays selectable. */
+.chip, .stamp, .stamp-year, .scope-btn, .btn, .check, .eyebrow,
+.person-card, .row-person, nav.site-nav button, .map-btn {
+  -webkit-user-select: none;
+  user-select: none;
 }
-.subnav button:hover { color: var(--orange); }
-.subnav button.is-active { color: var(--ink); border-bottom-color: var(--orange); }
 
-@media (max-width: 1180px) {
-  nav.site-nav { flex-wrap: wrap; gap: 8px 18px; }
-  .social-row { display: none; }
-}
+.header-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+
+
+
+
 </style>
 </head>
 <body>
@@ -427,7 +445,7 @@ footer.site {
 
 <script>
 (function () {
-  var PROFILES = [{"userId":"amara-okafor-example-com","first":"Amara","last":"Okafor","pronouns":null,"year":2014,"location":"Boston, MA","photoUrl":null,"career":"Pediatrician · Boston Medical Center","industry":"Health & Medicine","concentration":"Human Developmental Biology","bio":"Two summers at SUP turned into a career in community pediatrics. Happy to talk about medical school, or about running a program while taking orgo.","programs":["Chinatown Afterschool Program (CHAP)","Summer Urban Program"],"programYears":null,"pbhaRole":"Program Director","openToMentor":true,"reachOut":"Anything about the pre-med path, or SUP director life.","claimedAt":"2026-09-12T01:18:48.622Z","isCurrentStudent":false,"searchText":"amara okafor boston, ma pediatrician · boston medical center health & medicine human developmental biology program director chinatown afterschool program (chap) summer urban program"},{"userId":"daniel-reyes-example-com","first":"Daniel","last":"Reyes","pronouns":null,"year":2009,"location":"Washington, DC","photoUrl":null,"career":"Policy Counsel · National Housing Law Project","industry":"Law & Policy","concentration":"Social Studies","bio":"Started in ESOL, ended up writing tenant protection legislation. The through-line is the same work.","programs":["Adult ESOL Program","CIVICS"],"programYears":null,"pbhaRole":"Cabinet","openToMentor":true,"reachOut":"Law school, legal aid, housing policy.","claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":false,"searchText":"daniel reyes washington, dc policy counsel · national housing law project law & policy social studies cabinet adult esol program civics"},{"userId":"priya-nair-example-com","first":"Priya","last":"Nair","pronouns":null,"year":2018,"location":"New York, NY","photoUrl":null,"career":"Product Manager · Duolingo","industry":"Technology","concentration":"Computer Science","bio":"Teaching adult ESL is why I work on language learning now.","programs":["Chinatown ESL","BRYE Tutoring"],"programYears":null,"pbhaRole":"Program Coordinator","openToMentor":true,"reachOut":"Breaking into product, or tech recruiting timelines.","claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":false,"searchText":"priya nair new york, ny product manager · duolingo technology computer science program coordinator chinatown esl brye tutoring"},{"userId":"marcus-bell-example-com","first":"Marcus","last":"Bell","pronouns":null,"year":1996,"location":"Chicago, IL","photoUrl":null,"career":"Executive Director · Southside Youth Alliance","industry":"Nonprofit","concentration":"Government","bio":"Thirty years in youth development. Still use the site-director playbook I learned at PBHA.","programs":["Cambridge After-School Program (CASP)","Summer Urban Program"],"programYears":null,"pbhaRole":"Officer","openToMentor":true,"reachOut":"Running a nonprofit, board development, fundraising.","claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":false,"searchText":"marcus bell chicago, il executive director · southside youth alliance nonprofit government officer cambridge after-school program (casp) summer urban program"},{"userId":"hannah-kim-example-com","first":"Hannah","last":"Kim","pronouns":null,"year":2021,"location":"San Francisco, CA","photoUrl":null,"career":"Software Engineer · Stripe","industry":"Technology","concentration":"Applied Mathematics","bio":"Directed Big Sib through the pandemic. Learned more about logistics than any class taught me.","programs":["Chinatown Big Sibling","Chinatown Teen"],"programYears":null,"pbhaRole":"Program Director","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":false,"searchText":"hannah kim san francisco, ca software engineer · stripe technology applied mathematics program director chinatown big sibling chinatown teen"},{"userId":"tomas-lindqvist-example-com","first":"Tomás","last":"Lindqvist","pronouns":null,"year":2012,"location":"Cambridge, MA","photoUrl":null,"career":"Assistant Professor of Education · Boston College","industry":"Education","concentration":"Psychology","bio":"I study summer learning loss, which is a fancy way of saying I still think about SUP.","programs":["Summer Urban Program","BRYE Summer"],"programYears":null,"pbhaRole":"Summer Director","openToMentor":true,"reachOut":"PhD applications in education or psych.","claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":false,"searchText":"tomás lindqvist cambridge, ma assistant professor of education · boston college education psychology summer director summer urban program brye summer"},{"userId":"rachel-adeyemi-example-com","first":"Rachel","last":"Adeyemi","pronouns":null,"year":2006,"location":"Atlanta, GA","photoUrl":null,"career":"VP of Community Impact · Regions Bank","industry":"Finance","concentration":"Economics","bio":null,"programs":["Chinatown Citizenship","Adult ESOL Program"],"programYears":null,"pbhaRole":"Cabinet","openToMentor":true,"reachOut":"Corporate social responsibility, finance recruiting.","claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":false,"searchText":"rachel adeyemi atlanta, ga vp of community impact · regions bank finance economics cabinet chinatown citizenship adult esol program"},{"userId":"joseph-hartley-example-com","first":"Joseph","last":"Hartley","pronouns":null,"year":1984,"location":"Portland, ME","photoUrl":null,"career":"Retired · former Superintendent, Portland Public Schools","industry":"Education","concentration":"History","bio":"PBHA in the early eighties. I have a filing cabinet of program histories if anyone is writing about that era.","programs":["Cambridge After-School Program (CASP)"],"programYears":null,"pbhaRole":"Officer","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":false,"searchText":"joseph hartley portland, me retired · former superintendent, portland public schools education history officer cambridge after-school program (casp)"},{"userId":"wei-zhang-example-com","first":"Wei","last":"Zhang","pronouns":null,"year":2016,"location":"Boston, MA","photoUrl":null,"career":"Immigration Attorney · Greater Boston Legal Services","industry":"Law & Policy","concentration":"East Asian Studies","bio":"Citizenship program, then law school, then back to the same clients.","programs":["Chinatown Citizenship","Chinatown ESL","Chinatown Adventure"],"programYears":null,"pbhaRole":"Program Director","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":false,"searchText":"wei zhang boston, ma immigration attorney · greater boston legal services law & policy east asian studies program director chinatown citizenship chinatown esl chinatown adventure"},{"userId":"elena-moreau-example-com","first":"Elena","last":"Moreau","pronouns":null,"year":2019,"location":"Brooklyn, NY","photoUrl":null,"career":"Documentary Producer · Field Notes Media","industry":"Media & Arts","concentration":"Visual and Environmental Studies","bio":null,"programs":["Boston Refugee Youth Enrichment (BRYE) Teen","BRYE 1-2-1"],"programYears":null,"pbhaRole":"Program Coordinator","openToMentor":true,"reachOut":"Film, documentary, freelance survival.","claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":false,"searchText":"elena moreau brooklyn, ny documentary producer · field notes media media & arts visual and environmental studies program coordinator boston refugee youth enrichment (brye) teen brye 1-2-1"},{"userId":"samuel-osei-example-com","first":"Samuel","last":"Osei","pronouns":null,"year":2011,"location":"Accra, Ghana","photoUrl":null,"career":"Director of Programs · Ashesi Education Collaborative","industry":"Education","concentration":"Social Studies","bio":null,"programs":["Summer Urban Program","Cambridge Youth Enrichment Program"],"programYears":null,"pbhaRole":"Summer Director","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":false,"searchText":"samuel osei accra, ghana director of programs · ashesi education collaborative education social studies summer director summer urban program cambridge youth enrichment program"},{"userId":"nora-feldman-example-com","first":"Nora","last":"Feldman","pronouns":null,"year":2002,"location":"Seattle, WA","photoUrl":null,"career":"Clinical Psychologist · private practice","industry":"Health & Medicine","concentration":"Psychology","bio":"Alzheimer's Buddies is the reason I went into clinical work with older adults.","programs":["Alzheimer's Buddies","Best Buddies"],"programYears":null,"pbhaRole":"Program Director","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":false,"searchText":"nora feldman seattle, wa clinical psychologist · private practice health & medicine psychology program director alzheimer's buddies best buddies"},{"userId":"andre-thompson-example-com","first":"André","last":"Thompson","pronouns":null,"year":2023,"location":"Cambridge, MA","photoUrl":null,"career":"Research Assistant · Harvard Kennedy School","industry":"Law & Policy","concentration":"Government","bio":null,"programs":["CIVICS","College High-School Alliance (CHANCE)"],"programYears":null,"pbhaRole":"Cabinet","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":false,"searchText":"andré thompson cambridge, ma research assistant · harvard kennedy school law & policy government cabinet civics college high-school alliance (chance)"},{"userId":"mei-lin-chen-example-com","first":"Mei Lin","last":"Chen","pronouns":null,"year":2027,"location":"Cambridge, MA","photoUrl":null,"career":"Student","industry":"Student","concentration":"Sociology","bio":"Current CHAP director. Looking for alumni who ran the program in the 2010s.","programs":["Chinatown Afterschool Program (CHAP)","Chinatown Teen"],"programYears":null,"pbhaRole":"Program Director","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":true,"searchText":"mei lin chen cambridge, ma student student sociology program director chinatown afterschool program (chap) chinatown teen"},{"userId":"jordan-pierre-example-com","first":"Jordan","last":"Pierre","pronouns":null,"year":2028,"location":"Cambridge, MA","photoUrl":null,"career":"Student","industry":"Student","concentration":"Neuroscience","bio":null,"programs":["Boston Refugee Youth Enrichment (BRYE) Extension"],"programYears":null,"pbhaRole":"Program Coordinator","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":true,"searchText":"jordan pierre cambridge, ma student student neuroscience program coordinator boston refugee youth enrichment (brye) extension"},{"userId":"sofia-marchetti-example-com","first":"Sofia","last":"Marchetti","pronouns":null,"year":2026,"location":"Cambridge, MA","photoUrl":null,"career":"Student","industry":"Student","concentration":"History and Literature","bio":null,"programs":["Adult ESOL Program","CIVICS"],"programYears":null,"pbhaRole":"Volunteer","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":false,"searchText":"sofia marchetti cambridge, ma student student history and literature volunteer adult esol program civics"},{"userId":"kenji-watanabe-example-com","first":"Kenji","last":"Watanabe","pronouns":null,"year":1999,"location":"Los Angeles, CA","photoUrl":null,"career":"Partner · Westline Ventures","industry":"Finance","concentration":"Economics","bio":null,"programs":["Cambridge After-School Program (CASP)","Summer Urban Program"],"programYears":null,"pbhaRole":"Cabinet","openToMentor":true,"reachOut":"Venture, startups, or how to fund a nonprofit side project.","claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":false,"searchText":"kenji watanabe los angeles, ca partner · westline ventures finance economics cabinet cambridge after-school program (casp) summer urban program"},{"userId":"grace-mutua-example-com","first":"Grace","last":"Mutua","pronouns":null,"year":2020,"location":"Nairobi, Kenya","photoUrl":null,"career":"Health Systems Analyst · Ministry of Health","industry":"Health & Medicine","concentration":"Global Health and Health Policy","bio":null,"programs":["Alzheimer's Buddies","Adult ESOL Program"],"programYears":null,"pbhaRole":"Program Coordinator","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":false,"searchText":"grace mutua nairobi, kenya health systems analyst · ministry of health health & medicine global health and health policy program coordinator alzheimer's buddies adult esol program"},{"userId":"patrick-donnelly-example-com","first":"Patrick","last":"Donnelly","pronouns":null,"year":1991,"location":"Dorchester, MA","photoUrl":null,"career":"Principal · Dorchester Collegiate Academy","industry":"Education","concentration":"English","bio":null,"programs":["Summer Urban Program","BRYE Tutoring"],"programYears":null,"pbhaRole":"Summer Director","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":false,"searchText":"patrick donnelly dorchester, ma principal · dorchester collegiate academy education english summer director summer urban program brye tutoring"},{"userId":"leila-haddad-example-com","first":"Leila","last":"Haddad","pronouns":null,"year":2015,"location":"London, UK","photoUrl":null,"career":"Economist · Institute for Fiscal Studies","industry":"Research","concentration":"Economics","bio":null,"programs":["Chinatown ESL","Adult ESOL Program"],"programYears":null,"pbhaRole":"Program Director","openToMentor":true,"reachOut":"Econ PhD, UK moves, research careers.","claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":false,"searchText":"leila haddad london, uk economist · institute for fiscal studies research economics program director chinatown esl adult esol program"},{"userId":"c-whitfield-example-com","first":"Charles","last":"Whitfield","pronouns":null,"year":1978,"location":"Portland, ME","photoUrl":null,"career":"Retired · former City Planner, Boston Redevelopment Authority","industry":"Law & Policy","concentration":"Government","bio":"CASP in the late seventies, when the program ran out of two rooms. Glad to see it still going.","programs":["Cambridge After-School Program (CASP)"],"programYears":null,"pbhaRole":"Program Director","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":false,"searchText":"charles whitfield portland, me retired · former city planner, boston redevelopment authority law & policy government program director cambridge after-school program (casp)"},{"userId":"m-alvarez-example-com","first":"Marisol","last":"Alvarez","pronouns":null,"year":1988,"location":"Boston, MA","photoUrl":null,"career":"Deputy Director · Massachusetts Department of Public Health","industry":"Health & Medicine","concentration":"Biology","bio":null,"programs":["Summer Urban Program"],"programYears":null,"pbhaRole":"Summer Director","openToMentor":true,"reachOut":"Public health careers, state government, or running a summer site.","claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":false,"searchText":"marisol alvarez boston, ma deputy director · massachusetts department of public health health & medicine biology summer director summer urban program"},{"userId":"t-nguyen-example-com","first":"Thao","last":"Nguyen","pronouns":null,"year":2004,"location":"Brooklyn, NY","photoUrl":null,"career":"Architect · Nguyen + Partners","industry":"Media & Arts","concentration":"Visual and Environmental Studies","bio":"Big Sib matched me with a seven-year-old in 2001. We still email.","programs":["Chinatown Big Sibling"],"programYears":null,"pbhaRole":"Program Coordinator","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":false,"searchText":"thao nguyen brooklyn, ny architect · nguyen + partners media & arts visual and environmental studies program coordinator chinatown big sibling"},{"userId":"r-okonkwo-example-com","first":"Reuben","last":"Okonkwo","pronouns":null,"year":2010,"location":"Boston, MA","photoUrl":null,"career":"Civics Teacher · Boston Latin Academy","industry":"Education","concentration":"History","bio":null,"programs":["CIVICS"],"programYears":null,"pbhaRole":"Program Director","openToMentor":true,"reachOut":"Teaching, licensure, and getting into a classroom after college.","claimedAt":"2026-09-12T01:18:48.623Z","isCurrentStudent":false,"searchText":"reuben okonkwo boston, ma civics teacher · boston latin academy education history program director civics"}];
+  var PROFILES = [{"userId":"amara-okafor-example-com","first":"Amara","last":"Okafor","pronouns":null,"year":2014,"location":"Boston, MA","photoUrl":null,"career":"Pediatrician · Boston Medical Center","industry":"Health & Medicine","concentration":"Human Developmental Biology","bio":"Two summers at SUP turned into a career in community pediatrics. Happy to talk about medical school, or about running a program while taking orgo.","programs":["Chinatown Afterschool Program (CHAP)","Summer Urban Program"],"programYears":null,"pbhaRole":"Program Director","openToMentor":true,"reachOut":"Anything about the pre-med path, or SUP director life.","claimedAt":"2026-09-12T01:24:34.272Z","isCurrentStudent":false,"searchText":"amara okafor boston, ma pediatrician · boston medical center health & medicine human developmental biology program director chinatown afterschool program (chap) summer urban program"},{"userId":"daniel-reyes-example-com","first":"Daniel","last":"Reyes","pronouns":null,"year":2009,"location":"Washington, DC","photoUrl":null,"career":"Policy Counsel · National Housing Law Project","industry":"Law & Policy","concentration":"Social Studies","bio":"Started in ESOL, ended up writing tenant protection legislation. The through-line is the same work.","programs":["Adult ESOL Program","CIVICS"],"programYears":null,"pbhaRole":"Cabinet","openToMentor":true,"reachOut":"Law school, legal aid, housing policy.","claimedAt":"2026-09-12T01:24:34.272Z","isCurrentStudent":false,"searchText":"daniel reyes washington, dc policy counsel · national housing law project law & policy social studies cabinet adult esol program civics"},{"userId":"priya-nair-example-com","first":"Priya","last":"Nair","pronouns":null,"year":2018,"location":"New York, NY","photoUrl":null,"career":"Product Manager · Duolingo","industry":"Technology","concentration":"Computer Science","bio":"Teaching adult ESL is why I work on language learning now.","programs":["Chinatown ESL","BRYE Tutoring"],"programYears":null,"pbhaRole":"Program Coordinator","openToMentor":true,"reachOut":"Breaking into product, or tech recruiting timelines.","claimedAt":"2026-09-12T01:24:34.273Z","isCurrentStudent":false,"searchText":"priya nair new york, ny product manager · duolingo technology computer science program coordinator chinatown esl brye tutoring"},{"userId":"marcus-bell-example-com","first":"Marcus","last":"Bell","pronouns":null,"year":1996,"location":"Chicago, IL","photoUrl":null,"career":"Executive Director · Southside Youth Alliance","industry":"Nonprofit","concentration":"Government","bio":"Thirty years in youth development. Still use the site-director playbook I learned at PBHA.","programs":["Cambridge After-School Program (CASP)","Summer Urban Program"],"programYears":null,"pbhaRole":"Officer","openToMentor":true,"reachOut":"Running a nonprofit, board development, fundraising.","claimedAt":"2026-09-12T01:24:34.273Z","isCurrentStudent":false,"searchText":"marcus bell chicago, il executive director · southside youth alliance nonprofit government officer cambridge after-school program (casp) summer urban program"},{"userId":"hannah-kim-example-com","first":"Hannah","last":"Kim","pronouns":null,"year":2021,"location":"San Francisco, CA","photoUrl":null,"career":"Software Engineer · Stripe","industry":"Technology","concentration":"Applied Mathematics","bio":"Directed Big Sib through the pandemic. Learned more about logistics than any class taught me.","programs":["Chinatown Big Sibling","Chinatown Teen"],"programYears":null,"pbhaRole":"Program Director","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-12T01:24:34.273Z","isCurrentStudent":false,"searchText":"hannah kim san francisco, ca software engineer · stripe technology applied mathematics program director chinatown big sibling chinatown teen"},{"userId":"tomas-lindqvist-example-com","first":"Tomás","last":"Lindqvist","pronouns":null,"year":2012,"location":"Cambridge, MA","photoUrl":null,"career":"Assistant Professor of Education · Boston College","industry":"Education","concentration":"Psychology","bio":"I study summer learning loss, which is a fancy way of saying I still think about SUP.","programs":["Summer Urban Program","BRYE Summer"],"programYears":null,"pbhaRole":"Summer Director","openToMentor":true,"reachOut":"PhD applications in education or psych.","claimedAt":"2026-09-12T01:24:34.273Z","isCurrentStudent":false,"searchText":"tomás lindqvist cambridge, ma assistant professor of education · boston college education psychology summer director summer urban program brye summer"},{"userId":"rachel-adeyemi-example-com","first":"Rachel","last":"Adeyemi","pronouns":null,"year":2006,"location":"Atlanta, GA","photoUrl":null,"career":"VP of Community Impact · Regions Bank","industry":"Finance","concentration":"Economics","bio":null,"programs":["Chinatown Citizenship","Adult ESOL Program"],"programYears":null,"pbhaRole":"Cabinet","openToMentor":true,"reachOut":"Corporate social responsibility, finance recruiting.","claimedAt":"2026-09-12T01:24:34.273Z","isCurrentStudent":false,"searchText":"rachel adeyemi atlanta, ga vp of community impact · regions bank finance economics cabinet chinatown citizenship adult esol program"},{"userId":"joseph-hartley-example-com","first":"Joseph","last":"Hartley","pronouns":null,"year":1984,"location":"Portland, ME","photoUrl":null,"career":"Retired · former Superintendent, Portland Public Schools","industry":"Education","concentration":"History","bio":"PBHA in the early eighties. I have a filing cabinet of program histories if anyone is writing about that era.","programs":["Cambridge After-School Program (CASP)"],"programYears":null,"pbhaRole":"Officer","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-12T01:24:34.273Z","isCurrentStudent":false,"searchText":"joseph hartley portland, me retired · former superintendent, portland public schools education history officer cambridge after-school program (casp)"},{"userId":"wei-zhang-example-com","first":"Wei","last":"Zhang","pronouns":null,"year":2016,"location":"Boston, MA","photoUrl":null,"career":"Immigration Attorney · Greater Boston Legal Services","industry":"Law & Policy","concentration":"East Asian Studies","bio":"Citizenship program, then law school, then back to the same clients.","programs":["Chinatown Citizenship","Chinatown ESL","Chinatown Adventure"],"programYears":null,"pbhaRole":"Program Director","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-12T01:24:34.273Z","isCurrentStudent":false,"searchText":"wei zhang boston, ma immigration attorney · greater boston legal services law & policy east asian studies program director chinatown citizenship chinatown esl chinatown adventure"},{"userId":"elena-moreau-example-com","first":"Elena","last":"Moreau","pronouns":null,"year":2019,"location":"Brooklyn, NY","photoUrl":null,"career":"Documentary Producer · Field Notes Media","industry":"Media & Arts","concentration":"Visual and Environmental Studies","bio":null,"programs":["Boston Refugee Youth Enrichment (BRYE) Teen","BRYE 1-2-1"],"programYears":null,"pbhaRole":"Program Coordinator","openToMentor":true,"reachOut":"Film, documentary, freelance survival.","claimedAt":"2026-09-12T01:24:34.273Z","isCurrentStudent":false,"searchText":"elena moreau brooklyn, ny documentary producer · field notes media media & arts visual and environmental studies program coordinator boston refugee youth enrichment (brye) teen brye 1-2-1"},{"userId":"samuel-osei-example-com","first":"Samuel","last":"Osei","pronouns":null,"year":2011,"location":"Accra, Ghana","photoUrl":null,"career":"Director of Programs · Ashesi Education Collaborative","industry":"Education","concentration":"Social Studies","bio":null,"programs":["Summer Urban Program","Cambridge Youth Enrichment Program"],"programYears":null,"pbhaRole":"Summer Director","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-12T01:24:34.273Z","isCurrentStudent":false,"searchText":"samuel osei accra, ghana director of programs · ashesi education collaborative education social studies summer director summer urban program cambridge youth enrichment program"},{"userId":"nora-feldman-example-com","first":"Nora","last":"Feldman","pronouns":null,"year":2002,"location":"Seattle, WA","photoUrl":null,"career":"Clinical Psychologist · private practice","industry":"Health & Medicine","concentration":"Psychology","bio":"Alzheimer's Buddies is the reason I went into clinical work with older adults.","programs":["Alzheimer's Buddies","Best Buddies"],"programYears":null,"pbhaRole":"Program Director","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-12T01:24:34.273Z","isCurrentStudent":false,"searchText":"nora feldman seattle, wa clinical psychologist · private practice health & medicine psychology program director alzheimer's buddies best buddies"},{"userId":"andre-thompson-example-com","first":"André","last":"Thompson","pronouns":null,"year":2023,"location":"Cambridge, MA","photoUrl":null,"career":"Research Assistant · Harvard Kennedy School","industry":"Law & Policy","concentration":"Government","bio":null,"programs":["CIVICS","College High-School Alliance (CHANCE)"],"programYears":null,"pbhaRole":"Cabinet","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-12T01:24:34.273Z","isCurrentStudent":false,"searchText":"andré thompson cambridge, ma research assistant · harvard kennedy school law & policy government cabinet civics college high-school alliance (chance)"},{"userId":"mei-lin-chen-example-com","first":"Mei Lin","last":"Chen","pronouns":null,"year":2027,"location":"Cambridge, MA","photoUrl":null,"career":"Student","industry":"Student","concentration":"Sociology","bio":"Current CHAP director. Looking for alumni who ran the program in the 2010s.","programs":["Chinatown Afterschool Program (CHAP)","Chinatown Teen"],"programYears":null,"pbhaRole":"Program Director","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-12T01:24:34.273Z","isCurrentStudent":true,"searchText":"mei lin chen cambridge, ma student student sociology program director chinatown afterschool program (chap) chinatown teen"},{"userId":"jordan-pierre-example-com","first":"Jordan","last":"Pierre","pronouns":null,"year":2028,"location":"Cambridge, MA","photoUrl":null,"career":"Student","industry":"Student","concentration":"Neuroscience","bio":null,"programs":["Boston Refugee Youth Enrichment (BRYE) Extension"],"programYears":null,"pbhaRole":"Program Coordinator","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-12T01:24:34.273Z","isCurrentStudent":true,"searchText":"jordan pierre cambridge, ma student student neuroscience program coordinator boston refugee youth enrichment (brye) extension"},{"userId":"sofia-marchetti-example-com","first":"Sofia","last":"Marchetti","pronouns":null,"year":2026,"location":"Cambridge, MA","photoUrl":null,"career":"Student","industry":"Student","concentration":"History and Literature","bio":null,"programs":["Adult ESOL Program","CIVICS"],"programYears":null,"pbhaRole":"Volunteer","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-12T01:24:34.273Z","isCurrentStudent":false,"searchText":"sofia marchetti cambridge, ma student student history and literature volunteer adult esol program civics"},{"userId":"kenji-watanabe-example-com","first":"Kenji","last":"Watanabe","pronouns":null,"year":1999,"location":"Los Angeles, CA","photoUrl":null,"career":"Partner · Westline Ventures","industry":"Finance","concentration":"Economics","bio":null,"programs":["Cambridge After-School Program (CASP)","Summer Urban Program"],"programYears":null,"pbhaRole":"Cabinet","openToMentor":true,"reachOut":"Venture, startups, or how to fund a nonprofit side project.","claimedAt":"2026-09-12T01:24:34.273Z","isCurrentStudent":false,"searchText":"kenji watanabe los angeles, ca partner · westline ventures finance economics cabinet cambridge after-school program (casp) summer urban program"},{"userId":"grace-mutua-example-com","first":"Grace","last":"Mutua","pronouns":null,"year":2020,"location":"Nairobi, Kenya","photoUrl":null,"career":"Health Systems Analyst · Ministry of Health","industry":"Health & Medicine","concentration":"Global Health and Health Policy","bio":null,"programs":["Alzheimer's Buddies","Adult ESOL Program"],"programYears":null,"pbhaRole":"Program Coordinator","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-12T01:24:34.273Z","isCurrentStudent":false,"searchText":"grace mutua nairobi, kenya health systems analyst · ministry of health health & medicine global health and health policy program coordinator alzheimer's buddies adult esol program"},{"userId":"patrick-donnelly-example-com","first":"Patrick","last":"Donnelly","pronouns":null,"year":1991,"location":"Dorchester, MA","photoUrl":null,"career":"Principal · Dorchester Collegiate Academy","industry":"Education","concentration":"English","bio":null,"programs":["Summer Urban Program","BRYE Tutoring"],"programYears":null,"pbhaRole":"Summer Director","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-12T01:24:34.273Z","isCurrentStudent":false,"searchText":"patrick donnelly dorchester, ma principal · dorchester collegiate academy education english summer director summer urban program brye tutoring"},{"userId":"leila-haddad-example-com","first":"Leila","last":"Haddad","pronouns":null,"year":2015,"location":"London, UK","photoUrl":null,"career":"Economist · Institute for Fiscal Studies","industry":"Research","concentration":"Economics","bio":null,"programs":["Chinatown ESL","Adult ESOL Program"],"programYears":null,"pbhaRole":"Program Director","openToMentor":true,"reachOut":"Econ PhD, UK moves, research careers.","claimedAt":"2026-09-12T01:24:34.273Z","isCurrentStudent":false,"searchText":"leila haddad london, uk economist · institute for fiscal studies research economics program director chinatown esl adult esol program"},{"userId":"c-whitfield-example-com","first":"Charles","last":"Whitfield","pronouns":null,"year":1978,"location":"Portland, ME","photoUrl":null,"career":"Retired · former City Planner, Boston Redevelopment Authority","industry":"Law & Policy","concentration":"Government","bio":"CASP in the late seventies, when the program ran out of two rooms. Glad to see it still going.","programs":["Cambridge After-School Program (CASP)"],"programYears":null,"pbhaRole":"Program Director","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-12T01:24:34.273Z","isCurrentStudent":false,"searchText":"charles whitfield portland, me retired · former city planner, boston redevelopment authority law & policy government program director cambridge after-school program (casp)"},{"userId":"m-alvarez-example-com","first":"Marisol","last":"Alvarez","pronouns":null,"year":1988,"location":"Boston, MA","photoUrl":null,"career":"Deputy Director · Massachusetts Department of Public Health","industry":"Health & Medicine","concentration":"Biology","bio":null,"programs":["Summer Urban Program"],"programYears":null,"pbhaRole":"Summer Director","openToMentor":true,"reachOut":"Public health careers, state government, or running a summer site.","claimedAt":"2026-09-12T01:24:34.273Z","isCurrentStudent":false,"searchText":"marisol alvarez boston, ma deputy director · massachusetts department of public health health & medicine biology summer director summer urban program"},{"userId":"t-nguyen-example-com","first":"Thao","last":"Nguyen","pronouns":null,"year":2004,"location":"Brooklyn, NY","photoUrl":null,"career":"Architect · Nguyen + Partners","industry":"Media & Arts","concentration":"Visual and Environmental Studies","bio":"Big Sib matched me with a seven-year-old in 2001. We still email.","programs":["Chinatown Big Sibling"],"programYears":null,"pbhaRole":"Program Coordinator","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-12T01:24:34.273Z","isCurrentStudent":false,"searchText":"thao nguyen brooklyn, ny architect · nguyen + partners media & arts visual and environmental studies program coordinator chinatown big sibling"},{"userId":"r-okonkwo-example-com","first":"Reuben","last":"Okonkwo","pronouns":null,"year":2010,"location":"Boston, MA","photoUrl":null,"career":"Civics Teacher · Boston Latin Academy","industry":"Education","concentration":"History","bio":null,"programs":["CIVICS"],"programYears":null,"pbhaRole":"Program Director","openToMentor":true,"reachOut":"Teaching, licensure, and getting into a classroom after college.","claimedAt":"2026-09-12T01:24:34.273Z","isCurrentStudent":false,"searchText":"reuben okonkwo boston, ma civics teacher · boston latin academy education history program director civics"}];
   var VOCAB = {"programs":["Adult ESOL Program","Alzheimer's Buddies","Best Buddies","Boston Refugee Youth Enrichment (BRYE) Extension","Boston Refugee Youth Enrichment (BRYE) Teen","BRYE 1-2-1","BRYE Summer","BRYE Tutoring","Cambridge After-School Program (CASP)","Cambridge Youth Enrichment Program","Chinatown Adventure","Chinatown Afterschool Program (CHAP)","Chinatown Big Sibling","Chinatown Citizenship","Chinatown ESL","Chinatown Teen","CIVICS","College High-School Alliance (CHANCE)","Summer Urban Program"],"roles":["Volunteer","Program Coordinator","Program Director","Summer Director","Cabinet","Officer"]};
   var VIEWER_ID = "amara-okafor-example-com";
   var STUDENT_BOUNDARY = 2027;
@@ -598,44 +616,6 @@ const shortYear = (y) => "’" + String(y).slice(2);
 const splitCareer = (career) => {
   const [title, org] = String(career || "").split(" · ");
   return { title: title || "", org: org || "" };
-};
-
-// The live top-level sections of pbha.org, each pointing at the page that
-// section opens to. Alumni is the tab this app adds.
-const SITE_NAV = [
-  { label: "About Us", href: "/mission-and-impact" },
-  { label: "SUP", href: "/sup" },
-  { label: "Programs", href: "/programs" },
-  { label: "For Participants", href: "/youthtermapp" },
-  { label: "For Volunteers", href: "/apply" },
-  { label: "Events", href: "/coles-2026" },
-  { label: "Features", href: "/125" },
-];
-
-const Social = {
-  facebook: () => (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6A22 22 0 0 0 14.3 3.5c-2.4 0-4 1.45-4 4.1v2.3H7.6V13h2.7v8z"/>
-    </svg>
-  ),
-  linkedin: () => (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M4.98 3.5A2.5 2.5 0 1 0 5 8.5a2.5 2.5 0 0 0 0-5zM3 9.5h4V21H3zM9.5 9.5h3.8v1.6h.05c.53-.95 1.83-1.95 3.76-1.95 4.02 0 4.76 2.5 4.76 5.76V21h-4v-4.9c0-1.17-.02-2.68-1.7-2.68-1.7 0-1.96 1.28-1.96 2.6V21h-3.7z"/>
-    </svg>
-  ),
-  instagram: () => (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
-      <rect x="3" y="3" width="18" height="18" rx="5"/>
-      <circle cx="12" cy="12" r="4"/>
-      <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/>
-    </svg>
-  ),
-  mail: () => (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
-      <rect x="2.5" y="5" width="19" height="14" rx="2"/>
-      <path d="M3 6.5l9 6.5 9-6.5"/>
-    </svg>
-  ),
 };
 
 function Logo() {
@@ -1845,47 +1825,26 @@ function App() {
             </span>
           </a>
 
-          {/* The site-wide nav, with Alumni added as its own tab. Every other
-              item is the live pbha.org section it belongs to; Alumni is the
-              only one this app serves. */}
-          <nav className="site-nav">
-            {SITE_NAV.map((item) => (
-              <a key={item.label} href={"https://www.pbha.org" + item.href}
-                target="_blank" rel="noopener noreferrer"
-                style={{ textDecoration: "none", fontSize: 15, fontWeight: 500,
-                         padding: "6px 0", borderBottom: "2px solid transparent" }}>
-                {item.label}
-              </a>
-            ))}
-            <button className="is-active"
-              onClick={() => { setScreen("directory"); setProfileId(null); }}>Alumni</button>
-          </nav>
+          {/* Only the alumni section's own nav. Dropping this app under
+              pbha.org means adding one Alumni item to their nav and pointing
+              it here — see "Integrating with pbha.org" in the README — so
+              there is nothing to be gained by restating their menu. */}
+          {me && (
+            <nav className="site-nav">
+              <button className={screen === "directory" || screen === "profile" ? "is-active" : ""}
+                onClick={() => { setScreen("directory"); setProfileId(null); }}>Directory</button>
+              <button className={screen === "me" ? "is-active" : ""}
+                onClick={() => setScreen("me")}>Your profile</button>
+            </nav>
+          )}
 
           <div className="header-actions">
-            <div className="social-row">
-              <a href="https://www.facebook.com/PBHAserves" target="_blank" rel="noopener noreferrer" aria-label="PBHA on Facebook"><Social.facebook /></a>
-              <a href="https://www.linkedin.com/company/phillips-brooks-house-association-inc-" target="_blank" rel="noopener noreferrer" aria-label="PBHA on LinkedIn"><Social.linkedin /></a>
-              <a href="https://www.instagram.com/pbha" target="_blank" rel="noopener noreferrer" aria-label="PBHA on Instagram"><Social.instagram /></a>
-              <a href="mailto:pbha@pbha.org" aria-label="Email PBHA"><Social.mail /></a>
-            </div>
+            {me && <button className="btn btn-ghost btn-sm" onClick={signOut}>Sign out</button>}
             <a className="btn btn-primary btn-sm" href="https://donatenow.networkforgood.org/1439676"
               target="_blank" rel="noopener noreferrer">Donate</a>
           </div>
         </div>
       </header>
-
-      {/* Signed-in members get the alumni section's own nav underneath. */}
-      {me && (
-        <div className="subnav">
-          <div className="wrap subnav-inner" style={{ padding: "12px 0" }}>
-            <button className={screen === "directory" || screen === "profile" ? "is-active" : ""}
-              onClick={() => { setScreen("directory"); setProfileId(null); }}>Directory</button>
-            <button className={screen === "me" ? "is-active" : ""}
-              onClick={() => setScreen("me")}>Your profile</button>
-            <button style={{ marginLeft: "auto" }} onClick={signOut}>Sign out</button>
-          </div>
-        </div>
-      )}
 
       {me === undefined && <div className="wrap page"><p className="meta">Loading…</p></div>}
       {me === null && <GateScreen onSignedIn={loadMe} />}
@@ -1896,43 +1855,29 @@ function App() {
       {me && screen === "me" && <MyProfileScreen me={me} onSaved={loadMe} />}
 
       <footer className="site">
-        <div className="wrap" style={{ display: "flex", gap: 40, flexWrap: "wrap", justifyContent: "space-between" }}>
-          <div style={{ maxWidth: 460 }}>
-            <div className="eyebrow">Phillips Brooks House Association</div>
-            <p className="meta" style={{ marginTop: 10 }}>
-              Harvard's largest student-run public service organization, home to more than 80
-              community-based programs across Boston and Cambridge.
-            </p>
-            <p className="meta" style={{ marginTop: 10 }}>
-              Phillips Brooks House, Harvard Yard, Cambridge, MA 02138<br/>
-              <a href="mailto:pbha@pbha.org">pbha@pbha.org</a>
-            </p>
+        <div className="wrap footer-grid">
+          <div>
+            <h4 className="footer-h">Phillips Brooks House Association</h4>
+            <p className="footer-p">HARVARD YARD<br/>CAMBRIDGE, MA 02138</p>
+            <p className="footer-p"><strong>PHONE:</strong> (617) 495-5526</p>
+            <p className="footer-p"><strong>FAX:</strong> (617) 496-2461</p>
+            <p className="footer-p"><strong>EMAIL:</strong>{" "}
+              <a href="mailto:pbha@pbha.org">pbha@pbha.org</a></p>
           </div>
-          <div style={{ display: "flex", gap: 48 }}>
-            <div>
-              <div className="eyebrow" style={{ marginBottom: 10 }}>Alumni</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                <a className="meta" href="https://www.pbha.org/alumni" target="_blank" rel="noopener noreferrer">Join the network</a>
-                <a className="meta" href="https://www.pbha.org/125" target="_blank" rel="noopener noreferrer">Road to the 125th</a>
-                <a className="meta" href="https://www.pbha.org/alumni-impact" target="_blank" rel="noopener noreferrer">Alumni impact</a>
-              </div>
-            </div>
-            <div>
-              <div className="eyebrow" style={{ marginBottom: 10 }}>PBHA</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                <a className="meta" href="https://www.pbha.org/programs" target="_blank" rel="noopener noreferrer">Programs</a>
-                <a className="meta" href="https://www.pbha.org/apply" target="_blank" rel="noopener noreferrer">Volunteer</a>
-                <a className="meta" href="https://www.pbha.org/contact-us" target="_blank" rel="noopener noreferrer">Contact</a>
-              </div>
-            </div>
+          <div className="footer-links">
+            <a href="https://accessibility.huit.harvard.edu/digital-accessibility-policy"
+              target="_blank" rel="noopener noreferrer">Digital Accessibility</a>
+            <a href="https://www.pbha.org/accessibility-2"
+              target="_blank" rel="noopener noreferrer">Accessibility Information &amp; Bias Report</a>
+            <a href="https://www.pbha.org/contact-us"
+              target="_blank" rel="noopener noreferrer">Contact Us</a>
+            <a href="https://pbha.us4.list-manage.com/subscribe?u=12a6d114426de46cf2848b3a6&amp;id=3f7724366c"
+              target="_blank" rel="noopener noreferrer">Subscribe to PBHA&rsquo;s email list</a>
           </div>
         </div>
         {window.__demoRequest && (
-          // One line, in the footer rather than across the top: this is a
-          // prototype on a personal GitHub Pages URL, not something PBHA runs.
           <div className="wrap">
-            <hr className="rule" style={{ margin: "28px 0 16px" }} />
-            <p className="meta" style={{ margin: 0, fontSize: 12.5 }}>
+            <p className="footer-note">
               A work-in-progress prototype of an alumni directory for PBHA, built for review.
               Not an official PBHA service, and the profiles shown are invented.
             </p>

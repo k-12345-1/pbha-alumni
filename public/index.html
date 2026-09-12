@@ -32,6 +32,8 @@
   --orange-dark: #d96f06;
   --orange-wash: #fdf0e0;
   --navy: #051460;
+  /* rgba(5, 20, 96, .44) over white — the band their footer sits on. */
+  --periwinkle: #9198b9;
 
   --sans: "Work Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
@@ -328,9 +330,33 @@ textarea.input { min-height: 100px; resize: vertical; line-height: 1.55; }
 .banner-error { border-left-color: #c0392b; background: #fdeceb; color: #8c271c; }
 
 footer.site {
-  border-top: 1px solid var(--rule);
-  padding: 48px 0 64px;
-  margin-top: 48px;
+  background: var(--periwinkle);
+  padding: 56px 0 64px;
+  margin-top: 64px;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+}
+.footer-h { font-size: 18.5px; font-weight: 700; color: var(--ink); margin-bottom: 20px; }
+.footer-p { font-size: 15px; font-weight: 500; color: var(--ink); margin: 0 0 16px; }
+.footer-p strong { font-weight: 700; }
+.footer-p a, .footer-links a {
+  color: var(--orange);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.footer-links { display: flex; flex-direction: column; gap: 18px; align-items: flex-start; font-size: 15px; font-weight: 500; }
+.footer-note {
+  margin: 40px 0 0;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  opacity: .8;
+}
+@media (max-width: 760px) {
+  .footer-grid { grid-template-columns: 1fr; gap: 32px; }
 }
 
 /* ---------- responsive ---------- */
@@ -396,29 +422,21 @@ footer.site {
 
 .card-pad { padding: 24px; }
 
-/* pbha.org runs a row of social glyphs and the DONATE pill at the right of
-   the header. */
-.header-actions { margin-left: auto; display: flex; align-items: center; gap: 18px; }
-.social-row { display: flex; align-items: center; gap: 16px; }
-.social-row a { color: var(--ink); display: flex; }
-.social-row a:hover { color: var(--orange); }
-
-/* The alumni section's own nav, sitting under the site-wide one — the shape
-   any subsection of their site would take. */
-.subnav { border-bottom: 1px solid var(--rule); background: var(--white); }
-.subnav-inner { display: flex; align-items: center; gap: 24px; padding: 12px var(--pad); }
-.subnav button {
-  background: none; border: 0; padding: 4px 0; cursor: pointer;
-  font-size: 14px; font-weight: 500; color: var(--ink-mute);
-  border-bottom: 2px solid transparent;
+/* Chips, stamps, pills, and the cards themselves are controls, not copy.
+   Without this, dragging across a card or double-clicking a chip selects its
+   label and leaves it highlighted. Prose — bios, names on the profile page,
+   contact details — stays selectable. */
+.chip, .stamp, .stamp-year, .scope-btn, .btn, .check, .eyebrow,
+.person-card, .row-person, nav.site-nav button, .map-btn {
+  -webkit-user-select: none;
+  user-select: none;
 }
-.subnav button:hover { color: var(--orange); }
-.subnav button.is-active { color: var(--ink); border-bottom-color: var(--orange); }
 
-@media (max-width: 1180px) {
-  nav.site-nav { flex-wrap: wrap; gap: 8px 18px; }
-  .social-row { display: none; }
-}
+.header-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+
+
+
+
 </style>
 </head>
 <body>
@@ -497,44 +515,6 @@ const shortYear = (y) => "’" + String(y).slice(2);
 const splitCareer = (career) => {
   const [title, org] = String(career || "").split(" · ");
   return { title: title || "", org: org || "" };
-};
-
-// The live top-level sections of pbha.org, each pointing at the page that
-// section opens to. Alumni is the tab this app adds.
-const SITE_NAV = [
-  { label: "About Us", href: "/mission-and-impact" },
-  { label: "SUP", href: "/sup" },
-  { label: "Programs", href: "/programs" },
-  { label: "For Participants", href: "/youthtermapp" },
-  { label: "For Volunteers", href: "/apply" },
-  { label: "Events", href: "/coles-2026" },
-  { label: "Features", href: "/125" },
-];
-
-const Social = {
-  facebook: () => (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6A22 22 0 0 0 14.3 3.5c-2.4 0-4 1.45-4 4.1v2.3H7.6V13h2.7v8z"/>
-    </svg>
-  ),
-  linkedin: () => (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M4.98 3.5A2.5 2.5 0 1 0 5 8.5a2.5 2.5 0 0 0 0-5zM3 9.5h4V21H3zM9.5 9.5h3.8v1.6h.05c.53-.95 1.83-1.95 3.76-1.95 4.02 0 4.76 2.5 4.76 5.76V21h-4v-4.9c0-1.17-.02-2.68-1.7-2.68-1.7 0-1.96 1.28-1.96 2.6V21h-3.7z"/>
-    </svg>
-  ),
-  instagram: () => (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
-      <rect x="3" y="3" width="18" height="18" rx="5"/>
-      <circle cx="12" cy="12" r="4"/>
-      <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/>
-    </svg>
-  ),
-  mail: () => (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
-      <rect x="2.5" y="5" width="19" height="14" rx="2"/>
-      <path d="M3 6.5l9 6.5 9-6.5"/>
-    </svg>
-  ),
 };
 
 function Logo() {
@@ -1744,47 +1724,26 @@ function App() {
             </span>
           </a>
 
-          {/* The site-wide nav, with Alumni added as its own tab. Every other
-              item is the live pbha.org section it belongs to; Alumni is the
-              only one this app serves. */}
-          <nav className="site-nav">
-            {SITE_NAV.map((item) => (
-              <a key={item.label} href={"https://www.pbha.org" + item.href}
-                target="_blank" rel="noopener noreferrer"
-                style={{ textDecoration: "none", fontSize: 15, fontWeight: 500,
-                         padding: "6px 0", borderBottom: "2px solid transparent" }}>
-                {item.label}
-              </a>
-            ))}
-            <button className="is-active"
-              onClick={() => { setScreen("directory"); setProfileId(null); }}>Alumni</button>
-          </nav>
+          {/* Only the alumni section's own nav. Dropping this app under
+              pbha.org means adding one Alumni item to their nav and pointing
+              it here — see "Integrating with pbha.org" in the README — so
+              there is nothing to be gained by restating their menu. */}
+          {me && (
+            <nav className="site-nav">
+              <button className={screen === "directory" || screen === "profile" ? "is-active" : ""}
+                onClick={() => { setScreen("directory"); setProfileId(null); }}>Directory</button>
+              <button className={screen === "me" ? "is-active" : ""}
+                onClick={() => setScreen("me")}>Your profile</button>
+            </nav>
+          )}
 
           <div className="header-actions">
-            <div className="social-row">
-              <a href="https://www.facebook.com/PBHAserves" target="_blank" rel="noopener noreferrer" aria-label="PBHA on Facebook"><Social.facebook /></a>
-              <a href="https://www.linkedin.com/company/phillips-brooks-house-association-inc-" target="_blank" rel="noopener noreferrer" aria-label="PBHA on LinkedIn"><Social.linkedin /></a>
-              <a href="https://www.instagram.com/pbha" target="_blank" rel="noopener noreferrer" aria-label="PBHA on Instagram"><Social.instagram /></a>
-              <a href="mailto:pbha@pbha.org" aria-label="Email PBHA"><Social.mail /></a>
-            </div>
+            {me && <button className="btn btn-ghost btn-sm" onClick={signOut}>Sign out</button>}
             <a className="btn btn-primary btn-sm" href="https://donatenow.networkforgood.org/1439676"
               target="_blank" rel="noopener noreferrer">Donate</a>
           </div>
         </div>
       </header>
-
-      {/* Signed-in members get the alumni section's own nav underneath. */}
-      {me && (
-        <div className="subnav">
-          <div className="wrap subnav-inner" style={{ padding: "12px 0" }}>
-            <button className={screen === "directory" || screen === "profile" ? "is-active" : ""}
-              onClick={() => { setScreen("directory"); setProfileId(null); }}>Directory</button>
-            <button className={screen === "me" ? "is-active" : ""}
-              onClick={() => setScreen("me")}>Your profile</button>
-            <button style={{ marginLeft: "auto" }} onClick={signOut}>Sign out</button>
-          </div>
-        </div>
-      )}
 
       {me === undefined && <div className="wrap page"><p className="meta">Loading…</p></div>}
       {me === null && <GateScreen onSignedIn={loadMe} />}
@@ -1795,43 +1754,29 @@ function App() {
       {me && screen === "me" && <MyProfileScreen me={me} onSaved={loadMe} />}
 
       <footer className="site">
-        <div className="wrap" style={{ display: "flex", gap: 40, flexWrap: "wrap", justifyContent: "space-between" }}>
-          <div style={{ maxWidth: 460 }}>
-            <div className="eyebrow">Phillips Brooks House Association</div>
-            <p className="meta" style={{ marginTop: 10 }}>
-              Harvard's largest student-run public service organization, home to more than 80
-              community-based programs across Boston and Cambridge.
-            </p>
-            <p className="meta" style={{ marginTop: 10 }}>
-              Phillips Brooks House, Harvard Yard, Cambridge, MA 02138<br/>
-              <a href="mailto:pbha@pbha.org">pbha@pbha.org</a>
-            </p>
+        <div className="wrap footer-grid">
+          <div>
+            <h4 className="footer-h">Phillips Brooks House Association</h4>
+            <p className="footer-p">HARVARD YARD<br/>CAMBRIDGE, MA 02138</p>
+            <p className="footer-p"><strong>PHONE:</strong> (617) 495-5526</p>
+            <p className="footer-p"><strong>FAX:</strong> (617) 496-2461</p>
+            <p className="footer-p"><strong>EMAIL:</strong>{" "}
+              <a href="mailto:pbha@pbha.org">pbha@pbha.org</a></p>
           </div>
-          <div style={{ display: "flex", gap: 48 }}>
-            <div>
-              <div className="eyebrow" style={{ marginBottom: 10 }}>Alumni</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                <a className="meta" href="https://www.pbha.org/alumni" target="_blank" rel="noopener noreferrer">Join the network</a>
-                <a className="meta" href="https://www.pbha.org/125" target="_blank" rel="noopener noreferrer">Road to the 125th</a>
-                <a className="meta" href="https://www.pbha.org/alumni-impact" target="_blank" rel="noopener noreferrer">Alumni impact</a>
-              </div>
-            </div>
-            <div>
-              <div className="eyebrow" style={{ marginBottom: 10 }}>PBHA</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                <a className="meta" href="https://www.pbha.org/programs" target="_blank" rel="noopener noreferrer">Programs</a>
-                <a className="meta" href="https://www.pbha.org/apply" target="_blank" rel="noopener noreferrer">Volunteer</a>
-                <a className="meta" href="https://www.pbha.org/contact-us" target="_blank" rel="noopener noreferrer">Contact</a>
-              </div>
-            </div>
+          <div className="footer-links">
+            <a href="https://accessibility.huit.harvard.edu/digital-accessibility-policy"
+              target="_blank" rel="noopener noreferrer">Digital Accessibility</a>
+            <a href="https://www.pbha.org/accessibility-2"
+              target="_blank" rel="noopener noreferrer">Accessibility Information &amp; Bias Report</a>
+            <a href="https://www.pbha.org/contact-us"
+              target="_blank" rel="noopener noreferrer">Contact Us</a>
+            <a href="https://pbha.us4.list-manage.com/subscribe?u=12a6d114426de46cf2848b3a6&amp;id=3f7724366c"
+              target="_blank" rel="noopener noreferrer">Subscribe to PBHA&rsquo;s email list</a>
           </div>
         </div>
         {window.__demoRequest && (
-          // One line, in the footer rather than across the top: this is a
-          // prototype on a personal GitHub Pages URL, not something PBHA runs.
           <div className="wrap">
-            <hr className="rule" style={{ margin: "28px 0 16px" }} />
-            <p className="meta" style={{ margin: 0, fontSize: 12.5 }}>
+            <p className="footer-note">
               A work-in-progress prototype of an alumni directory for PBHA, built for review.
               Not an official PBHA service, and the profiles shown are invented.
             </p>

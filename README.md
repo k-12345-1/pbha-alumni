@@ -55,6 +55,26 @@ deployed.
   `CORS_ORIGINS`, `NODE_ENV=production`
 - Optional: `SIGNUP_SECRET_CODE` to gate signup behind an invite code
 
+## Integrating with pbha.org
+
+This is built to drop into their site rather than to sit beside it, so it does
+not restate their menu or reproduce their pages. What it does carry is their
+type, palette, control shapes, and footer, so a visitor crossing from pbha.org
+into the directory should not feel a seam.
+
+When PBHA is ready, integration is three things:
+
+1. **One nav item.** Add `Alumni` to their top-level nav, pointed at wherever
+   this is hosted — `pbha.org/alumni` via a reverse proxy or subdomain, or an
+   external link to start with. Nothing in this app needs to change.
+2. **A host and a database.** Any Node host plus Postgres (see Deploying).
+3. **The roster.** Load names, class years, and programs as unclaimed rows;
+   members claim their own by signing up with the email on the row.
+
+Their header and footer live in `public/index.html` as ordinary markup. If they
+would rather serve their real Squarespace chrome around this, the app's own
+header and footer come out and the rest is unaffected.
+
 ## The static demo
 
 `docs/` is a self-contained demo published to GitHub Pages at
@@ -67,7 +87,11 @@ npm run build:demo    # regenerate docs/index.html after a front-end change
 ```
 
 `public/index.html` stays the single source of truth — the demo is generated from
-it, never forked. The only demo-awareness in the app is the `window.__demoRequest`
+it, never forked. The preview also carries two notes the real build does not: a
+line on the sign-in card saying the directory is not live and any credentials
+will do, and a line in the footer saying it is a prototype rather than an
+official PBHA service. Both exist because the preview sits on a public URL
+wearing PBHA's branding, and both come out once PBHA hosts it themselves. The only demo-awareness in the app is the `window.__demoRequest`
 hook at the top of `api.request`, which nothing defines in the real build.
 
 ## Layout
