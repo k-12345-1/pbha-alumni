@@ -91,18 +91,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: 0.01em; }
 .page { padding: 56px 0 110px; }
 .rule { height: 1px; background: var(--rule); border: 0; }
 
-/* Their announcement strip is white on white with a hairline, not a dark bar. */
-.notice-bar {
-  background: var(--white);
-  color: var(--ink);
-  font-size: 13.3px;
-  font-weight: 500;
-  text-align: center;
-  padding: 11px 16px;
-  border-bottom: 1px solid var(--rule);
-}
-.notice-bar strong { font-weight: 700; }
-.notice-bar .link { color: var(--orange); text-decoration: underline; text-underline-offset: 3px; }
+
 
 header.site {
   position: sticky;
@@ -123,18 +112,8 @@ header.site {
   margin: 0 auto;
 }
 .brand { display: flex; align-items: center; gap: 13px; text-decoration: none; }
-.brand-mark {
-  width: 35px; height: 51px; flex: none;
-  background: var(--ink);
-  color: var(--orange);
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  font-size: 12px;
-  letter-spacing: 0.02em;
-  line-height: 1.05;
-  text-align: center;
-}
+/* Their own mark, at the 35x51 they run it at in their header. */
+.brand-mark { width: 35px; height: 51px; flex: none; object-fit: contain; }
 .brand-name { font-size: 15px; font-weight: 600; line-height: 1.25; }
 .brand-sub { font-size: 11px; color: var(--ink-mute); letter-spacing: 0.08em; text-transform: uppercase; }
 
@@ -427,12 +406,48 @@ footer.site {
    label and leaves it highlighted. Prose — bios, names on the profile page,
    contact details — stays selectable. */
 .chip, .stamp, .stamp-year, .scope-btn, .btn, .check, .eyebrow,
-.person-card, .row-person, nav.site-nav button, .map-btn {
+.person-card, .row-person, nav.site-nav button, .map-btn, .account-btn, .account-menu button {
   -webkit-user-select: none;
   user-select: none;
 }
 
 .header-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+
+.account-btn {
+  width: 38px; height: 38px; padding: 0;
+  border-radius: 50%;
+  border: 0;
+  background: var(--orange);
+  color: var(--white);
+  display: grid; place-items: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background .15s;
+}
+.account-btn:hover { background: var(--orange-dark); }
+.account-btn img { width: 100%; height: 100%; object-fit: cover; }
+
+.account-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 210px;
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .1);
+  padding: 6px;
+  z-index: 50;
+}
+.account-who { padding: 10px 12px 12px; border-bottom: 1px solid var(--rule); margin-bottom: 6px; }
+.account-menu button {
+  display: block; width: 100%; text-align: left;
+  padding: 10px 12px;
+  background: none; border: 0;
+  font-size: 14px; font-weight: 500; color: var(--ink);
+  cursor: pointer;
+}
+.account-menu button:hover { background: var(--wash); color: var(--orange); }
 
 
 
@@ -517,12 +532,59 @@ const splitCareer = (career) => {
   return { title: title || "", org: org || "" };
 };
 
-function Logo() {
+// The account control in the header: an orange avatar that opens the two
+// things it stands for — edit your profile, or sign out.
+function AccountMenu({ me, onProfile, onSignOut }) {
+  const [open, setOpen] = React.useState(false);
+  const ref = React.useRef(null);
+
+  // Close on a click anywhere else, or on Escape. Bound only while open so
+  // the listeners are not sitting on the document for the whole session.
+  React.useEffect(() => {
+    if (!open) return;
+    const onDocClick = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const onKey = (e) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  const first = me.profile?.first || "";
+  const last = me.profile?.last || "";
+
   return (
-    <div className="brand-mark" aria-hidden="true">
-      <span>PB<br/>HA</span>
+    <div ref={ref} style={{ position: "relative" }}>
+      <button className="account-btn" onClick={() => setOpen((o) => !o)}
+        aria-haspopup="menu" aria-expanded={open}
+        aria-label={`Account menu for ${first} ${last}`.trim()}>
+        {me.profile?.photoUrl
+          ? <img src={me.profile.photoUrl} alt="" />
+          : <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="8" r="4"/>
+              <path d="M4 21c0-4.2 3.6-7 8-7s8 2.8 8 7z"/>
+            </svg>}
+      </button>
+      {open && (
+        <div className="account-menu" role="menu">
+          {(first || last) && (
+            <div className="account-who">
+              <div style={{ fontWeight: 600 }}>{first} {last}</div>
+              <div className="meta" style={{ fontSize: 12.5 }}>{me.email}</div>
+            </div>
+          )}
+          <button role="menuitem" onClick={() => { setOpen(false); onProfile(); }}>Your profile</button>
+          <button role="menuitem" onClick={() => { setOpen(false); onSignOut(); }}>Sign out</button>
+        </div>
+      )}
     </div>
   );
+}
+
+function Logo() {
+  return <img className="brand-mark" src="pbha-logo.png" alt="Phillips Brooks House Association" />;
 }
 
 function Field({ label, hint, children }) {
@@ -1216,11 +1278,7 @@ function DirectoryScreen({ onOpenProfile }) {
   return (
     <div className="wrap page">
       <h1 className="h-1 accent">Directory</h1>
-      <p className="lede" style={{ marginTop: 14, maxWidth: 660 }}>
-        Every PBHA member who has chosen to be listed, searchable by program, class year,
-        city, and the work they do now.
-      </p>
-      <hr className="rule" style={{ margin: "28px 0 32px" }} />
+      <hr className="rule" style={{ margin: "22px 0 32px" }} />
 
       <div className="directory-layout" style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: 44 }}>
         <aside className="directory-rail" style={{ position: "sticky", top: 92, alignSelf: "start" }}>
@@ -1709,11 +1767,6 @@ function App() {
 
   return (
     <>
-      <div className="notice-bar">
-        The <span className="link">PBHA Alumni Network</span> is open to everyone who has
-        volunteered, coordinated, or directed a PBHA program.
-      </div>
-
       <header className="site">
         <div className="site-inner">
           <a className="brand" href="https://www.pbha.org" target="_blank" rel="noopener noreferrer">
@@ -1730,17 +1783,21 @@ function App() {
               there is nothing to be gained by restating their menu. */}
           {me && (
             <nav className="site-nav">
+              {/* Editing your own profile lives in the account menu, not here,
+                  so it is not offered in two places at once. */}
               <button className={screen === "directory" || screen === "profile" ? "is-active" : ""}
                 onClick={() => { setScreen("directory"); setProfileId(null); }}>Directory</button>
-              <button className={screen === "me" ? "is-active" : ""}
-                onClick={() => setScreen("me")}>Your profile</button>
             </nav>
           )}
 
           <div className="header-actions">
-            {me && <button className="btn btn-ghost btn-sm" onClick={signOut}>Sign out</button>}
-            <a className="btn btn-primary btn-sm" href="https://donatenow.networkforgood.org/1439676"
-              target="_blank" rel="noopener noreferrer">Donate</a>
+            {me && (
+              <AccountMenu
+                me={me}
+                onProfile={() => setScreen("me")}
+                onSignOut={signOut}
+              />
+            )}
           </div>
         </div>
       </header>

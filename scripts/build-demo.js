@@ -164,6 +164,9 @@ const outDir = path.join(ROOT, "docs");
 fs.mkdirSync(outDir, { recursive: true });
 fs.writeFileSync(path.join(outDir, "index.html"), html);
 
+// The logo is referenced by relative path, so it ships beside the page.
+fs.copyFileSync(path.join(ROOT, "public/pbha-logo.png"), path.join(outDir, "pbha-logo.png"));
+
 // The map fetches geo/world.json and geo/locations.json by relative path, so
 // they have to sit beside the page in the published output too.
 const geoSrc = path.join(ROOT, "public/geo");
