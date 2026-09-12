@@ -39,8 +39,13 @@
 
   --sans: "Work Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
-  --max: 1440px;
-  --pad: 40px;
+  /* Measured on pbha.org at a 1440px viewport, once their fade-in settles:
+     content sits 86.4px from each edge — exactly 6vw — and is capped at
+     1498px. Their header and their body share that gutter, so the logo lines
+     up with the headings underneath it. clamp keeps it sane on phones and on
+     very wide screens. */
+  --max: 1498px;
+  --pad: clamp(20px, 6vw, 120px);
 }
 
 * { box-sizing: border-box; }
@@ -90,7 +95,10 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: 0.01em; }
 /* ---------- layout ---------- */
 
 .wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--pad); }
-.page { padding: 56px 0 110px; }
+/* Vertical only — a padding shorthand here would reset the horizontal
+   gutter .wrap sets, which is what had been pinning body content to the
+   left edge while the header sat correctly inset. */
+.page { padding-top: 56px; padding-bottom: 110px; }
 .rule { height: 1px; background: var(--rule); border: 0; }
 
 
@@ -106,14 +114,11 @@ header.site {
   display: flex;
   align-items: center;
   gap: 26px;
-  /* Measured off pbha.org at a 1440px viewport: their header row runs 63px
-     tall, holds the 35x51 mark with 6px above and below it, and carries no
-     horizontal gutter at all — the logo sits flush at x=0 and the control at
-     the right edge sits flush too. Content is capped at 1498px, so the row
-     only starts insetting on screens wider than that. */
-  min-height: 63px;
-  padding: 0;
-  max-width: 1498px;
+  /* Their header row runs 65px tall and holds the 35x51 mark with 7px above
+     and below it, on the same gutter as the body content. */
+  min-height: 65px;
+  padding: 0 var(--pad);
+  max-width: var(--max);
   margin: 0 auto;
 }
 /* Their first nav item begins 26px after the mark. */
@@ -351,7 +356,6 @@ footer.site {
   .grid-people { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 860px) {
-  :root { --pad: 20px; }
   .gate-layout { grid-template-columns: 1fr !important; gap: 40px !important; }
   .profile-layout { grid-template-columns: 1fr !important; gap: 28px !important; }
   .directory-layout { grid-template-columns: 1fr !important; }
