@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PBHA Alumni Directory</title>
+<meta name="description" content="The alumni directory of the Phillips Brooks House Association.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* PBHA Alumni Directory
+   Type, color, and control shapes follow pbha.org: Work Sans throughout,
+   black on white, one orange accent, and fully-rounded uppercase buttons. */
+
+:root {
+  --white: #ffffff;
+  --ink: #000000;
+  --ink-soft: #333333;
+  --ink-mute: #6b6b6b;
+  --rule: #e3e3e3;
+  --wash: #f7f6f4;
+  --wash-2: #efedea;
+
+  --orange: #f98715;
+  --orange-dark: #d96f06;
+  --orange-wash: #fef1e2;
+
+  --sans: "Work Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  --max: 1440px;
+  --pad: 40px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--white);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }
+button, input, select, textarea { font-family: inherit; }
+
+/* ---------- type ---------- */
+
+h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: 0.01em; line-height: 1.08; }
+.h-display { font-size: clamp(40px, 6vw, 61px); }
+.h-1 { font-size: clamp(32px, 4.4vw, 48px); }
+.h-2 { font-size: clamp(24px, 3vw, 30px); }
+.h-3 { font-size: 20px; line-height: 1.25; }
+.accent { color: var(--orange); }
+
+.lede { font-size: 18px; line-height: 1.6; color: var(--ink-soft); }
+
+/* Uppercase micro-label. PBHA uses this treatment for nav and buttons; here
+   it also carries section and filter headings. */
+.eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.meta { font-size: 13px; color: var(--ink-mute); }
+
+/* ---------- layout ---------- */
+
+.wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--pad); }
+.page { padding: 44px 0 96px; }
+.rule { height: 1px; background: var(--rule); border: 0; }
+
+.notice-bar {
+  background: var(--ink);
+  color: var(--white);
+  font-size: 13px;
+  text-align: center;
+  padding: 9px 16px;
+}
+.notice-bar strong { color: var(--orange); font-weight: 600; }
+
+header.site {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--white);
+  border-bottom: 1px solid var(--rule);
+}
+.site-inner {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 14px var(--pad);
+  max-width: var(--max);
+  margin: 0 auto;
+}
+.brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.brand-mark {
+  width: 38px; height: 38px; flex: none;
+  background: var(--ink);
+  color: var(--orange);
+  border-radius: 3px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-align: center;
+}
+.brand-name { font-size: 15px; font-weight: 600; line-height: 1.2; }
+.brand-sub { font-size: 11px; color: var(--ink-mute); letter-spacing: 0.06em; text-transform: uppercase; }
+
+nav.site-nav { display: flex; align-items: center; gap: 22px; margin-left: 8px; }
+nav.site-nav button {
+  background: none; border: 0; padding: 4px 0; cursor: pointer;
+  font-size: 15px; font-weight: 500; color: var(--ink);
+  border-bottom: 2px solid transparent;
+}
+nav.site-nav button:hover { color: var(--orange); }
+nav.site-nav button.is-active { border-bottom-color: var(--orange); }
+
+/* ---------- controls ---------- */
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border-radius: 300px;
+  border: 1px solid transparent;
+  padding: 13px 28px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+  white-space: nowrap;
+}
+.btn-primary { background: var(--orange); color: var(--white); }
+.btn-primary:hover { background: var(--orange-dark); }
+.btn-ink { background: var(--ink); color: var(--white); }
+.btn-ink:hover { background: var(--ink-soft); }
+.btn-ghost { background: transparent; color: var(--ink); border-color: var(--ink); }
+.btn-ghost:hover { border-color: var(--orange); color: var(--orange); }
+.btn-sm { padding: 8px 16px; font-size: 11.5px; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.field { display: block; margin-bottom: 16px; }
+.field > span { display: block; margin-bottom: 6px; }
+.input, .select, textarea.input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  font-size: 15px;
+  background: var(--white);
+  color: var(--ink);
+}
+.input:focus, .select:focus { outline: 2px solid var(--orange); outline-offset: -1px; border-color: transparent; }
+textarea.input { min-height: 96px; resize: vertical; line-height: 1.5; }
+
+.search {
+  display: flex; align-items: center; gap: 10px;
+  border: 1px solid var(--ink);
+  border-radius: 300px;
+  padding: 10px 18px;
+  background: var(--white);
+}
+.search input { border: 0; outline: 0; flex: 1; font-size: 14px; background: transparent; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid var(--rule);
+  background: var(--white);
+  border-radius: 300px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all .12s;
+}
+.chip:hover { border-color: var(--ink); }
+.chip.is-on { background: var(--ink); border-color: var(--ink); color: var(--white); }
+.chip-static { cursor: default; background: var(--wash); border-color: transparent; }
+.chip-accent { background: var(--orange-wash); border-color: transparent; color: var(--orange-dark); cursor: default; }
+
+.scope-btn {
+  text-align: left;
+  width: 100%;
+  padding: 9px 14px;
+  border-radius: 300px;
+  border: 1px solid var(--rule);
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .12s;
+}
+.scope-btn:hover { border-color: var(--ink); }
+.scope-btn.is-on { background: var(--ink); border-color: var(--ink); color: var(--white); }
+
+.check {
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer; font-size: 13px; color: var(--ink-soft);
+}
+.check .box {
+  width: 16px; height: 16px; flex: none;
+  border: 1px solid var(--ink); border-radius: 3px; background: var(--white);
+}
+.check.is-on .box { background: var(--orange); border-color: var(--orange); }
+.check.is-on { color: var(--ink); }
+
+/* ---------- cards ---------- */
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+}
+
+.person-card {
+  display: flex; flex-direction: column;
+  text-align: left; padding: 0; overflow: hidden;
+  cursor: pointer;
+  transition: border-color .15s, transform .12s, box-shadow .15s;
+}
+.person-card:hover {
+  border-color: var(--ink);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.06);
+}
+.person-photo {
+  aspect-ratio: 5 / 4;
+  background: var(--wash-2);
+  display: grid; place-items: center;
+  position: relative;
+  border-bottom: 1px solid var(--rule);
+  overflow: hidden;
+}
+.person-photo img { width: 100%; height: 100%; object-fit: cover; }
+.initials { font-size: 34px; font-weight: 700; color: var(--ink); opacity: .28; letter-spacing: 0.04em; }
+.stamp {
+  position: absolute; top: 12px; left: 12px;
+  background: var(--white);
+  border-radius: 300px;
+  padding: 4px 11px;
+  font-size: 9.5px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.stamp-year {
+  position: absolute; top: 12px; right: 12px;
+  background: var(--ink); color: var(--white);
+  border-radius: 300px; padding: 4px 11px;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+}
+.person-body { padding: 16px 18px 20px; }
+
+.grid-people { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+.row-person {
+  display: grid;
+  grid-template-columns: 46px 1.3fr 1.2fr 1fr 150px;
+  gap: 16px; align-items: center;
+  width: 100%; text-align: left;
+  padding: 13px 18px;
+  border: 0; border-bottom: 1px solid var(--rule);
+  background: transparent; cursor: pointer;
+  transition: background .12s;
+}
+.row-person:last-child { border-bottom: 0; }
+.row-person:hover { background: var(--wash); }
+.avatar {
+  width: 46px; height: 46px; border-radius: 50%;
+  background: var(--wash-2); display: grid; place-items: center; overflow: hidden;
+  font-size: 14px; font-weight: 700; color: var(--ink); opacity: .85;
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.stat-row { display: flex; gap: 44px; flex-wrap: wrap; }
+.stat-n { font-size: 40px; font-weight: 700; line-height: 1; color: var(--orange); }
+
+.empty { padding: 64px 24px; text-align: center; color: var(--ink-mute); }
+
+.banner {
+  border-left: 3px solid var(--orange);
+  background: var(--orange-wash);
+  padding: 12px 16px;
+  font-size: 13px;
+  border-radius: 0 4px 4px 0;
+}
+.banner-error { border-left-color: #c0392b; background: #fdeceb; color: #8c271c; }
+
+footer.site {
+  border-top: 1px solid var(--rule);
+  padding: 40px 0 56px;
+  margin-top: 40px;
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 1100px) {
+  .grid-people { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 860px) {
+  :root { --pad: 20px; }
+  .directory-layout { grid-template-columns: 1fr !important; }
+  .directory-rail { position: static !important; }
+  .grid-people { grid-template-columns: 1fr; }
+  .row-person { grid-template-columns: 46px 1fr; grid-template-areas: none; }
+  .row-person > :nth-child(n+3) { grid-column: 2; }
+  nav.site-nav { gap: 14px; }
+  .site-inner { flex-wrap: wrap; gap: 14px; }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js" crossorigin></script>
+
+<script type="text/babel" data-presets="react">
+/* ------------------------------------------------------------------ *
+ * API client
+ * ------------------------------------------------------------------ */
+
+const api = {
+  async request(method, path, body) {
+    const res = await fetch(path, {
+      method,
+      credentials: "include",
+      headers: body ? { "Content-Type": "application/json" } : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    if (res.status === 204) return null;
+    const text = await res.text();
+    const data = text ? JSON.parse(text) : null;
+    if (!res.ok) {
+      const err = new Error(data?.error?.message || "Something went wrong");
+      err.status = res.status;
+      err.code = data?.error?.code;
+      throw err;
+    }
+    return data;
+  },
+  get(path) { return api.request("GET", path); },
+  post(path, body) { return api.request("POST", path, body); },
+  patch(path, body) { return api.request("PATCH", path, body); },
+};
+
+/* ------------------------------------------------------------------ *
+ * Small shared pieces
+ * ------------------------------------------------------------------ */
+
+const initials = (first, last) =>
+  `${(first || "").charAt(0)}${(last || "").charAt(0)}`.toUpperCase();
+
+const shortYear = (y) => "’" + String(y).slice(2);
+
+// career is stored as "Title · Organization" so a card can show the title on
+// one line and the organization beneath it.
+const splitCareer = (career) => {
+  const [title, org] = String(career || "").split(" · ");
+  return { title: title || "", org: org || "" };
+};
+
+function Logo() {
+  return (
+    <div className="brand-mark" aria-hidden="true">
+      <span>PB<br/>HA</span>
+    </div>
+  );
+}
+
+function Field({ label, hint, children }) {
+  return (
+    <label className="field">
+      <span className="eyebrow">{label}</span>
+      {children}
+      {hint && <span className="meta" style={{ marginTop: 4 }}>{hint}</span>}
+    </label>
+  );
+}
+
+function Pin() {
+  return (
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="2.2" style={{ flex: "none" }}>
+      <path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/>
+      <circle cx="12" cy="10" r="2.4"/>
+    </svg>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+      <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/>
+    </svg>
+  );
+}
+
+function Photo({ person, className }) {
+  if (person.photoUrl) {
+    return <img src={person.photoUrl} alt="" className={className} />;
+  }
+  return <span className="initials">{initials(person.first, person.last)}</span>;
+}
+
+function ProgramChips({ programs, limit }) {
+  const list = limit ? programs.slice(0, limit) : programs;
+  const rest = limit ? programs.length - list.length : 0;
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+      {list.map((p) => <span key={p} className="chip chip-static">{p}</span>)}
+      {rest > 0 && <span className="chip chip-static">+{rest}</span>}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Sign in / join
+ * ------------------------------------------------------------------ */
+
+function GateScreen({ onSignedIn }) {
+  const [mode, setMode] = React.useState("signin");
+  const [form, setForm] = React.useState({
+    email: "", password: "", first: "", last: "", year: "", inviteCode: "", acceptTerms: false,
+  });
+  const [error, setError] = React.useState("");
+  const [busy, setBusy] = React.useState(false);
+
+  const set = (k) => (e) => {
+    const v = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+    setForm((f) => ({ ...f, [k]: v }));
+  };
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    try {
+      if (mode === "signin") {
+        await api.post("/api/auth/signin", { email: form.email, password: form.password });
+      } else {
+        await api.post("/api/auth/signup", {
+          email: form.email,
+          password: form.password,
+          first: form.first,
+          last: form.last,
+          year: Number(form.year),
+          acceptTerms: true,
+          ...(form.inviteCode ? { inviteCode: form.inviteCode } : {}),
+        });
+      }
+      await onSignedIn();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="wrap page">
+      <div style={{ display: "grid", gridTemplateColumns: "1.15fr 1fr", gap: 72, alignItems: "start" }}
+        className="gate-layout">
+        <div>
+          <div className="eyebrow" style={{ marginBottom: 18 }}>Phillips Brooks House Association</div>
+          <h1 className="h-display">
+            The PBHA <span className="accent">Alumni Directory</span>
+          </h1>
+          <p className="lede" style={{ marginTop: 22, maxWidth: 560 }}>
+            More than a century of students have run PBHA's programs. This is where they find
+            each other again: by program, by class year, by city, by the work they went on to do.
+          </p>
+
+          <hr className="rule" style={{ margin: "36px 0 28px" }} />
+
+          <div className="stat-row">
+            <div>
+              <div className="stat-n">80+</div>
+              <div className="eyebrow" style={{ marginTop: 6 }}>Student-run programs</div>
+            </div>
+            <div>
+              <div className="stat-n">1904</div>
+              <div className="eyebrow" style={{ marginTop: 6 }}>Founded</div>
+            </div>
+            <div>
+              <div className="stat-n">Boston<br/>+ Cambridge</div>
+              <div className="eyebrow" style={{ marginTop: 6 }}>Communities served</div>
+            </div>
+          </div>
+
+          <p className="meta" style={{ marginTop: 36, maxWidth: 520 }}>
+            The directory is visible to signed-in members only. Profiles are never sold,
+            exported, or added to mailing lists, and any member can hide their own.
+          </p>
+        </div>
+
+        <div className="card" style={{ padding: 32 }}>
+          <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
+            <button className={`btn btn-sm ${mode === "signin" ? "btn-ink" : "btn-ghost"}`}
+              onClick={() => { setMode("signin"); setError(""); }}>Sign in</button>
+            <button className={`btn btn-sm ${mode === "signup" ? "btn-ink" : "btn-ghost"}`}
+              onClick={() => { setMode("signup"); setError(""); }}>Join</button>
+          </div>
+
+          <form onSubmit={submit}>
+            {mode === "signup" && (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                <Field label="First name">
+                  <input className="input" value={form.first} onChange={set("first")} required />
+                </Field>
+                <Field label="Last name">
+                  <input className="input" value={form.last} onChange={set("last")} required />
+                </Field>
+              </div>
+            )}
+            {mode === "signup" && (
+              <Field label="Class year" hint="The year you graduated, or expect to.">
+                <input className="input" type="number" min="1930" max="2050"
+                  value={form.year} onChange={set("year")} required />
+              </Field>
+            )}
+            <Field label="Email">
+              <input className="input" type="email" autoComplete="email"
+                value={form.email} onChange={set("email")} required />
+            </Field>
+            <Field label="Password"
+              hint={mode === "signup" ? "At least 10 characters." : undefined}>
+              <input className="input" type="password"
+                autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                value={form.password} onChange={set("password")} required />
+            </Field>
+            {mode === "signup" && (
+              <Field label="Invite code" hint="Only if PBHA gave you one.">
+                <input className="input" value={form.inviteCode} onChange={set("inviteCode")} />
+              </Field>
+            )}
+
+            {mode === "signup" && (
+              <p className="meta" style={{ marginBottom: 18 }}>
+                By joining you agree to use the directory to reconnect with PBHA members, and
+                not to export it, scrape it, or add anyone to a mailing list without asking.
+              </p>
+            )}
+
+            {error && <div className="banner banner-error" style={{ marginBottom: 16 }}>{error}</div>}
+
+            <button className="btn btn-primary" style={{ width: "100%" }} disabled={busy}>
+              {busy ? "One moment…" : mode === "signin" ? "Sign in" : "Create account"}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Directory
+ * ------------------------------------------------------------------ */
+
+const YEAR_MIN = 1950;
+const YEAR_MAX = new Date().getFullYear() + 4;
+
+function FilterGroup({ label, children }) {
+  return (
+    <div style={{ marginBottom: 26 }}>
+      <div className="eyebrow" style={{ marginBottom: 10 }}>{label}</div>
+      {children}
+    </div>
+  );
+}
+
+function PersonCard({ person, onOpen }) {
+  const unclaimed = !person.claimedAt;
+  const { title, org } = splitCareer(person.career);
+  return (
+    <button className="card person-card" onClick={() => onOpen(person.userId)}>
+      <div className="person-photo" style={{ opacity: unclaimed ? 0.55 : 1 }}>
+        <Photo person={person} />
+        <span className="stamp">{person.isCurrentStudent ? "Student" : "Alum"}</span>
+        <span className="stamp-year">{shortYear(person.year)}</span>
+      </div>
+      <div className="person-body">
+        <h3 className="h-3">{person.first} {person.last}</h3>
+        {unclaimed ? (
+          <>
+            {person.pbhaRole && (
+              <div style={{ marginTop: 10 }}>
+                <span className="chip chip-accent">{person.pbhaRole}</span>
+              </div>
+            )}
+            {/* An unclaimed profile shows name and class year only. Nothing
+                else was opted into — it is here from a bulk import. */}
+            <div className="meta" style={{ marginTop: 10, fontStyle: "italic" }}>
+              Profile not yet claimed
+            </div>
+          </>
+        ) : (
+          <>
+            {title && <div className="meta" style={{ marginTop: 5 }}>{title}</div>}
+            {org && <div className="meta">{org}</div>}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 12 }}>
+              {person.pbhaRole && <span className="chip chip-accent">{person.pbhaRole}</span>}
+              {person.programs.slice(0, 2).map((p) => (
+                <span key={p} className="chip chip-static">{p}</span>
+              ))}
+              {person.programs.length > 2 && (
+                <span className="chip chip-static">+{person.programs.length - 2}</span>
+              )}
+            </div>
+            {person.location && (
+              <div className="meta" style={{ marginTop: 12, display: "inline-flex", alignItems: "center", gap: 5 }}>
+                <Pin /> {person.location}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </button>
+  );
+}
+
+function PersonRow({ person, onOpen }) {
+  const { title, org } = splitCareer(person.career);
+  return (
+    <button className="row-person" onClick={() => onOpen(person.userId)}>
+      <span className="avatar"><Photo person={person} /></span>
+      <span>
+        <span style={{ display: "block", fontWeight: 500 }}>{person.first} {person.last}</span>
+        <span className="meta">{shortYear(person.year)}{person.isCurrentStudent ? " · Student" : ""}</span>
+      </span>
+      <span>
+        <span style={{ display: "block", fontSize: 13.5 }}>{title || "—"}</span>
+        {org && <span className="meta">{org}</span>}
+      </span>
+      <span className="meta" style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+        {person.location ? <><Pin /> {person.location}</> : "—"}
+      </span>
+      <span style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
+        {person.pbhaRole && <span className="chip chip-accent">{person.pbhaRole}</span>}
+      </span>
+    </button>
+  );
+}
+
+function DirectoryScreen({ onOpenProfile }) {
+  const [q, setQ] = React.useState("");
+  const [who, setWho] = React.useState("all");
+  const [programs, setPrograms] = React.useState([]);
+  const [industries, setIndustries] = React.useState([]);
+  const [roles, setRoles] = React.useState([]);
+  const [yearFrom, setYearFrom] = React.useState(YEAR_MIN);
+  const [yearTo, setYearTo] = React.useState(YEAR_MAX);
+  const [mentorOnly, setMentorOnly] = React.useState(false);
+  const [sort, setSort] = React.useState("recent");
+  const [layout, setLayout] = React.useState("grid");
+
+  const [results, setResults] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState("");
+  const [facets, setFacets] = React.useState({
+    programs: [], industries: [], locations: [], roles: [], totalAlumni: 0, totalStudents: 0,
+  });
+
+  // Facets do not depend on the filters, so they are fetched once.
+  React.useEffect(() => {
+    api.get("/api/directory/facets").then(setFacets).catch(() => {});
+  }, []);
+
+  const toggle = (list, value, set) =>
+    set(list.includes(value) ? list.filter((x) => x !== value) : [...list, value]);
+
+  // Refetch on any filter change, debounced so typing a full name fires one
+  // request at the end rather than one per keystroke.
+  React.useEffect(() => {
+    setLoading(true);
+    let cancelled = false;
+    const handle = setTimeout(() => {
+      const params = new URLSearchParams();
+      if (q.trim()) params.set("q", q.trim());
+      params.set("who", who);
+      params.set("sort", sort);
+      params.set("yearFrom", String(yearFrom));
+      params.set("yearTo", String(yearTo));
+      if (mentorOnly) params.set("openToMentor", "true");
+      programs.forEach((p) => params.append("program", p));
+      industries.forEach((i) => params.append("industry", i));
+      roles.forEach((r) => params.append("role", r));
+      // The page renders everything in one fetch — no load-more UI — so the
+      // page size matches the server's cap.
+      params.set("pageSize", "2000");
+
+      api.get("/api/directory?" + params.toString())
+        .then((res) => {
+          if (cancelled) return;
+          setResults(res.items);
+          setError("");
+        })
+        .catch((err) => {
+          if (cancelled) return;
+          setResults([]);
+          setError(err.message);
+        })
+        .finally(() => { if (!cancelled) setLoading(false); });
+    }, 250);
+    return () => { cancelled = true; clearTimeout(handle); };
+  }, [q, who, sort, yearFrom, yearTo, mentorOnly, programs, industries, roles]);
+
+  const total = facets.totalAlumni + facets.totalStudents;
+  const activeFilters = [
+    ...programs.map((p) => ({ label: p, clear: () => toggle(programs, p, setPrograms) })),
+    ...industries.map((i) => ({ label: i, clear: () => toggle(industries, i, setIndustries) })),
+    ...roles.map((r) => ({ label: r, clear: () => toggle(roles, r, setRoles) })),
+    ...(mentorOnly ? [{ label: "open to mentor", clear: () => setMentorOnly(false) }] : []),
+  ];
+
+  const clearAll = () => {
+    setQ(""); setWho("all"); setPrograms([]); setIndustries([]); setRoles([]);
+    setYearFrom(YEAR_MIN); setYearTo(YEAR_MAX); setMentorOnly(false);
+  };
+
+  return (
+    <div className="wrap page">
+      <h1 className="h-1">Directory</h1>
+      <p className="lede" style={{ marginTop: 12, maxWidth: 640 }}>
+        Every PBHA member who has chosen to be listed, searchable by program, class year,
+        city, and the work they do now.
+      </p>
+      <hr className="rule" style={{ margin: "28px 0 32px" }} />
+
+      <div className="directory-layout" style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: 44 }}>
+        <aside className="directory-rail" style={{ position: "sticky", top: 92, alignSelf: "start" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
+            <span className="eyebrow">Filters</span>
+            <button onClick={clearAll}
+              style={{ background: "none", border: 0, padding: 0, cursor: "pointer",
+                       fontSize: 12, textDecoration: "underline", color: "var(--ink-mute)" }}>
+              clear all
+            </button>
+          </div>
+
+          <label className="search" style={{ marginBottom: 24 }}>
+            <SearchIcon />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Name, city, employer" />
+          </label>
+
+          <FilterGroup label="Show">
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {[
+                { k: "all", l: `Everyone · ${total}` },
+                { k: "alumni", l: `Alumni · ${facets.totalAlumni}` },
+                { k: "students", l: `Current students · ${facets.totalStudents}` },
+              ].map((s) => (
+                <button key={s.k} className={`scope-btn ${who === s.k ? "is-on" : ""}`}
+                  onClick={() => setWho(s.k)}>{s.l}</button>
+              ))}
+            </div>
+          </FilterGroup>
+
+          <FilterGroup label="Class year">
+            <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12 }}>
+              <input className="input" type="number" min={YEAR_MIN} max={YEAR_MAX}
+                style={{ padding: "7px 9px", fontSize: 13 }}
+                value={yearFrom}
+                onChange={(e) => setYearFrom(Math.min(Number(e.target.value) || YEAR_MIN, yearTo))} />
+              <span className="meta">to</span>
+              <input className="input" type="number" min={YEAR_MIN} max={YEAR_MAX}
+                style={{ padding: "7px 9px", fontSize: 13 }}
+                value={yearTo}
+                onChange={(e) => setYearTo(Math.max(Number(e.target.value) || YEAR_MAX, yearFrom))} />
+            </div>
+          </FilterGroup>
+
+          <FilterGroup label="PBHA role">
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {facets.roles.map((r) => (
+                <button key={r.name} className={`chip ${roles.includes(r.name) ? "is-on" : ""}`}
+                  onClick={() => toggle(roles, r.name, setRoles)}>{r.name}</button>
+              ))}
+              {facets.roles.length === 0 && <span className="meta">—</span>}
+            </div>
+          </FilterGroup>
+
+          <FilterGroup label="Program">
+            <div style={{ display: "flex", flexDirection: "column", gap: 6, maxHeight: 260, overflowY: "auto" }}>
+              {facets.programs.map((p) => (
+                <label key={p.name}
+                  className={`check ${programs.includes(p.name) ? "is-on" : ""}`}
+                  onClick={(e) => { e.preventDefault(); toggle(programs, p.name, setPrograms); }}>
+                  <span className="box" />
+                  <span>{p.name} <span className="meta">· {p.count}</span></span>
+                </label>
+              ))}
+              {facets.programs.length === 0 && <span className="meta">—</span>}
+            </div>
+          </FilterGroup>
+
+          <FilterGroup label="Field of work">
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {facets.industries.map((i) => (
+                <button key={i.name} className={`chip ${industries.includes(i.name) ? "is-on" : ""}`}
+                  onClick={() => toggle(industries, i.name, setIndustries)}>
+                  {i.name}
+                </button>
+              ))}
+              {facets.industries.length === 0 && <span className="meta">—</span>}
+            </div>
+          </FilterGroup>
+
+          <FilterGroup label="Mentorship">
+            <label className={`check ${mentorOnly ? "is-on" : ""}`}
+              onClick={(e) => { e.preventDefault(); setMentorOnly(!mentorOnly); }}>
+              <span className="box" />
+              <span>Only members open to mentoring</span>
+            </label>
+          </FilterGroup>
+        </aside>
+
+        <section>
+          <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", marginBottom: 20 }}>
+            <span className="eyebrow">
+              {loading ? "Searching…" : `${results.length} of ${total} members`}
+            </span>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              {activeFilters.map((f) => (
+                <button key={f.label} className="chip is-on" onClick={f.clear}>{f.label} ✕</button>
+              ))}
+            </div>
+            <div style={{ display: "flex", gap: 8, marginLeft: "auto", alignItems: "center" }}>
+              <select className="select" value={sort} onChange={(e) => setSort(e.target.value)}
+                style={{ width: "auto", padding: "8px 12px", fontSize: 13 }}>
+                <option value="recent">Recently joined</option>
+                <option value="year-desc">Class year — newest</option>
+                <option value="year-asc">Class year — oldest</option>
+                <option value="name">Last name (A–Z)</option>
+              </select>
+              <button className={`btn btn-sm ${layout === "grid" ? "btn-ink" : "btn-ghost"}`}
+                onClick={() => setLayout("grid")}>Grid</button>
+              <button className={`btn btn-sm ${layout === "list" ? "btn-ink" : "btn-ghost"}`}
+                onClick={() => setLayout("list")}>List</button>
+            </div>
+          </div>
+
+          {error && <div className="banner banner-error" style={{ marginBottom: 20 }}>{error}</div>}
+
+          {!loading && results.length === 0 && !error && (
+            <div className="card empty">
+              <div className="h-3" style={{ marginBottom: 8 }}>No members match those filters</div>
+              <p className="meta">Try widening the class years or clearing a program.</p>
+            </div>
+          )}
+
+          {layout === "grid" ? (
+            <div className="grid-people">
+              {results.map((p) => (
+                <PersonCard key={p.userId} person={p} onOpen={onOpenProfile} />
+              ))}
+            </div>
+          ) : (
+            results.length > 0 && (
+              <div className="card" style={{ overflow: "hidden" }}>
+                {results.map((p) => (
+                  <PersonRow key={p.userId} person={p} onOpen={onOpenProfile} />
+                ))}
+              </div>
+            )
+          )}
+        </section>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Profile
+ * ------------------------------------------------------------------ */
+
+function ProfileScreen({ userId, onBack }) {
+  const [person, setPerson] = React.useState(null);
+  const [error, setError] = React.useState("");
+
+  React.useEffect(() => {
+    setPerson(null);
+    setError("");
+    api.get("/api/users/" + encodeURIComponent(userId))
+      .then(setPerson)
+      .catch((err) => setError(err.message));
+  }, [userId]);
+
+  if (error) {
+    return (
+      <div className="wrap page">
+        <div className="banner banner-error">{error}</div>
+        <button className="btn btn-ghost btn-sm" style={{ marginTop: 20 }} onClick={onBack}>Back</button>
+      </div>
+    );
+  }
+  if (!person) return <div className="wrap page"><p className="meta">Loading…</p></div>;
+
+  const { title, org } = splitCareer(person.career);
+  const programYears = person.programYears || {};
+
+  return (
+    <div className="wrap page">
+      <button className="btn btn-ghost btn-sm" onClick={onBack} style={{ marginBottom: 28 }}>
+        ← Directory
+      </button>
+
+      <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: 48, alignItems: "start" }}
+        className="profile-layout">
+        <div>
+          <div className="person-photo" style={{ borderRadius: 6, border: "1px solid var(--rule)" }}>
+            <Photo person={person} />
+          </div>
+          <div style={{ display: "flex", gap: 6, marginTop: 14, flexWrap: "wrap" }}>
+            <span className="chip chip-static">
+              {person.isCurrentStudent ? "Current student" : "Alum"} · {person.year}
+            </span>
+            {person.openToMentor && <span className="chip chip-accent">Open to mentoring</span>}
+          </div>
+        </div>
+
+        <div>
+          <h1 className="h-1">{person.first} {person.last}</h1>
+          {person.pronouns && <div className="meta" style={{ marginTop: 6 }}>{person.pronouns}</div>}
+
+          <div style={{ marginTop: 18 }}>
+            {title && <div className="h-3">{title}</div>}
+            {org && <div className="lede" style={{ marginTop: 2 }}>{org}</div>}
+            <div className="meta" style={{ marginTop: 10, display: "flex", gap: 18, flexWrap: "wrap" }}>
+              {person.location && (
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                  <Pin /> {person.location}
+                </span>
+              )}
+              {person.industry && <span>{person.industry}</span>}
+              {person.concentration && <span>Concentrated in {person.concentration}</span>}
+            </div>
+          </div>
+
+          <hr className="rule" style={{ margin: "28px 0" }} />
+
+          <div className="eyebrow" style={{ marginBottom: 10 }}>At PBHA</div>
+          {person.pbhaRole && (
+            <div style={{ marginBottom: 12 }}>
+              <span className="chip chip-accent">{person.pbhaRole}</span>
+            </div>
+          )}
+          {person.programs.length > 0 ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {person.programs.map((p) => (
+                <div key={p} style={{ display: "flex", gap: 10, alignItems: "baseline", flexWrap: "wrap" }}>
+                  <span style={{ fontWeight: 500 }}>{p}</span>
+                  {programYears[p] && <span className="meta">{programYears[p]}</span>}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="meta">No programs listed yet.</p>
+          )}
+
+          {person.bio && (
+            <>
+              <hr className="rule" style={{ margin: "28px 0" }} />
+              <div className="eyebrow" style={{ marginBottom: 10 }}>About</div>
+              <p style={{ margin: 0, whiteSpace: "pre-wrap", maxWidth: 640 }}>{person.bio}</p>
+            </>
+          )}
+
+          {person.reachOut && (
+            <>
+              <hr className="rule" style={{ margin: "28px 0" }} />
+              <div className="eyebrow" style={{ marginBottom: 10 }}>Reach out about</div>
+              <p style={{ margin: 0, whiteSpace: "pre-wrap", maxWidth: 640 }}>{person.reachOut}</p>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * My profile
+ * ------------------------------------------------------------------ */
+
+function MyProfileScreen({ me, onSaved }) {
+  const [form, setForm] = React.useState(null);
+  const [privacy, setPrivacy] = React.useState(null);
+  const [vocab, setVocab] = React.useState({ programs: [], roles: [] });
+  const [status, setStatus] = React.useState("");
+  const [error, setError] = React.useState("");
+  const [busy, setBusy] = React.useState(false);
+
+  React.useEffect(() => {
+    Promise.all([
+      api.get("/api/users/" + encodeURIComponent(me.id)),
+      api.get("/api/users/me/privacy"),
+      api.get("/api/vocab"),
+    ])
+      .then(([profile, priv, v]) => {
+        setForm({
+          first: profile.first || "",
+          last: profile.last || "",
+          pronouns: profile.pronouns || "",
+          year: profile.year || "",
+          location: profile.location || "",
+          photoUrl: profile.photoUrl || "",
+          career: profile.career || "",
+          industry: profile.industry || "",
+          concentration: profile.concentration || "",
+          bio: profile.bio || "",
+          programs: profile.programs || [],
+          pbhaRole: profile.pbhaRole || "",
+          openToMentor: !!profile.openToMentor,
+          reachOut: profile.reachOut || "",
+        });
+        setPrivacy(priv);
+        setVocab(v);
+      })
+      .catch((err) => setError(err.message));
+  }, [me.id]);
+
+  if (error && !form) return <div className="wrap page"><div className="banner banner-error">{error}</div></div>;
+  if (!form) return <div className="wrap page"><p className="meta">Loading…</p></div>;
+
+  const set = (k) => (e) => {
+    const v = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+    setForm((f) => ({ ...f, [k]: v }));
+  };
+  const toggleProgram = (name) =>
+    setForm((f) => ({
+      ...f,
+      programs: f.programs.includes(name)
+        ? f.programs.filter((p) => p !== name)
+        : [...f.programs, name],
+    }));
+
+  const save = async (e) => {
+    e.preventDefault();
+    setBusy(true); setStatus(""); setError("");
+    try {
+      // Empty text inputs are sent as null, not "", so a cleared field really
+      // clears rather than storing a blank string the filters would match.
+      const blank = (v) => (v.trim() === "" ? null : v.trim());
+      await api.patch("/api/users/me", {
+        first: form.first.trim(),
+        last: form.last.trim(),
+        pronouns: blank(form.pronouns),
+        year: Number(form.year),
+        location: blank(form.location),
+        photoUrl: blank(form.photoUrl),
+        career: blank(form.career),
+        industry: blank(form.industry),
+        concentration: blank(form.concentration),
+        bio: blank(form.bio),
+        programs: form.programs,
+        pbhaRole: blank(form.pbhaRole),
+        openToMentor: form.openToMentor,
+        reachOut: blank(form.reachOut),
+      });
+      setStatus("Saved.");
+      onSaved && onSaved();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const savePrivacy = async (patch) => {
+    const next = { ...privacy, ...patch };
+    setPrivacy(next);
+    try {
+      await api.patch("/api/users/me/privacy", patch);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  return (
+    <div className="wrap page" style={{ maxWidth: 880 }}>
+      <h1 className="h-1">Your profile</h1>
+      <p className="lede" style={{ marginTop: 12 }}>
+        This is what other PBHA members see in the directory.
+      </p>
+      <hr className="rule" style={{ margin: "28px 0 32px" }} />
+
+      <form onSubmit={save}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+          <Field label="First name"><input className="input" value={form.first} onChange={set("first")} required /></Field>
+          <Field label="Last name"><input className="input" value={form.last} onChange={set("last")} required /></Field>
+          <Field label="Pronouns"><input className="input" value={form.pronouns} onChange={set("pronouns")} /></Field>
+          <Field label="Class year"><input className="input" type="number" min="1930" max="2050" value={form.year} onChange={set("year")} required /></Field>
+          <Field label="City"><input className="input" value={form.location} onChange={set("location")} placeholder="Boston, MA" /></Field>
+          <Field label="Concentration"><input className="input" value={form.concentration} onChange={set("concentration")} /></Field>
+        </div>
+
+        <Field label="Work" hint='Written as "Title · Organization" so the directory can show both.'>
+          <input className="input" value={form.career} onChange={set("career")}
+            placeholder="Immigration Attorney · Greater Boston Legal Services" />
+        </Field>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+          <Field label="Field of work" hint="Used as a directory filter."><input className="input" value={form.industry} onChange={set("industry")} placeholder="Law & Policy" /></Field>
+          <Field label="Photo URL"><input className="input" value={form.photoUrl} onChange={set("photoUrl")} placeholder="https://…" /></Field>
+        </div>
+
+        <Field label="PBHA role">
+          <select className="select" value={form.pbhaRole} onChange={set("pbhaRole")}>
+            <option value="">Not listed</option>
+            {vocab.roles.map((r) => <option key={r} value={r}>{r}</option>)}
+          </select>
+        </Field>
+
+        <div className="field">
+          <span className="eyebrow" style={{ display: "block", marginBottom: 10 }}>Programs</span>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {vocab.programs.map((p) => (
+              <button type="button" key={p}
+                className={`chip ${form.programs.includes(p) ? "is-on" : ""}`}
+                onClick={() => toggleProgram(p)}>{p}</button>
+            ))}
+          </div>
+        </div>
+
+        <Field label="About"><textarea className="input" value={form.bio} onChange={set("bio")} /></Field>
+
+        <div className="field">
+          <label className={`check ${form.openToMentor ? "is-on" : ""}`}
+            onClick={(e) => { e.preventDefault(); setForm((f) => ({ ...f, openToMentor: !f.openToMentor })); }}>
+            <span className="box" />
+            <span>I'm open to mentoring current students</span>
+          </label>
+        </div>
+
+        {form.openToMentor && (
+          <Field label="Reach out about"><textarea className="input" value={form.reachOut} onChange={set("reachOut")} /></Field>
+        )}
+
+        {error && <div className="banner banner-error" style={{ marginBottom: 16 }}>{error}</div>}
+        {status && <div className="banner" style={{ marginBottom: 16 }}>{status}</div>}
+
+        <button className="btn btn-primary" disabled={busy}>{busy ? "Saving…" : "Save profile"}</button>
+      </form>
+
+      <hr className="rule" style={{ margin: "44px 0 28px" }} />
+      <h2 className="h-2">Privacy</h2>
+      <div style={{ display: "flex", flexDirection: "column", gap: 14, marginTop: 18 }}>
+        <label className={`check ${privacy?.showInDirectory ? "is-on" : ""}`}
+          onClick={(e) => { e.preventDefault(); savePrivacy({ showInDirectory: !privacy.showInDirectory }); }}>
+          <span className="box" />
+          <span>List me in the directory</span>
+        </label>
+        <label className={`check ${privacy?.profileVisibility === "ALUMNI" ? "is-on" : ""}`}
+          onClick={(e) => {
+            e.preventDefault();
+            savePrivacy({ profileVisibility: privacy.profileVisibility === "ALUMNI" ? "PRIVATE" : "ALUMNI" });
+          }}>
+          <span className="box" />
+          <span>Let signed-in PBHA members open my full profile</span>
+        </label>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Shell
+ * ------------------------------------------------------------------ */
+
+function App() {
+  const [me, setMe] = React.useState(undefined); // undefined = still checking
+  const [screen, setScreen] = React.useState("directory");
+  const [profileId, setProfileId] = React.useState(null);
+
+  const loadMe = React.useCallback(async () => {
+    try {
+      setMe(await api.get("/api/auth/me"));
+    } catch {
+      setMe(null);
+    }
+  }, []);
+
+  React.useEffect(() => { loadMe(); }, [loadMe]);
+
+  const signOut = async () => {
+    await api.post("/api/auth/signout").catch(() => {});
+    setMe(null);
+    setScreen("directory");
+    setProfileId(null);
+  };
+
+  const openProfile = (id) => { setProfileId(id); setScreen("profile"); };
+
+  return (
+    <>
+      <div className="notice-bar">
+        The <strong>PBHA Alumni Directory</strong> — visible to signed-in members only.
+      </div>
+
+      <header className="site">
+        <div className="site-inner">
+          <a className="brand" href="#" onClick={(e) => { e.preventDefault(); setScreen("directory"); }}>
+            <Logo />
+            <span>
+              <span className="brand-name">Phillips Brooks House Association</span><br/>
+              <span className="brand-sub">Alumni Network</span>
+            </span>
+          </a>
+
+          {me && (
+            <nav className="site-nav">
+              <button className={screen === "directory" || screen === "profile" ? "is-active" : ""}
+                onClick={() => { setScreen("directory"); setProfileId(null); }}>Directory</button>
+              <button className={screen === "me" ? "is-active" : ""}
+                onClick={() => setScreen("me")}>Your profile</button>
+            </nav>
+          )}
+
+          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 12 }}>
+            {me && <span className="meta" style={{ display: "none" }}>{me.email}</span>}
+            {me
+              ? <button className="btn btn-ghost btn-sm" onClick={signOut}>Sign out</button>
+              : null}
+            <a className="btn btn-primary btn-sm" href="https://www.pbha.org/donate"
+              target="_blank" rel="noopener noreferrer">Donate</a>
+          </div>
+        </div>
+      </header>
+
+      {me === undefined && <div className="wrap page"><p className="meta">Loading…</p></div>}
+      {me === null && <GateScreen onSignedIn={loadMe} />}
+      {me && screen === "directory" && <DirectoryScreen onOpenProfile={openProfile} />}
+      {me && screen === "profile" && profileId && (
+        <ProfileScreen userId={profileId} onBack={() => { setScreen("directory"); setProfileId(null); }} />
+      )}
+      {me && screen === "me" && <MyProfileScreen me={me} onSaved={loadMe} />}
+
+      <footer className="site">
+        <div className="wrap" style={{ display: "flex", gap: 24, flexWrap: "wrap", justifyContent: "space-between" }}>
+          <div>
+            <div className="eyebrow">Phillips Brooks House Association</div>
+            <p className="meta" style={{ marginTop: 8, maxWidth: 440 }}>
+              Harvard's largest student-run public service organization, home to more than 80
+              community-based programs across Boston and Cambridge.
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: 28 }}>
+            <a className="meta" href="https://www.pbha.org" target="_blank" rel="noopener noreferrer">pbha.org</a>
+            <a className="meta" href="https://www.pbha.org/contact-us" target="_blank" rel="noopener noreferrer">Contact</a>
+          </div>
+        </div>
+      </footer>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

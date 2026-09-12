@@ -1,0 +1,131 @@
+// PBHA Alumni Directory — database schema
+//
+// Postgres + Prisma. Scoped deliberately to what the directory needs:
+// accounts, profiles, and the privacy switches that decide whether a
+// profile is listed. Events / messages / mentorship are out of scope for
+// this first cut and are not modeled here.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // Supabase and other poolers route runtime queries through PgBouncer in
+  // transaction mode, which does not support prepared statements. Migrations
+  // need a direct connection — set DIRECT_URL to the un-pooled string.
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  ADMIN
+  ALUM
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+// ALUMNI  — listed in the directory, visible to any signed-in member.
+// PRIVATE — account works, profile is hidden from everyone but its owner.
+enum ProfileVisibility {
+  ALUMNI
+  PRIVATE
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  passwordHash String
+  role         UserRole      @default(ALUM)
+  status       AccountStatus @default(ACTIVE)
+
+  emailVerified Boolean @default(false)
+
+  // Wall-clock time of the most recent JWT issued for this user. Any token
+  // whose `iat` predates this is rejected, so signing in somewhere new
+  // invalidates the older session.
+  lastTokenIssuedAt DateTime?
+
+  termsAcceptedAt DateTime?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  profile Profile?
+  privacy PrivacySettings?
+
+  @@index([status])
+  @@index([deletedAt])
+}
+
+model Profile {
+  userId String @id
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  first    String
+  last     String
+  pronouns String?
+
+  // Harvard/Radcliffe class year. Student vs alumni is derived from this
+  // plus today's date (see src/lib/class-year.ts) rather than stored, so
+  // nobody has to remember to flip a flag every June.
+  year Int
+
+  location String?
+  photoUrl String?
+
+  career        String?
+  industry      String?
+  concentration String?
+  bio           String?
+
+  // PBHA programs this person served in, as free-form program names drawn
+  // from the shared PROGRAMS list. A plain String[] rather than an enum:
+  // PBHA runs 80+ programs and the roster changes every year, so a new
+  // program should not require a migration.
+  programs String[]
+
+  // Optional per-program detail, e.g. { "Chinatown ESL": "2014-2016, Director" }.
+  programYears Json?
+
+  // PBHA role at its most senior, e.g. "Program Director", "Cabinet",
+  // "Summer Urban Program Director". Free text for the same reason.
+  pbhaRole String?
+
+  openToMentor Boolean @default(false)
+  reachOut     String?
+
+  // Set when the member first signs in. Null marks a bulk-imported profile
+  // that nobody has claimed yet; those render with an INVITED treatment and
+  // show name + class year only.
+  claimedAt DateTime?
+
+  // Lowercased concatenation of the searchable fields, maintained on write.
+  // Lets the directory do one indexed `contains` instead of OR-ing six
+  // case-insensitive column scans.
+  searchText String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([year])
+  @@index([industry])
+  @@index([location])
+}
+
+model PrivacySettings {
+  userId String @id
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  profileVisibility ProfileVisibility @default(ALUMNI)
+  showInDirectory   Boolean           @default(true)
+  openToMessages    Boolean           @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

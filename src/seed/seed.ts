@@ -1,0 +1,237 @@
+/**
+ * Demo seed for local development.
+ *
+ * Every person below is invented. Do NOT run this against a database holding
+ * real member data — it upserts by email and would overwrite a live profile
+ * that happened to share one of these addresses.
+ *
+ *   npm run seed
+ *
+ * All seeded accounts share the password in SEED_PASSWORD.
+ */
+import { prisma } from "../db";
+import { hashPassword } from "../lib/auth";
+import { buildSearchText } from "../services/user.service";
+
+const SEED_PASSWORD = "pbha-demo-2026";
+
+type Seed = {
+  email: string;
+  first: string;
+  last: string;
+  year: number;
+  location?: string;
+  career?: string;
+  industry?: string;
+  concentration?: string;
+  pbhaRole?: string;
+  programs: string[];
+  bio?: string;
+  openToMentor?: boolean;
+  reachOut?: string;
+  // Unclaimed rows model a bulk import: the person is in the directory but
+  // has not signed in yet, so the card shows name and class year only.
+  unclaimed?: boolean;
+};
+
+const PEOPLE: Seed[] = [
+  {
+    email: "amara.okafor@example.com", first: "Amara", last: "Okafor", year: 2014,
+    location: "Boston, MA", career: "Pediatrician · Boston Medical Center",
+    industry: "Health & Medicine", concentration: "Human Developmental Biology",
+    pbhaRole: "Program Director", programs: ["Chinatown Afterschool Program (CHAP)", "Summer Urban Program"],
+    bio: "Two summers at SUP turned into a career in community pediatrics. Happy to talk about medical school, or about running a program while taking orgo.",
+    openToMentor: true, reachOut: "Anything about the pre-med path, or SUP director life.",
+  },
+  {
+    email: "daniel.reyes@example.com", first: "Daniel", last: "Reyes", year: 2009,
+    location: "Washington, DC", career: "Policy Counsel · National Housing Law Project",
+    industry: "Law & Policy", concentration: "Social Studies", pbhaRole: "Cabinet",
+    programs: ["Adult ESOL Program", "CIVICS"],
+    bio: "Started in ESOL, ended up writing tenant protection legislation. The through-line is the same work.",
+    openToMentor: true, reachOut: "Law school, legal aid, housing policy.",
+  },
+  {
+    email: "priya.nair@example.com", first: "Priya", last: "Nair", year: 2018,
+    location: "New York, NY", career: "Product Manager · Duolingo",
+    industry: "Technology", concentration: "Computer Science", pbhaRole: "Program Coordinator",
+    programs: ["Chinatown ESL", "BRYE Tutoring"],
+    bio: "Teaching adult ESL is why I work on language learning now.",
+    openToMentor: true, reachOut: "Breaking into product, or tech recruiting timelines.",
+  },
+  {
+    email: "marcus.bell@example.com", first: "Marcus", last: "Bell", year: 1996,
+    location: "Chicago, IL", career: "Executive Director · Southside Youth Alliance",
+    industry: "Nonprofit", concentration: "Government", pbhaRole: "Officer",
+    programs: ["Cambridge After-School Program (CASP)", "Summer Urban Program"],
+    bio: "Thirty years in youth development. Still use the site-director playbook I learned at PBHA.",
+    openToMentor: true, reachOut: "Running a nonprofit, board development, fundraising.",
+  },
+  {
+    email: "hannah.kim@example.com", first: "Hannah", last: "Kim", year: 2021,
+    location: "San Francisco, CA", career: "Software Engineer · Stripe",
+    industry: "Technology", concentration: "Applied Mathematics", pbhaRole: "Program Director",
+    programs: ["Chinatown Big Sibling", "Chinatown Teen"],
+    bio: "Directed Big Sib through the pandemic. Learned more about logistics than any class taught me.",
+    openToMentor: true,
+  },
+  {
+    email: "tomas.lindqvist@example.com", first: "Tomás", last: "Lindqvist", year: 2012,
+    location: "Cambridge, MA", career: "Assistant Professor of Education · Boston College",
+    industry: "Education", concentration: "Psychology", pbhaRole: "Summer Director",
+    programs: ["Summer Urban Program", "BRYE Summer"],
+    bio: "I study summer learning loss, which is a fancy way of saying I still think about SUP.",
+    openToMentor: true, reachOut: "PhD applications in education or psych.",
+  },
+  {
+    email: "rachel.adeyemi@example.com", first: "Rachel", last: "Adeyemi", year: 2006,
+    location: "Atlanta, GA", career: "VP of Community Impact · Regions Bank",
+    industry: "Finance", concentration: "Economics", pbhaRole: "Cabinet",
+    programs: ["Chinatown Citizenship", "Adult ESOL Program"],
+    openToMentor: true, reachOut: "Corporate social responsibility, finance recruiting.",
+  },
+  {
+    email: "joseph.hartley@example.com", first: "Joseph", last: "Hartley", year: 1984,
+    location: "Portland, ME", career: "Retired · former Superintendent, Portland Public Schools",
+    industry: "Education", concentration: "History", pbhaRole: "Officer",
+    programs: ["Cambridge After-School Program (CASP)"],
+    bio: "PBHA in the early eighties. I have a filing cabinet of program histories if anyone is writing about that era.",
+  },
+  {
+    email: "wei.zhang@example.com", first: "Wei", last: "Zhang", year: 2016,
+    location: "Boston, MA", career: "Immigration Attorney · Greater Boston Legal Services",
+    industry: "Law & Policy", concentration: "East Asian Studies", pbhaRole: "Program Director",
+    programs: ["Chinatown Citizenship", "Chinatown ESL", "Chinatown Adventure"],
+    bio: "Citizenship program, then law school, then back to the same clients.",
+    openToMentor: true,
+  },
+  {
+    email: "elena.moreau@example.com", first: "Elena", last: "Moreau", year: 2019,
+    location: "Brooklyn, NY", career: "Documentary Producer · Field Notes Media",
+    industry: "Media & Arts", concentration: "Visual and Environmental Studies",
+    pbhaRole: "Program Coordinator", programs: ["Boston Refugee Youth Enrichment (BRYE) Teen", "BRYE 1-2-1"],
+    openToMentor: true, reachOut: "Film, documentary, freelance survival.",
+  },
+  {
+    email: "samuel.osei@example.com", first: "Samuel", last: "Osei", year: 2011,
+    location: "Accra, Ghana", career: "Director of Programs · Ashesi Education Collaborative",
+    industry: "Education", concentration: "Social Studies", pbhaRole: "Summer Director",
+    programs: ["Summer Urban Program", "Cambridge Youth Enrichment Program"],
+    openToMentor: true,
+  },
+  {
+    email: "nora.feldman@example.com", first: "Nora", last: "Feldman", year: 2002,
+    location: "Seattle, WA", career: "Clinical Psychologist · private practice",
+    industry: "Health & Medicine", concentration: "Psychology", pbhaRole: "Program Director",
+    programs: ["Alzheimer's Buddies", "Best Buddies"],
+    bio: "Alzheimer's Buddies is the reason I went into clinical work with older adults.",
+    openToMentor: true,
+  },
+  {
+    email: "andre.thompson@example.com", first: "André", last: "Thompson", year: 2023,
+    location: "Cambridge, MA", career: "Research Assistant · Harvard Kennedy School",
+    industry: "Law & Policy", concentration: "Government", pbhaRole: "Cabinet",
+    programs: ["CIVICS", "College High-School Alliance (CHANCE)"],
+    openToMentor: false,
+  },
+  {
+    email: "mei.lin.chen@example.com", first: "Mei Lin", last: "Chen", year: 2027,
+    location: "Cambridge, MA", career: "Student", industry: "Student",
+    concentration: "Sociology", pbhaRole: "Program Director",
+    programs: ["Chinatown Afterschool Program (CHAP)", "Chinatown Teen"],
+    bio: "Current CHAP director. Looking for alumni who ran the program in the 2010s.",
+  },
+  {
+    email: "jordan.pierre@example.com", first: "Jordan", last: "Pierre", year: 2028,
+    location: "Cambridge, MA", career: "Student", industry: "Student",
+    concentration: "Neuroscience", pbhaRole: "Program Coordinator",
+    programs: ["Boston Refugee Youth Enrichment (BRYE) Extension"],
+  },
+  {
+    email: "sofia.marchetti@example.com", first: "Sofia", last: "Marchetti", year: 2026,
+    location: "Cambridge, MA", career: "Student", industry: "Student",
+    concentration: "History and Literature", pbhaRole: "Volunteer",
+    programs: ["Adult ESOL Program", "CIVICS"],
+  },
+  {
+    email: "kenji.watanabe@example.com", first: "Kenji", last: "Watanabe", year: 1999,
+    location: "Los Angeles, CA", career: "Partner · Westline Ventures",
+    industry: "Finance", concentration: "Economics", pbhaRole: "Cabinet",
+    programs: ["Cambridge After-School Program (CASP)", "Summer Urban Program"],
+    openToMentor: true, reachOut: "Venture, startups, or how to fund a nonprofit side project.",
+  },
+  {
+    email: "grace.mutua@example.com", first: "Grace", last: "Mutua", year: 2020,
+    location: "Nairobi, Kenya", career: "Health Systems Analyst · Ministry of Health",
+    industry: "Health & Medicine", concentration: "Global Health and Health Policy",
+    pbhaRole: "Program Coordinator", programs: ["Alzheimer's Buddies", "Adult ESOL Program"],
+    openToMentor: true,
+  },
+  {
+    email: "patrick.donnelly@example.com", first: "Patrick", last: "Donnelly", year: 1991,
+    location: "Dorchester, MA", career: "Principal · Dorchester Collegiate Academy",
+    industry: "Education", concentration: "English", pbhaRole: "Summer Director",
+    programs: ["Summer Urban Program", "BRYE Tutoring"],
+    openToMentor: true,
+  },
+  {
+    email: "leila.haddad@example.com", first: "Leila", last: "Haddad", year: 2015,
+    location: "London, UK", career: "Economist · Institute for Fiscal Studies",
+    industry: "Research", concentration: "Economics", pbhaRole: "Program Director",
+    programs: ["Chinatown ESL", "Adult ESOL Program"],
+    openToMentor: true, reachOut: "Econ PhD, UK moves, research careers.",
+  },
+  // Bulk-imported, not yet claimed.
+  { email: "c.whitfield@example.com", first: "Charles", last: "Whitfield", year: 1978, programs: ["Cambridge After-School Program (CASP)"], unclaimed: true },
+  { email: "m.alvarez@example.com", first: "Marisol", last: "Alvarez", year: 1988, programs: ["Summer Urban Program"], unclaimed: true },
+  { email: "t.nguyen@example.com", first: "Thao", last: "Nguyen", year: 2004, programs: ["Chinatown Big Sibling"], unclaimed: true },
+  { email: "r.okonkwo@example.com", first: "Reuben", last: "Okonkwo", year: 2010, programs: ["CIVICS"], unclaimed: true },
+];
+
+const main = async () => {
+  const passwordHash = await hashPassword(SEED_PASSWORD);
+
+  for (const p of PEOPLE) {
+    const profileData = {
+      first: p.first,
+      last: p.last,
+      year: p.year,
+      location: p.location ?? null,
+      career: p.career ?? null,
+      industry: p.industry ?? null,
+      concentration: p.concentration ?? null,
+      pbhaRole: p.pbhaRole ?? null,
+      programs: p.programs,
+      bio: p.bio ?? null,
+      openToMentor: p.openToMentor ?? false,
+      reachOut: p.reachOut ?? null,
+      claimedAt: p.unclaimed ? null : new Date(),
+      searchText: buildSearchText(p),
+    };
+
+    await prisma.user.upsert({
+      where: { email: p.email },
+      create: {
+        email: p.email,
+        passwordHash,
+        emailVerified: !p.unclaimed,
+        termsAcceptedAt: p.unclaimed ? null : new Date(),
+        profile: { create: profileData },
+        privacy: { create: {} },
+      },
+      update: {
+        profile: { upsert: { create: profileData, update: profileData } },
+        privacy: { upsert: { create: {}, update: {} } },
+      },
+    });
+  }
+
+  console.log(`Seeded ${PEOPLE.length} demo profiles. Password: ${SEED_PASSWORD}`);
+};
+
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(() => prisma.$disconnect());
