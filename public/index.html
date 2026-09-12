@@ -1099,50 +1099,34 @@ function FilterGroup({ label, children }) {
 }
 
 function PersonCard({ person, onOpen }) {
-  const unclaimed = !person.claimedAt;
   const { title, org } = splitCareer(person.career);
   return (
     <button className="card person-card" onClick={() => onOpen(person.userId)}
       onMouseEnter={() => api.prefetch("/api/users/" + encodeURIComponent(person.userId))}>
-      <div className="person-photo" style={{ opacity: unclaimed ? 0.55 : 1 }}>
+      <div className="person-photo">
         <Photo person={person} />
         <span className="stamp">{person.isCurrentStudent ? "Student" : "Alum"}</span>
         <span className="stamp-year">{shortYear(person.year)}</span>
       </div>
       <div className="person-body">
         <h3 className="h-3">{person.first} {person.last}</h3>
-        {unclaimed ? (
-          <>
-            {person.pbhaRole && (
-              <div style={{ marginTop: 10 }}>
-                <span className="chip chip-accent">{person.pbhaRole}</span>
-              </div>
+        {title && <div className="meta" style={{ marginTop: 5 }}>{title}</div>}
+        {org && <div className="meta">{org}</div>}
+        {(person.pbhaRole || person.programs.length > 0) && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 12 }}>
+            {person.pbhaRole && <span className="chip chip-accent">{person.pbhaRole}</span>}
+            {person.programs.slice(0, 2).map((p) => (
+              <span key={p} className="chip chip-static">{p}</span>
+            ))}
+            {person.programs.length > 2 && (
+              <span className="chip chip-static">+{person.programs.length - 2}</span>
             )}
-            {/* An unclaimed profile shows name and class year only. Nothing
-                else was opted into — it is here from a bulk import. */}
-            <div className="meta" style={{ marginTop: 10, fontStyle: "italic" }}>
-              Profile not yet claimed
-            </div>
-          </>
-        ) : (
-          <>
-            {title && <div className="meta" style={{ marginTop: 5 }}>{title}</div>}
-            {org && <div className="meta">{org}</div>}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 12 }}>
-              {person.pbhaRole && <span className="chip chip-accent">{person.pbhaRole}</span>}
-              {person.programs.slice(0, 2).map((p) => (
-                <span key={p} className="chip chip-static">{p}</span>
-              ))}
-              {person.programs.length > 2 && (
-                <span className="chip chip-static">+{person.programs.length - 2}</span>
-              )}
-            </div>
-            {person.location && (
-              <div className="meta" style={{ marginTop: 12, display: "inline-flex", alignItems: "center", gap: 5 }}>
-                <Pin /> {person.location}
-              </div>
-            )}
-          </>
+          </div>
+        )}
+        {person.location && (
+          <div className="meta" style={{ marginTop: 12, display: "inline-flex", alignItems: "center", gap: 5 }}>
+            <Pin /> {person.location}
+          </div>
         )}
       </div>
     </button>
