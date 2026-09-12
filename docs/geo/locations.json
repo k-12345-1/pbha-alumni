@@ -1,0 +1,82 @@
+{
+"boston, ma": {
+"lat": 42.3601,
+"lon": -71.0589,
+"matched": "Boston, Suffolk County, Massachusetts, United States"
+},
+"cambridge, ma": {
+"lat": 42.3736,
+"lon": -71.1097,
+"matched": "Cambridge, Middlesex County, Massachusetts, United States"
+},
+"somerville, ma": {
+"lat": 42.3876,
+"lon": -71.0995,
+"matched": "Somerville, Middlesex County, Massachusetts, United States"
+},
+"dorchester, ma": {
+"lat": 42.3016,
+"lon": -71.0661,
+"matched": "Dorchester, Boston, Suffolk County, Massachusetts, United States"
+},
+"new york, ny": {
+"lat": 40.7128,
+"lon": -74.006,
+"matched": "New York, United States"
+},
+"brooklyn, ny": {
+"lat": 40.6782,
+"lon": -73.9442,
+"matched": "Brooklyn, Kings County, New York, United States"
+},
+"washington, dc": {
+"lat": 38.9072,
+"lon": -77.0369,
+"matched": "Washington, District of Columbia, United States"
+},
+"chicago, il": {
+"lat": 41.8781,
+"lon": -87.6298,
+"matched": "Chicago, Cook County, Illinois, United States"
+},
+"san francisco, ca": {
+"lat": 37.7749,
+"lon": -122.4194,
+"matched": "San Francisco, California, United States"
+},
+"los angeles, ca": {
+"lat": 34.0522,
+"lon": -118.2437,
+"matched": "Los Angeles, California, United States"
+},
+"seattle, wa": {
+"lat": 47.6062,
+"lon": -122.3321,
+"matched": "Seattle, King County, Washington, United States"
+},
+"atlanta, ga": {
+"lat": 33.749,
+"lon": -84.388,
+"matched": "Atlanta, Fulton County, Georgia, United States"
+},
+"portland, me": {
+"lat": 43.6591,
+"lon": -70.2568,
+"matched": "Portland, Cumberland County, Maine, United States"
+},
+"london, uk": {
+"lat": 51.5074,
+"lon": -0.1278,
+"matched": "London, Greater London, England, United Kingdom"
+},
+"accra, ghana": {
+"lat": 5.6037,
+"lon": -0.187,
+"matched": "Accra, Greater Accra Region, Ghana"
+},
+"nairobi, kenya": {
+"lat": -1.2864,
+"lon": 36.8172,
+"matched": "Nairobi, Kenya"
+}
+}

@@ -165,6 +165,15 @@ html = html.replace('<script src="https://unpkg.com/react@18', runtime + '<scrip
 const outDir = path.join(ROOT, "docs");
 fs.mkdirSync(outDir, { recursive: true });
 fs.writeFileSync(path.join(outDir, "index.html"), html);
+
+// The map fetches geo/world.json and geo/locations.json by relative path, so
+// they have to sit beside the page in the published output too.
+const geoSrc = path.join(ROOT, "public/geo");
+const geoOut = path.join(outDir, "geo");
+fs.mkdirSync(geoOut, { recursive: true });
+for (const f of fs.readdirSync(geoSrc)) {
+  fs.copyFileSync(path.join(geoSrc, f), path.join(geoOut, f));
+}
 // Tells Pages not to run the output through Jekyll.
 fs.writeFileSync(path.join(outDir, ".nojekyll"), "");
-console.log(`Wrote docs/index.html (${profiles.length} demo profiles)`);
+console.log(`Wrote docs/index.html (${profiles.length} demo profiles) + docs/geo/`);

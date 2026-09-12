@@ -12,9 +12,13 @@ and donations are deliberately not modeled.
 - **Sign in / join.** Email and password, JWT in an httpOnly session cookie.
   Signing in somewhere new invalidates the older session.
 - **Directory.** Search across name, city, employer, field, and program. Filter by
-  scope (everyone / alumni / current students), class-year range, PBHA role,
-  program, field of work, and whether someone is open to mentoring. Sort by
-  recently joined, class year, or last name. Grid and list layouts.
+  scope (everyone / alumni / current students), a dual-handle class-year range,
+  PBHA role, program, field of work, and whether someone is open to mentoring.
+  Sort by recently joined, class year, or last name.
+- **Grid, list, and map.** The map plots members on a Robinson projection, sized
+  by how many are in each place; clicking a place lists them underneath so the
+  map keeps its zoom. Ported from the FOP alumni directory, which this is
+  modeled on.
 - **Profiles.** Full profile page with programs, PBHA role, work, and what the
   person is happy to be contacted about.
 - **Your profile.** Self-service editing, plus the two privacy switches that decide
@@ -74,10 +78,26 @@ src/routes/                 auth, directory, users
 src/services/               the query and privacy logic
 src/lib/class-year.ts       student vs alumni, derived from class year
 src/lib/programs.ts         the PBHA program and role vocabulary
+public/geo/                 world outlines + the location lookup the map reads
+scripts/geocode-locations.js  resolves typed locations to coordinates
 public/index.html           the whole front end
 scripts/build-demo.js       generates docs/ for GitHub Pages
 docs/                       the published static demo (generated)
 ```
+
+## The map
+
+`public/geo/world.json` holds the country outlines already projected; the build
+that produces it is the one from the FOP directory. `public/geo/locations.json`
+maps typed location text ("Brooklyn, NY", "SF", "London, UK") to coordinates and
+is committed, so nothing geocodes at request time.
+
+```bash
+npm run geocode             # resolve locations that have no entry yet
+npm run geocode -- --report # just list what is unresolved
+```
+
+A location with no entry simply has no dot; it is never guessed at.
 
 ## Notes for whoever picks this up next
 

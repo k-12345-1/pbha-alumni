@@ -350,6 +350,51 @@ footer.site {
   nav.site-nav { gap: 16px; }
   .site-inner { flex-wrap: wrap; gap: 16px; min-height: 0; }
 }
+
+/* Dual-range class-year slider — two overlaid range inputs with the selected
+   span painted between them. pointer-events is off on the track so the two
+   thumbs stay independently grabbable where they overlap. */
+.dual-range {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  pointer-events: none;
+  margin: 0;
+  height: 24px;
+}
+.dual-range::-webkit-slider-runnable-track { background: transparent; height: 2px; }
+.dual-range::-moz-range-track { background: transparent; height: 2px; }
+.dual-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  pointer-events: auto;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--orange);
+  border: 2px solid var(--white);
+  box-shadow: 0 0 0 1px var(--orange);
+  cursor: pointer;
+  margin-top: -7px;
+}
+.dual-range::-moz-range-thumb {
+  pointer-events: auto;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--orange);
+  border: 2px solid var(--white);
+  box-shadow: 0 0 0 1px var(--orange);
+  cursor: pointer;
+}
+
+.map-btn {
+  width: 30px; height: 30px; padding: 0;
+  border: 1px solid var(--rule); background: var(--white); color: var(--ink);
+  cursor: pointer; font-size: 15px; line-height: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.map-btn:hover { border-color: var(--orange); color: var(--orange); }
+
+.card-pad { padding: 24px; }
 </style>
 </head>
 <body>
@@ -387,9 +432,31 @@ const api = {
     }
     return data;
   },
-  get(path) { return api.request("GET", path); },
+  get(path) {
+    // Served from the prefetch cache when a hover already fetched it. Only
+    // GETs are cached, and only until read, so nothing goes stale on screen.
+    const hit = api._cache.get(path);
+    if (hit) { api._cache.delete(path); return hit; }
+    return api.request("GET", path);
+  },
   post(path, body) { return api.request("POST", path, body); },
   patch(path, body) { return api.request("PATCH", path, body); },
+
+  // Warm a GET without caring about the result. Hovering a directory card
+  // fires this, so by the time the click handler renders the profile the
+  // response is usually already in hand.
+  _cache: new Map(),
+  prefetch(path) {
+    if (api._cache.has(path)) return;
+    const p = api.request("GET", path).catch(() => {
+      api._cache.delete(path);
+      return null;
+    });
+    api._cache.set(path, p);
+    // Do not hold a warmed response forever — a stale profile is worse than
+    // a second request.
+    setTimeout(() => { if (api._cache.get(path) === p) api._cache.delete(path); }, 30000);
+  },
 };
 
 /* ------------------------------------------------------------------ *
@@ -603,8 +670,355 @@ function GateScreen({ onSignedIn }) {
  * Directory
  * ------------------------------------------------------------------ */
 
+/* ------------------------------------------------------------------ *
+ * Directory map — where members are, on a Robinson world projection.
+ *
+ * Ported from the FOP alumni directory. Three inputs, all static and
+ * already cached: the projected country outlines (geo/world.json), the
+ * text-to-coordinate lookup built by scripts/geocode-locations.js
+ * (geo/locations.json), and the location counts the directory already
+ * fetches for its facets. Nothing geocodes at request time.
+ *
+ * Paths are relative, not root-absolute, so the same code works served
+ * from the site root and from the /pbha-alumni/ GitHub Pages base.
+ * ------------------------------------------------------------------ */
+
+// Bump when geo/*.json is rebuilt — those files are cached, so without a
+// version a regenerated map keeps showing the previous build.
+const GEO_V = "1";
+
+// How far the map will zoom. The outlines are Natural Earth 50m; past this
+// a screen pixel is finer than the source geometry.
+const MAX_Z = 64;
+
+// Shorthands folded onto the full name so they land on one dot rather than
+// two stacked in the same spot. Must match CANON in scripts/geocode-locations.js.
+const CANON = {
+  "cambridge": "cambridge, ma",
+  "boston": "boston, ma",
+  "sf": "san francisco, ca",
+  "san francisco": "san francisco, ca",
+  "nyc": "new york, ny",
+  "new york city": "new york, ny",
+  "dc": "washington, dc",
+  "washington, d.c.": "washington, dc",
+  "london": "london, uk",
+};
+
+function DirectoryMap({ locations, people, onOpenProfile }) {
+  const [world, setWorld] = React.useState(null);
+  const [coords, setCoords] = React.useState(null);
+  const [failed, setFailed] = React.useState(false);
+  const [hover, setHover] = React.useState(null);
+  const [picked, setPicked] = React.useState(null);
+  const isTouch = typeof window !== "undefined" && !!window.matchMedia &&
+                  window.matchMedia("(pointer: coarse)").matches;
+  const [z, setZ] = React.useState(1);
+  const [pan, setPan] = React.useState({ x: 0, y: 0 });
+  const svgRef = React.useRef(null);
+  const drag = React.useRef(null);
+  const gesture = React.useRef(null);
+
+  React.useEffect(() => {
+    let dead = false;
+    Promise.all([
+      fetch("geo/world.json?v=" + GEO_V).then((r) => r.json()),
+      fetch("geo/locations.json?v=" + GEO_V).then((r) => r.json()).catch(() => ({})),
+    ])
+      .then(([w, c]) => { if (!dead) { setWorld(w); setCoords(c); } })
+      .catch(() => { if (!dead) setFailed(true); });
+    return () => { dead = true; };
+  }, []);
+
+  const norm = (v) => {
+    const k = String(v || "").toLowerCase().trim().replace(/\s+/g, " ").replace(/\s*,\s*/g, ", ");
+    return CANON[k] || k;
+  };
+
+  // Robinson, matching scripts/build-world.py exactly. If the two drift the
+  // dots stop landing on their coastlines.
+  const project = React.useCallback((lat, lon, w) => {
+    const PLEN = [1.0000, 0.9986, 0.9954, 0.9900, 0.9822, 0.9730, 0.9600, 0.9427, 0.9216,
+                  0.8962, 0.8679, 0.8350, 0.7986, 0.7597, 0.7186, 0.6732, 0.6213, 0.5722, 0.5322];
+    const PDIST = [0.0000, 0.0620, 0.1240, 0.1860, 0.2480, 0.3100, 0.3720, 0.4340, 0.4958,
+                   0.5571, 0.6176, 0.6769, 0.7346, 0.7903, 0.8435, 0.8936, 0.9394, 0.9761, 1.0000];
+    const KX = 0.8487, KY = 1.3523;
+    const a = Math.min(Math.abs(lat), 90) / 5;
+    const i = Math.min(Math.floor(a), 17);
+    const t = a - i;
+    const xf = PLEN[i] + (PLEN[i + 1] - PLEN[i]) * t;
+    const yf = PDIST[i] + (PDIST[i + 1] - PDIST[i]) * t;
+    const x = KX * xf * (lon * Math.PI / 180);
+    const y = KY * yf * (lat >= 0 ? 1 : -1);
+    const halfW = KX * Math.PI, halfH = KY;
+    const sc = Math.min(w.w / (2 * halfW), w.h / (2 * halfH));
+    return [x * sc + w.w / 2, w.h / 2 - y * sc];
+  }, []);
+
+  // Join counts to coordinates. Several typed spellings can share one place,
+  // so sum them onto a single dot instead of stacking near-identical circles.
+  const dots = React.useMemo(() => {
+    if (!world || !coords) return [];
+    const byKey = new Map();
+    (locations || []).forEach((l) => {
+      const key = norm(l.name);
+      const hit = coords[key];
+      if (!hit) return;
+      const prev = byKey.get(key);
+      if (prev) {
+        prev.count += l.count;
+        if (l.name.length > prev.label.length) prev.label = l.name;
+        return;
+      }
+      byKey.set(key, { key, label: l.name, count: l.count, lat: hit.lat, lon: hit.lon });
+    });
+    const out = [...byKey.values()];
+    const max = out.reduce((m, d) => Math.max(m, d.count), 1);
+    out.forEach((d) => {
+      const [x, y] = project(d.lat, d.lon, world);
+      d.x = x; d.y = y;
+      d.r = 3.4 + 11 * Math.sqrt(d.count / max);   // area, not radius, tracks count
+    });
+    // Biggest first in the DOM so small dots stay clickable on top of them.
+    return out.sort((a, b) => b.count - a.count);
+  }, [world, coords, locations, project]);
+
+  // Visible window. The base is world.view, the bounding box of the land, so
+  // the empty polar ocean is cropped rather than padding the frame. On a phone
+  // that crop works against us — it makes the frame wider, and width is what
+  // limits a narrow screen — so touch gets the full canvas plus a margin.
+  const V = React.useMemo(() => {
+    if (!world) return null;
+    const land = world.view || [0, 0, world.w, world.h];
+    if (!isTouch) return land;
+    const padY = world.h * 0.1;
+    return [0, -padY, world.w, world.h + padY * 2];
+  }, [world, isTouch]);
+  const BX = V ? V[0] : 0, BY = V ? V[1] : 0, BW = V ? V[2] : 0, BH = V ? V[3] : 0;
+  const CX = BX + BW / 2, CY = BY + BH / 2;
+  const vw = BW / z, vh = BH / z;
+  const clamp = (pt, zz) => {
+    if (!V) return { x: 0, y: 0 };
+    const mx = Math.max(0, (BW - BW / zz) / 2);
+    const my = Math.max(0, (BH - BH / zz) / 2);
+    return { x: Math.max(-mx, Math.min(mx, pt.x)), y: Math.max(-my, Math.min(my, pt.y)) };
+  };
+  const vx = CX + pan.x - vw / 2;
+  const vy = CY + pan.y - vh / 2;
+
+  // Wheel zoom toward the cursor. Bound natively with passive:false so
+  // preventDefault actually stops the page scrolling underneath.
+  React.useEffect(() => {
+    const el = svgRef.current;
+    if (!el || !world) return;
+    const onWheel = (e) => {
+      e.preventDefault();
+      const r = el.getBoundingClientRect();
+      const fx = (e.clientX - r.left) / r.width, fy = (e.clientY - r.top) / r.height;
+      const mx = vx + fx * vw, my = vy + fy * vh;
+      const nz = Math.max(1, Math.min(MAX_Z, z * (e.deltaY < 0 ? 1.15 : 1 / 1.15)));
+      const nvw = BW / nz, nvh = BH / nz;
+      setZ(nz);
+      setPan(clamp({ x: (mx - fx * nvw) + nvw / 2 - CX,
+                     y: (my - fy * nvh) + nvh / 2 - CY }, nz));
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [world, z, pan.x, pan.y, vx, vy, vw, vh]);
+
+  // Touch: two fingers pinch toward the midpoint, one finger pans once zoomed.
+  React.useEffect(() => {
+    const el = svgRef.current;
+    if (!el || !world) return;
+    const spread = (a, b) => Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+
+    const onStart = (e) => {
+      if (e.touches.length === 2) {
+        const [a, b] = e.touches;
+        gesture.current = {
+          mode: "pinch", d: spread(a, b),
+          cx: (a.clientX + b.clientX) / 2, cy: (a.clientY + b.clientY) / 2,
+          z, pan: { ...pan },
+        };
+      } else if (e.touches.length === 1 && z > 1) {
+        gesture.current = { mode: "pan", x: e.touches[0].clientX, y: e.touches[0].clientY, z, pan: { ...pan } };
+      }
+    };
+    const onMove = (e) => {
+      const g = gesture.current;
+      if (!g) return;
+      const r = el.getBoundingClientRect();
+      if (g.mode === "pinch" && e.touches.length === 2) {
+        e.preventDefault();
+        const [a, b] = e.touches;
+        const nz = Math.max(1, Math.min(MAX_Z, g.z * (spread(a, b) / (g.d || 1))));
+        // Keep whatever was under the pinch midpoint pinned under it, so the
+        // map grows out of the spot being pinched.
+        const fx = (g.cx - r.left) / r.width, fy = (g.cy - r.top) / r.height;
+        const sw = BW / g.z, sh = BH / g.z;
+        const mx = CX + g.pan.x - sw / 2 + fx * sw;
+        const my = CY + g.pan.y - sh / 2 + fy * sh;
+        const nw = BW / nz, nh = BH / nz;
+        setZ(nz);
+        setPan(clamp({ x: (mx - fx * nw) + nw / 2 - CX,
+                       y: (my - fy * nh) + nh / 2 - CY }, nz));
+      } else if (g.mode === "pan" && e.touches.length === 1) {
+        e.preventDefault();
+        const t = e.touches[0];
+        const dx = (t.clientX - g.x) / r.width * (BW / g.z);
+        const dy = (t.clientY - g.y) / r.height * (BH / g.z);
+        setPan(clamp({ x: g.pan.x - dx, y: g.pan.y - dy }, g.z));
+      }
+    };
+    const onEnd = (e) => {
+      if (e.touches.length === 0) { gesture.current = null; return; }
+      // Lifting one finger of a pinch hands over to a pan cleanly rather than
+      // leaving a stale two-finger gesture running.
+      if (e.touches.length === 1) {
+        gesture.current = { mode: "pan", x: e.touches[0].clientX, y: e.touches[0].clientY, z, pan: { ...pan } };
+      }
+    };
+
+    el.addEventListener("touchstart", onStart, { passive: false });
+    el.addEventListener("touchmove", onMove, { passive: false });
+    el.addEventListener("touchend", onEnd, { passive: false });
+    el.addEventListener("touchcancel", onEnd, { passive: false });
+    return () => {
+      el.removeEventListener("touchstart", onStart);
+      el.removeEventListener("touchmove", onMove);
+      el.removeEventListener("touchend", onEnd);
+      el.removeEventListener("touchcancel", onEnd);
+    };
+  }, [world, z, pan.x, pan.y]);
+
+  const onDown = (e) => { if (z > 1) drag.current = { x: e.clientX, y: e.clientY, pan: { ...pan } }; };
+  const onMove = (e) => {
+    if (!drag.current || !world) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    const dx = (e.clientX - drag.current.x) / r.width * vw;
+    const dy = (e.clientY - drag.current.y) / r.height * vh;
+    setPan(clamp({ x: drag.current.pan.x - dx, y: drag.current.pan.y - dy }, z));
+  };
+  const endDrag = () => { drag.current = null; };
+  const reset = () => { setZ(1); setPan({ x: 0, y: 0 }); };
+
+  const atPicked = React.useMemo(() => {
+    if (!picked) return [];
+    return (people || []).filter((p) => norm(p.location) === picked.key);
+  }, [picked, people]);
+
+  const placed = dots.reduce((n, d) => n + d.count, 0);
+
+  if (failed) return <div className="card card-pad meta">The map could not be loaded.</div>;
+  if (!world || !coords) return <div className="card card-pad meta">Loading the map…</div>;
+  if (!dots.length) {
+    return (
+      <div className="card card-pad meta">
+        No locations have been placed on the map yet. Run <code>node scripts/geocode-locations.js</code> to resolve them.
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="card" style={{ position: "relative", padding: 0, overflow: "hidden", background: "var(--wash)" }}>
+        <svg ref={svgRef} viewBox={`${vx} ${vy} ${vw} ${vh}`}
+             style={{ display: "block", width: "100%", height: "auto",
+                      cursor: z > 1 ? (drag.current ? "grabbing" : "grab") : "default", touchAction: "none" }}
+             onMouseDown={onDown} onMouseMove={onMove} onMouseUp={endDrag} onMouseLeave={endDrag}
+             role="img" aria-label="World map of member locations">
+          <g fill="var(--white)" stroke="var(--rule)" strokeWidth="0.8" strokeLinejoin="round">
+            {world.paths.map((d, i) => <path key={i} d={d} vectorEffect="non-scaling-stroke" />)}
+          </g>
+          {dots.map((d) => {
+            const sel = picked && picked.key === d.key;
+            const on = sel || (hover && hover.key === d.key);
+            // Dots shrink as the map grows, so a tight cluster pulls apart:
+            // Boston and Cambridge are one blob at 1x and two dots by 64x. The
+            // floor keeps a single-member place from vanishing.
+            const screenR = Math.max(3, (on ? d.r + 1.5 : d.r) * Math.pow(z, -0.35));
+            const rr = screenR / z;
+            return (
+              <circle key={d.key} cx={d.x} cy={d.y} r={rr}
+                fill={on ? "var(--orange-dark)" : "var(--orange)"} fillOpacity={on ? 0.95 : 0.7}
+                stroke="var(--white)" strokeWidth={1.2 / z} style={{ cursor: "pointer" }}
+                onMouseEnter={() => setHover(d)} onMouseLeave={() => setHover(null)}
+                onClick={() => setPicked(picked && picked.key === d.key ? null : d)}>
+                <title>{d.count} in {d.label}</title>
+              </circle>
+            );
+          })}
+        </svg>
+        <div style={{ position: "absolute", right: 16, bottom: 16, display: "flex", flexDirection: "column", gap: 6 }}>
+          {[["+", () => { const nz = Math.min(MAX_Z, z * 1.5); setZ(nz); setPan((pt) => clamp(pt, nz)); }],
+            ["−", () => { const nz = Math.max(1, z / 1.5); setZ(nz); setPan((pt) => clamp(pt, nz)); }]].map(([lab, fn]) => (
+            <button key={lab} className="map-btn" onClick={fn}
+              aria-label={lab === "+" ? "Zoom in" : "Zoom out"}>{lab}</button>
+          ))}
+          {z > 1 && (
+            <button className="map-btn" onClick={reset} aria-label="Reset the view"
+              style={{ fontSize: 9.5, lineHeight: 1, color: "var(--ink-mute)" }}>reset</button>
+          )}
+        </div>
+        {hover && (
+          <div style={{ position: "absolute", left: `${((hover.x - vx) / vw) * 100}%`, top: `${((hover.y - vy) / vh) * 100}%`,
+                        transform: "translate(-50%, -175%)", pointerEvents: "none", whiteSpace: "nowrap",
+                        background: "var(--ink)", color: "var(--white)", fontSize: 12, padding: "5px 10px", borderRadius: 300 }}>
+            <strong>{hover.count}</strong> in {hover.label}
+          </div>
+        )}
+      </div>
+
+      {picked && (
+        <div className="card" style={{ marginTop: 14, padding: "18px 20px" }}>
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>
+            <div>
+              <span className="h-3">{picked.label}</span>
+              <span className="meta" style={{ marginLeft: 10 }}>
+                {picked.count} {picked.count === 1 ? "member" : "members"}
+              </span>
+            </div>
+            <button onClick={() => setPicked(null)}
+              style={{ background: "none", border: 0, padding: 0, font: "inherit", fontSize: 13,
+                       color: "var(--ink-mute)", cursor: "pointer", textDecoration: "underline" }}>
+              clear
+            </button>
+          </div>
+          {atPicked.length ? (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))", gap: 8 }}>
+              {atPicked.map((p) => (
+                <button key={p.userId} onClick={() => onOpenProfile(p.userId)}
+                  onMouseEnter={() => api.prefetch("/api/users/" + encodeURIComponent(p.userId))}
+                  style={{ display: "block", textAlign: "left", width: "100%", background: "transparent",
+                           border: "1px solid var(--rule)", borderRadius: 2, padding: "10px 12px",
+                           cursor: "pointer", font: "inherit", color: "inherit" }}>
+                  <div style={{ fontSize: 14, fontWeight: 500 }}>{p.first} {p.last}</div>
+                  {p.career && <div className="meta" style={{ fontSize: 12.5 }}>{splitCareer(p.career).title}</div>}
+                </button>
+              ))}
+            </div>
+          ) : (
+            // Dot counts come from site-wide facets but the cards come from the
+            // current result set, so a filter can legitimately leave a place
+            // with nobody to show.
+            <p className="meta" style={{ margin: 0 }}>No one here matches the filters you have set.</p>
+          )}
+        </div>
+      )}
+
+      <div className="meta" style={{ marginTop: 10, display: "flex", flexWrap: "wrap", gap: 14, alignItems: "baseline", fontSize: 12.5 }}>
+        <span><span className="em-n">{placed}</span> {placed === 1 ? "member" : "members"} across {dots.length} {dots.length === 1 ? "place" : "places"}</span>
+        <span style={{ marginLeft: "auto" }}>
+          {isTouch ? "Pinch to zoom · drag to pan · tap a place" : "Scroll to zoom · drag to pan · click a place"}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 const YEAR_MIN = 1950;
 const YEAR_MAX = new Date().getFullYear() + 4;
+const YEAR_SPAN = YEAR_MAX - YEAR_MIN;
 
 function FilterGroup({ label, children }) {
   return (
@@ -619,7 +1033,8 @@ function PersonCard({ person, onOpen }) {
   const unclaimed = !person.claimedAt;
   const { title, org } = splitCareer(person.career);
   return (
-    <button className="card person-card" onClick={() => onOpen(person.userId)}>
+    <button className="card person-card" onClick={() => onOpen(person.userId)}
+      onMouseEnter={() => api.prefetch("/api/users/" + encodeURIComponent(person.userId))}>
       <div className="person-photo" style={{ opacity: unclaimed ? 0.55 : 1 }}>
         <Photo person={person} />
         <span className="stamp">{person.isCurrentStudent ? "Student" : "Alum"}</span>
@@ -668,7 +1083,8 @@ function PersonCard({ person, onOpen }) {
 function PersonRow({ person, onOpen }) {
   const { title, org } = splitCareer(person.career);
   return (
-    <button className="row-person" onClick={() => onOpen(person.userId)}>
+    <button className="row-person" onClick={() => onOpen(person.userId)}
+      onMouseEnter={() => api.prefetch("/api/users/" + encodeURIComponent(person.userId))}>
       <span className="avatar"><Photo person={person} /></span>
       <span>
         <span style={{ display: "block", fontWeight: 500 }}>{person.first} {person.last}</span>
@@ -803,16 +1219,26 @@ function DirectoryScreen({ onOpenProfile }) {
           </FilterGroup>
 
           <FilterGroup label="Class year">
-            <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12 }}>
-              <input className="input" type="number" min={YEAR_MIN} max={YEAR_MAX}
-                style={{ padding: "7px 9px", fontSize: 13 }}
-                value={yearFrom}
-                onChange={(e) => setYearFrom(Math.min(Number(e.target.value) || YEAR_MIN, yearTo))} />
-              <span className="meta">to</span>
-              <input className="input" type="number" min={YEAR_MIN} max={YEAR_MAX}
-                style={{ padding: "7px 9px", fontSize: 13 }}
-                value={yearTo}
-                onChange={(e) => setYearTo(Math.max(Number(e.target.value) || YEAR_MAX, yearFrom))} />
+            <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, fontWeight: 500 }}>
+              <span>{yearFrom}</span>
+              <div style={{ flex: 1, position: "relative", height: 24 }}>
+                <div style={{ position: "absolute", left: 0, right: 0, top: 11, height: 2, background: "var(--rule)" }} />
+                <div style={{ position: "absolute", top: 11, height: 2, background: "var(--orange)",
+                              left: `${((yearFrom - YEAR_MIN) / YEAR_SPAN) * 100}%`,
+                              right: `${100 - ((yearTo - YEAR_MIN) / YEAR_SPAN) * 100}%` }} />
+                {/* Two overlaid inputs. The upper one is the max handle; when
+                    both sit at the top of the range the min handle is raised
+                    above it so it stays grabbable. */}
+                <input type="range" className="dual-range" min={YEAR_MIN} max={YEAR_MAX} value={yearFrom}
+                  aria-label="Earliest class year"
+                  onChange={(e) => setYearFrom(Math.min(Number(e.target.value), yearTo))}
+                  style={{ position: "absolute", inset: 0, width: "100%", zIndex: yearFrom > YEAR_MAX - 4 ? 3 : 2 }} />
+                <input type="range" className="dual-range" min={YEAR_MIN} max={YEAR_MAX} value={yearTo}
+                  aria-label="Latest class year"
+                  onChange={(e) => setYearTo(Math.max(Number(e.target.value), yearFrom))}
+                  style={{ position: "absolute", inset: 0, width: "100%", zIndex: 2 }} />
+              </div>
+              <span>{yearTo}</span>
             </div>
           </FilterGroup>
 
@@ -885,19 +1311,27 @@ function DirectoryScreen({ onOpenProfile }) {
                 onClick={() => setLayout("grid")}>Grid</button>
               <button className={`btn btn-sm ${layout === "list" ? "btn-ink" : "btn-ghost"}`}
                 onClick={() => setLayout("list")}>List</button>
+              <button className={`btn btn-sm ${layout === "map" ? "btn-ink" : "btn-ghost"}`}
+                onClick={() => setLayout("map")}>Map</button>
             </div>
           </div>
 
           {error && <div className="banner banner-error" style={{ marginBottom: 20 }}>{error}</div>}
 
-          {!loading && results.length === 0 && !error && (
+          {!loading && results.length === 0 && !error && layout !== "map" && (
             <div className="card empty">
               <div className="h-3" style={{ marginBottom: 8 }}>No members match those filters</div>
               <p className="meta">Try widening the class years or clearing a program.</p>
             </div>
           )}
 
-          {layout === "grid" ? (
+          {layout === "map" ? (
+            <DirectoryMap
+              locations={facets.locations || []}
+              people={results}
+              onOpenProfile={onOpenProfile}
+            />
+          ) : layout === "grid" ? (
             <div className="grid-people">
               {results.map((p) => (
                 <PersonCard key={p.userId} person={p} onOpen={onOpenProfile} />
