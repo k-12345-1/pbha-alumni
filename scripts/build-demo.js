@@ -119,7 +119,7 @@ const runtime = `
     return { items: out, meta: { page: 1, pageSize: out.length, total: out.length, totalPages: 1 } };
   }
 
-  var signedIn = true;
+  var signedIn = false;
 
   window.__demoRequest = function (method, path, body) {
     var url = path.split("?")[0];
@@ -157,8 +157,6 @@ const runtime = `
 `;
 
 let html = fs.readFileSync(path.join(ROOT, "public/index.html"), "utf8");
-html = html.replace("<title>PBHA Alumni Directory</title>",
-  "<title>PBHA Alumni Directory — demo</title>");
 // Inject before the React scripts so the hook exists by the time App mounts.
 html = html.replace('<script src="https://unpkg.com/react@18', runtime + '<script src="https://unpkg.com/react@18');
 
