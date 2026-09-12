@@ -31,9 +31,9 @@
   --orange: #f98715;
   --orange-dark: #d96f06;
   --orange-wash: #fdf0e0;
-  --navy: #051460;
-  /* rgba(5, 20, 96, .44) over white — the band their footer sits on. */
-  --periwinkle: #9198b9;
+  /* The band their footer sits on, taken from the section's own
+     declaration: hsla(230.11, 90.1%, 19.8%, .44). */
+  --footer-band: rgba(5, 20, 96, 0.44);
 
   --sans: "Work Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
@@ -309,13 +309,13 @@ textarea.input { min-height: 100px; resize: vertical; line-height: 1.55; }
 .banner-error { border-left-color: #c0392b; background: #fdeceb; color: #8c271c; }
 
 footer.site {
-  background: var(--periwinkle);
+  background: var(--footer-band);
   padding: 56px 0 64px;
   margin-top: 64px;
 }
 .footer-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.2fr 1fr 1fr;
   gap: 48px;
 }
 .footer-h { font-size: 18.5px; font-weight: 700; color: var(--ink); margin-bottom: 20px; }
@@ -326,15 +326,16 @@ footer.site {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
-.footer-links { display: flex; flex-direction: column; gap: 18px; align-items: flex-start; font-size: 15px; font-weight: 500; }
-.footer-note {
-  margin: 40px 0 0;
-  font-size: 12.5px;
-  font-weight: 500;
-  color: var(--ink-soft);
-  opacity: .8;
+.footer-links { display: flex; flex-direction: column; gap: 14px; align-items: flex-start; font-size: 15px; font-weight: 500; }
+/* The site-wide column lines up with the other two rather than sitting under
+   a heading of its own, since theirs carries no heading either. */
+.footer-links-last { padding-top: 44px; gap: 18px; }
+
+@media (max-width: 1000px) {
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .footer-links-last { padding-top: 0; }
 }
-@media (max-width: 760px) {
+@media (max-width: 700px) {
   .footer-grid { grid-template-columns: 1fr; gap: 32px; }
 }
 
@@ -1820,7 +1821,25 @@ function App() {
             <p className="footer-p"><strong>EMAIL:</strong>{" "}
               <a href="mailto:pbha@pbha.org">pbha@pbha.org</a></p>
           </div>
-          <div className="footer-links">
+          <div>
+            <h4 className="footer-h">Alumni</h4>
+            <div className="footer-links">
+              <a href="https://www.pbha.org/get-involved/join-the-alumni-network"
+                target="_blank" rel="noopener noreferrer">Join the Alumni Network</a>
+              <a href="https://www.pbha.org/alumni-impact"
+                target="_blank" rel="noopener noreferrer">Alumni Impact</a>
+              <a href="https://www.pbha.org/reunions"
+                target="_blank" rel="noopener noreferrer">PBHA&rsquo;s Reunions</a>
+              <a href="https://www.pbha.org/125"
+                target="_blank" rel="noopener noreferrer">Road to the 125th</a>
+              <a href="https://www.pbha.org/120stories"
+                target="_blank" rel="noopener noreferrer">120 Stories</a>
+              <a href="https://www.pbha.org/coles-2026"
+                target="_blank" rel="noopener noreferrer">Robert Coles &ldquo;Call of Service&rdquo; Lecture</a>
+            </div>
+          </div>
+
+          <div className="footer-links footer-links-last">
             <a href="https://accessibility.huit.harvard.edu/digital-accessibility-policy"
               target="_blank" rel="noopener noreferrer">Digital Accessibility</a>
             <a href="https://www.pbha.org/accessibility-2"
@@ -1831,14 +1850,6 @@ function App() {
               target="_blank" rel="noopener noreferrer">Subscribe to PBHA&rsquo;s email list</a>
           </div>
         </div>
-        {window.__demoRequest && (
-          <div className="wrap">
-            <p className="footer-note">
-              A work-in-progress prototype of an alumni directory for PBHA, built for review.
-              Not an official PBHA service, and the profiles shown are invented.
-            </p>
-          </div>
-        )}
       </footer>
     </>
   );
