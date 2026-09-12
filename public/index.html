@@ -103,15 +103,19 @@ header.site {
 .site-inner {
   display: flex;
   align-items: center;
-  gap: 30px;
-  /* Their header stands 108px tall; the sticky one here is a little tighter so
-     it does not eat the viewport when scrolled. */
-  min-height: 88px;
-  padding: 16px var(--pad);
-  max-width: var(--max);
+  gap: 26px;
+  /* Measured off pbha.org at a 1440px viewport: their header row runs 63px
+     tall, holds the 35x51 mark with 6px above and below it, and carries no
+     horizontal gutter at all — the logo sits flush at x=0 and the control at
+     the right edge sits flush too. Content is capped at 1498px, so the row
+     only starts insetting on screens wider than that. */
+  min-height: 63px;
+  padding: 0;
+  max-width: 1498px;
   margin: 0 auto;
 }
-.brand { display: flex; align-items: center; gap: 13px; text-decoration: none; }
+/* Their first nav item begins 26px after the mark. */
+.brand { display: flex; align-items: center; gap: 26px; text-decoration: none; }
 /* Their own mark, at the 35x51 they run it at in their header. */
 .brand-mark { width: 35px; height: 51px; flex: none; object-fit: contain; }
 .brand-name { font-size: 15px; font-weight: 600; line-height: 1.25; }
