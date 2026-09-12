@@ -51,6 +51,21 @@ deployed.
   `CORS_ORIGINS`, `NODE_ENV=production`
 - Optional: `SIGNUP_SECRET_CODE` to gate signup behind an invite code
 
+## The static demo
+
+`docs/` is a self-contained demo published to GitHub Pages at
+<https://k-12345-1.github.io/pbha-alumni/>. It is the real front end with a mock
+in place of the API, so the directory, filters, search, and profile pages work
+with no server; sign-in and saving are inert.
+
+```bash
+npm run build:demo    # regenerate docs/index.html after a front-end change
+```
+
+`public/index.html` stays the single source of truth — the demo is generated from
+it, never forked. The only demo-awareness in the app is the `window.__demoRequest`
+hook at the top of `api.request`, which nothing defines in the real build.
+
 ## Layout
 
 ```
@@ -60,6 +75,8 @@ src/services/               the query and privacy logic
 src/lib/class-year.ts       student vs alumni, derived from class year
 src/lib/programs.ts         the PBHA program and role vocabulary
 public/index.html           the whole front end
+scripts/build-demo.js       generates docs/ for GitHub Pages
+docs/                       the published static demo (generated)
 ```
 
 ## Notes for whoever picks this up next
