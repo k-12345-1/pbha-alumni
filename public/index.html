@@ -125,12 +125,6 @@ header.site {
   max-width: var(--max);
   margin: 0 auto;
 }
-/* Their first nav item begins 26px after the mark. */
-.brand { display: flex; align-items: center; gap: 26px; text-decoration: none; }
-/* Their own mark, at the 35x51 they run it at in their header. */
-.brand-mark { width: 35px; height: 51px; flex: none; object-fit: contain; }
-.brand-name { font-size: 15px; font-weight: 600; line-height: 1.25; }
-.brand-sub { font-size: 11px; color: var(--ink-mute); letter-spacing: 0.08em; text-transform: uppercase; }
 
 /* Sentence case, 15px/500, black — not uppercase. */
 nav.site-nav { display: flex; align-items: center; gap: 24px; }
@@ -922,10 +916,6 @@ function AccountMenu({ me, onProfile, onSignOut }) {
       )}
     </div>
   );
-}
-
-function Logo() {
-  return <img className="brand-mark" src="pbha-logo.png" alt="Phillips Brooks House Association" />;
 }
 
 function Field({ label, hint, children }) {
