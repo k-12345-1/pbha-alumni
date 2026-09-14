@@ -23,11 +23,17 @@ export const profileUpdateSchema = z
     career: z.string().max(160).nullable().optional(),
     industry: z.string().max(60).nullable().optional(),
     concentration: z.string().max(80).nullable().optional(),
+    house: z.string().max(60).nullable().optional(),
     bio: z.string().max(1500).nullable().optional(),
+
+    // Self-reported and always optional.
+    gender: z.string().max(80).nullable().optional(),
+    raceEthnicity: z.array(z.string().min(1).max(80)).max(12).optional(),
 
     programs: z.array(z.string().min(1).max(120)).max(30).optional(),
     programYears: z.record(z.string(), z.string().max(120)).optional(),
     pbhaRole: z.string().max(80).nullable().optional(),
+    involvement: z.string().max(2000).nullable().optional(),
 
     openToMentor: z.boolean().optional(),
     reachOut: z.string().max(2000).nullable().optional(),
@@ -39,6 +45,7 @@ export const privacyUpdateSchema = z
     profileVisibility: z.enum(["ALUMNI", "PRIVATE"]).optional(),
     showInDirectory: z.boolean().optional(),
     openToMessages: z.boolean().optional(),
+    showIdentity: z.boolean().optional(),
   })
   .strict();
 
@@ -51,6 +58,7 @@ export const directoryQuerySchema = z.object({
   yearTo: z.coerce.number().int().min(1930).max(2100).optional(),
   industry: z.union([z.string(), z.array(z.string())]).optional().transform(asArray),
   program: z.union([z.string(), z.array(z.string())]).optional().transform(asArray),
+  house: z.union([z.string(), z.array(z.string())]).optional().transform(asArray),
   role: z.union([z.string(), z.array(z.string())]).optional().transform(asArray),
   openToMentor: z
     .union([z.literal("true"), z.literal("false"), z.boolean()])

@@ -412,6 +412,18 @@ footer.site {
 
 .card-pad { padding: 24px; }
 
+/* The signed-out landing: one centred column rather than a split hero. */
+.gate { max-width: 560px; margin: 40px auto 0; text-align: center; }
+.gate-tabs { display: flex; gap: 10px; justify-content: center; margin: 36px 0 28px; }
+.gate-form {
+  text-align: left;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 32px;
+}
+.two-up { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 560px) { .two-up { grid-template-columns: 1fr; gap: 0; } }
+
 /* Chips, stamps, pills, and the cards themselves are controls, not copy.
    Without this, dragging across a card or double-clicking a chip selects its
    label and leaves it highlighted. Prose — bios, names on the profile page,
@@ -463,6 +475,126 @@ footer.site {
 
 
 
+
+/* ---------- welcome ---------- */
+
+.tile-row, .link-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+.link-grid { grid-template-columns: repeat(3, 1fr); }
+.tile, .link-card {
+  display: block;
+  text-align: left;
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 24px;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  font: inherit;
+  transition: border-color .15s;
+}
+.tile:hover, .link-card:hover { border-color: var(--orange); }
+.tile p, .link-card p { margin: 10px 0 16px; }
+.tile-cta { font-size: 13px; font-weight: 600; color: var(--orange); }
+
+/* ---------- study ---------- */
+
+.stat-band {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 32px;
+  margin-top: 36px;
+}
+.finding {
+  display: grid;
+  grid-template-columns: 1fr 90px 110px;
+  gap: 16px;
+  align-items: baseline;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 14.5px;
+}
+.finding:last-child { border-bottom: 0; }
+.finding-head {
+  font-size: 11px; font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--ink-mute);
+  background: var(--wash);
+}
+.finding .em-n { font-size: 17px; }
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 150px 1fr 46px;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+.bar-row:last-child { margin-bottom: 0; }
+.bar-label { font-weight: 500; }
+.bar-track { background: var(--wash-2); height: 14px; display: block; }
+.bar-fill { background: var(--orange); height: 100%; display: block; }
+.bar-value { font-weight: 700; color: var(--orange); text-align: right; }
+
+.link-orange { color: var(--orange); text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------- archives ---------- */
+
+.era { border-bottom: 1px solid var(--rule); }
+.era:last-child { border-bottom: 0; }
+.era-head {
+  display: grid;
+  grid-template-columns: 130px 1fr 24px;
+  gap: 16px;
+  align-items: center;
+  width: 100%;
+  padding: 18px 20px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+}
+.era-head:hover { background: var(--wash); }
+.era-years { font-size: 13px; font-weight: 600; color: var(--orange); letter-spacing: .04em; }
+.era-title { font-size: 17px; font-weight: 600; }
+.era-mark { font-size: 18px; color: var(--ink-mute); text-align: right; }
+.era-body { margin: 0; padding: 0 20px 22px 166px; }
+.era-body li { margin-bottom: 10px; max-width: 680px; }
+.era-body li:last-child { margin-bottom: 0; }
+
+.story-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+.story {
+  display: block;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 16px 18px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color .15s;
+}
+.story:hover { border-color: var(--orange); }
+.story-n { display: block; font-size: 12px; font-weight: 700; color: var(--orange); letter-spacing: .06em; }
+.story-who { display: block; font-size: 16px; font-weight: 600; margin: 4px 0 4px; }
+
+@media (max-width: 1000px) {
+  .tile-row, .link-grid, .story-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 700px) {
+  .tile-row, .link-grid, .story-grid { grid-template-columns: 1fr; }
+  .era-head { grid-template-columns: 100px 1fr 20px; gap: 10px; }
+  .era-body { padding-left: 20px; }
+  .finding { grid-template-columns: 1fr 60px 70px; gap: 10px; }
+  .bar-row { grid-template-columns: 110px 1fr 40px; }
+}
 </style>
 </head>
 <body>
@@ -471,19 +603,20 @@ footer.site {
 
 <script>
 (function () {
-  var PROFILES = [{"userId":"amara-okafor-example-com","first":"Amara","last":"Okafor","pronouns":null,"year":2014,"location":"Boston, MA","photoUrl":null,"career":"Pediatrician · Boston Medical Center","industry":"Health & Medicine","concentration":"Human Developmental Biology","bio":"Two summers at SUP turned into a career in community pediatrics. Happy to talk about medical school, or about running a program while taking orgo.","programs":["Chinatown Afterschool Program (CHAP)","Summer Urban Program"],"programYears":null,"pbhaRole":"Program Director","openToMentor":true,"reachOut":"Anything about the pre-med path, or SUP director life.","claimedAt":"2026-09-12T01:58:19.124Z","isCurrentStudent":false,"searchText":"amara okafor boston, ma pediatrician · boston medical center health & medicine human developmental biology program director chinatown afterschool program (chap) summer urban program"},{"userId":"daniel-reyes-example-com","first":"Daniel","last":"Reyes","pronouns":null,"year":2009,"location":"Washington, DC","photoUrl":null,"career":"Policy Counsel · National Housing Law Project","industry":"Law & Policy","concentration":"Social Studies","bio":"Started in ESOL, ended up writing tenant protection legislation. The through-line is the same work.","programs":["Adult ESOL Program","CIVICS"],"programYears":null,"pbhaRole":"Cabinet","openToMentor":true,"reachOut":"Law school, legal aid, housing policy.","claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":false,"searchText":"daniel reyes washington, dc policy counsel · national housing law project law & policy social studies cabinet adult esol program civics"},{"userId":"priya-nair-example-com","first":"Priya","last":"Nair","pronouns":null,"year":2018,"location":"New York, NY","photoUrl":null,"career":"Product Manager · Duolingo","industry":"Technology","concentration":"Computer Science","bio":"Teaching adult ESL is why I work on language learning now.","programs":["Chinatown ESL","BRYE Tutoring"],"programYears":null,"pbhaRole":"Program Coordinator","openToMentor":true,"reachOut":"Breaking into product, or tech recruiting timelines.","claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":false,"searchText":"priya nair new york, ny product manager · duolingo technology computer science program coordinator chinatown esl brye tutoring"},{"userId":"marcus-bell-example-com","first":"Marcus","last":"Bell","pronouns":null,"year":1996,"location":"Chicago, IL","photoUrl":null,"career":"Executive Director · Southside Youth Alliance","industry":"Nonprofit","concentration":"Government","bio":"Thirty years in youth development. Still use the site-director playbook I learned at PBHA.","programs":["Cambridge After-School Program (CASP)","Summer Urban Program"],"programYears":null,"pbhaRole":"Officer","openToMentor":true,"reachOut":"Running a nonprofit, board development, fundraising.","claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":false,"searchText":"marcus bell chicago, il executive director · southside youth alliance nonprofit government officer cambridge after-school program (casp) summer urban program"},{"userId":"hannah-kim-example-com","first":"Hannah","last":"Kim","pronouns":null,"year":2021,"location":"San Francisco, CA","photoUrl":null,"career":"Software Engineer · Stripe","industry":"Technology","concentration":"Applied Mathematics","bio":"Directed Big Sib through the pandemic. Learned more about logistics than any class taught me.","programs":["Chinatown Big Sibling","Chinatown Teen"],"programYears":null,"pbhaRole":"Program Director","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":false,"searchText":"hannah kim san francisco, ca software engineer · stripe technology applied mathematics program director chinatown big sibling chinatown teen"},{"userId":"tomas-lindqvist-example-com","first":"Tomás","last":"Lindqvist","pronouns":null,"year":2012,"location":"Cambridge, MA","photoUrl":null,"career":"Assistant Professor of Education · Boston College","industry":"Education","concentration":"Psychology","bio":"I study summer learning loss, which is a fancy way of saying I still think about SUP.","programs":["Summer Urban Program","BRYE Summer"],"programYears":null,"pbhaRole":"Summer Director","openToMentor":true,"reachOut":"PhD applications in education or psych.","claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":false,"searchText":"tomás lindqvist cambridge, ma assistant professor of education · boston college education psychology summer director summer urban program brye summer"},{"userId":"rachel-adeyemi-example-com","first":"Rachel","last":"Adeyemi","pronouns":null,"year":2006,"location":"Atlanta, GA","photoUrl":null,"career":"VP of Community Impact · Regions Bank","industry":"Finance","concentration":"Economics","bio":null,"programs":["Chinatown Citizenship","Adult ESOL Program"],"programYears":null,"pbhaRole":"Cabinet","openToMentor":true,"reachOut":"Corporate social responsibility, finance recruiting.","claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":false,"searchText":"rachel adeyemi atlanta, ga vp of community impact · regions bank finance economics cabinet chinatown citizenship adult esol program"},{"userId":"joseph-hartley-example-com","first":"Joseph","last":"Hartley","pronouns":null,"year":1984,"location":"Portland, ME","photoUrl":null,"career":"Retired · former Superintendent, Portland Public Schools","industry":"Education","concentration":"History","bio":"PBHA in the early eighties. I have a filing cabinet of program histories if anyone is writing about that era.","programs":["Cambridge After-School Program (CASP)"],"programYears":null,"pbhaRole":"Officer","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":false,"searchText":"joseph hartley portland, me retired · former superintendent, portland public schools education history officer cambridge after-school program (casp)"},{"userId":"wei-zhang-example-com","first":"Wei","last":"Zhang","pronouns":null,"year":2016,"location":"Boston, MA","photoUrl":null,"career":"Immigration Attorney · Greater Boston Legal Services","industry":"Law & Policy","concentration":"East Asian Studies","bio":"Citizenship program, then law school, then back to the same clients.","programs":["Chinatown Citizenship","Chinatown ESL","Chinatown Adventure"],"programYears":null,"pbhaRole":"Program Director","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":false,"searchText":"wei zhang boston, ma immigration attorney · greater boston legal services law & policy east asian studies program director chinatown citizenship chinatown esl chinatown adventure"},{"userId":"elena-moreau-example-com","first":"Elena","last":"Moreau","pronouns":null,"year":2019,"location":"Brooklyn, NY","photoUrl":null,"career":"Documentary Producer · Field Notes Media","industry":"Media & Arts","concentration":"Visual and Environmental Studies","bio":null,"programs":["Boston Refugee Youth Enrichment (BRYE) Teen","BRYE 1-2-1"],"programYears":null,"pbhaRole":"Program Coordinator","openToMentor":true,"reachOut":"Film, documentary, freelance survival.","claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":false,"searchText":"elena moreau brooklyn, ny documentary producer · field notes media media & arts visual and environmental studies program coordinator boston refugee youth enrichment (brye) teen brye 1-2-1"},{"userId":"samuel-osei-example-com","first":"Samuel","last":"Osei","pronouns":null,"year":2011,"location":"Accra, Ghana","photoUrl":null,"career":"Director of Programs · Ashesi Education Collaborative","industry":"Education","concentration":"Social Studies","bio":null,"programs":["Summer Urban Program","Cambridge Youth Enrichment Program"],"programYears":null,"pbhaRole":"Summer Director","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":false,"searchText":"samuel osei accra, ghana director of programs · ashesi education collaborative education social studies summer director summer urban program cambridge youth enrichment program"},{"userId":"nora-feldman-example-com","first":"Nora","last":"Feldman","pronouns":null,"year":2002,"location":"Seattle, WA","photoUrl":null,"career":"Clinical Psychologist · private practice","industry":"Health & Medicine","concentration":"Psychology","bio":"Alzheimer's Buddies is the reason I went into clinical work with older adults.","programs":["Alzheimer's Buddies","Best Buddies"],"programYears":null,"pbhaRole":"Program Director","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":false,"searchText":"nora feldman seattle, wa clinical psychologist · private practice health & medicine psychology program director alzheimer's buddies best buddies"},{"userId":"andre-thompson-example-com","first":"André","last":"Thompson","pronouns":null,"year":2023,"location":"Cambridge, MA","photoUrl":null,"career":"Research Assistant · Harvard Kennedy School","industry":"Law & Policy","concentration":"Government","bio":null,"programs":["CIVICS","College High-School Alliance (CHANCE)"],"programYears":null,"pbhaRole":"Cabinet","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":false,"searchText":"andré thompson cambridge, ma research assistant · harvard kennedy school law & policy government cabinet civics college high-school alliance (chance)"},{"userId":"mei-lin-chen-example-com","first":"Mei Lin","last":"Chen","pronouns":null,"year":2027,"location":"Cambridge, MA","photoUrl":null,"career":"Student","industry":"Student","concentration":"Sociology","bio":"Current CHAP director. Looking for alumni who ran the program in the 2010s.","programs":["Chinatown Afterschool Program (CHAP)","Chinatown Teen"],"programYears":null,"pbhaRole":"Program Director","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":true,"searchText":"mei lin chen cambridge, ma student student sociology program director chinatown afterschool program (chap) chinatown teen"},{"userId":"jordan-pierre-example-com","first":"Jordan","last":"Pierre","pronouns":null,"year":2028,"location":"Cambridge, MA","photoUrl":null,"career":"Student","industry":"Student","concentration":"Neuroscience","bio":null,"programs":["Boston Refugee Youth Enrichment (BRYE) Extension"],"programYears":null,"pbhaRole":"Program Coordinator","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":true,"searchText":"jordan pierre cambridge, ma student student neuroscience program coordinator boston refugee youth enrichment (brye) extension"},{"userId":"sofia-marchetti-example-com","first":"Sofia","last":"Marchetti","pronouns":null,"year":2026,"location":"Cambridge, MA","photoUrl":null,"career":"Student","industry":"Student","concentration":"History and Literature","bio":null,"programs":["Adult ESOL Program","CIVICS"],"programYears":null,"pbhaRole":"Volunteer","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":false,"searchText":"sofia marchetti cambridge, ma student student history and literature volunteer adult esol program civics"},{"userId":"kenji-watanabe-example-com","first":"Kenji","last":"Watanabe","pronouns":null,"year":1999,"location":"Los Angeles, CA","photoUrl":null,"career":"Partner · Westline Ventures","industry":"Finance","concentration":"Economics","bio":null,"programs":["Cambridge After-School Program (CASP)","Summer Urban Program"],"programYears":null,"pbhaRole":"Cabinet","openToMentor":true,"reachOut":"Venture, startups, or how to fund a nonprofit side project.","claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":false,"searchText":"kenji watanabe los angeles, ca partner · westline ventures finance economics cabinet cambridge after-school program (casp) summer urban program"},{"userId":"grace-mutua-example-com","first":"Grace","last":"Mutua","pronouns":null,"year":2020,"location":"Nairobi, Kenya","photoUrl":null,"career":"Health Systems Analyst · Ministry of Health","industry":"Health & Medicine","concentration":"Global Health and Health Policy","bio":null,"programs":["Alzheimer's Buddies","Adult ESOL Program"],"programYears":null,"pbhaRole":"Program Coordinator","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":false,"searchText":"grace mutua nairobi, kenya health systems analyst · ministry of health health & medicine global health and health policy program coordinator alzheimer's buddies adult esol program"},{"userId":"patrick-donnelly-example-com","first":"Patrick","last":"Donnelly","pronouns":null,"year":1991,"location":"Dorchester, MA","photoUrl":null,"career":"Principal · Dorchester Collegiate Academy","industry":"Education","concentration":"English","bio":null,"programs":["Summer Urban Program","BRYE Tutoring"],"programYears":null,"pbhaRole":"Summer Director","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":false,"searchText":"patrick donnelly dorchester, ma principal · dorchester collegiate academy education english summer director summer urban program brye tutoring"},{"userId":"leila-haddad-example-com","first":"Leila","last":"Haddad","pronouns":null,"year":2015,"location":"London, UK","photoUrl":null,"career":"Economist · Institute for Fiscal Studies","industry":"Research","concentration":"Economics","bio":null,"programs":["Chinatown ESL","Adult ESOL Program"],"programYears":null,"pbhaRole":"Program Director","openToMentor":true,"reachOut":"Econ PhD, UK moves, research careers.","claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":false,"searchText":"leila haddad london, uk economist · institute for fiscal studies research economics program director chinatown esl adult esol program"},{"userId":"c-whitfield-example-com","first":"Charles","last":"Whitfield","pronouns":null,"year":1978,"location":"Portland, ME","photoUrl":null,"career":"Retired · former City Planner, Boston Redevelopment Authority","industry":"Law & Policy","concentration":"Government","bio":"CASP in the late seventies, when the program ran out of two rooms. Glad to see it still going.","programs":["Cambridge After-School Program (CASP)"],"programYears":null,"pbhaRole":"Program Director","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":false,"searchText":"charles whitfield portland, me retired · former city planner, boston redevelopment authority law & policy government program director cambridge after-school program (casp)"},{"userId":"m-alvarez-example-com","first":"Marisol","last":"Alvarez","pronouns":null,"year":1988,"location":"Boston, MA","photoUrl":null,"career":"Deputy Director · Massachusetts Department of Public Health","industry":"Health & Medicine","concentration":"Biology","bio":null,"programs":["Summer Urban Program"],"programYears":null,"pbhaRole":"Summer Director","openToMentor":true,"reachOut":"Public health careers, state government, or running a summer site.","claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":false,"searchText":"marisol alvarez boston, ma deputy director · massachusetts department of public health health & medicine biology summer director summer urban program"},{"userId":"t-nguyen-example-com","first":"Thao","last":"Nguyen","pronouns":null,"year":2004,"location":"Brooklyn, NY","photoUrl":null,"career":"Architect · Nguyen + Partners","industry":"Media & Arts","concentration":"Visual and Environmental Studies","bio":"Big Sib matched me with a seven-year-old in 2001. We still email.","programs":["Chinatown Big Sibling"],"programYears":null,"pbhaRole":"Program Coordinator","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":false,"searchText":"thao nguyen brooklyn, ny architect · nguyen + partners media & arts visual and environmental studies program coordinator chinatown big sibling"},{"userId":"r-okonkwo-example-com","first":"Reuben","last":"Okonkwo","pronouns":null,"year":2010,"location":"Boston, MA","photoUrl":null,"career":"Civics Teacher · Boston Latin Academy","industry":"Education","concentration":"History","bio":null,"programs":["CIVICS"],"programYears":null,"pbhaRole":"Program Director","openToMentor":true,"reachOut":"Teaching, licensure, and getting into a classroom after college.","claimedAt":"2026-09-12T01:58:19.125Z","isCurrentStudent":false,"searchText":"reuben okonkwo boston, ma civics teacher · boston latin academy education history program director civics"}];
-  var VOCAB = {"programs":["Adult ESOL Program","Alzheimer's Buddies","Best Buddies","Boston Refugee Youth Enrichment (BRYE) Extension","Boston Refugee Youth Enrichment (BRYE) Teen","BRYE 1-2-1","BRYE Summer","BRYE Tutoring","Cambridge After-School Program (CASP)","Cambridge Youth Enrichment Program","Chinatown Adventure","Chinatown Afterschool Program (CHAP)","Chinatown Big Sibling","Chinatown Citizenship","Chinatown ESL","Chinatown Teen","CIVICS","College High-School Alliance (CHANCE)","Summer Urban Program"],"roles":["Volunteer","Program Coordinator","Program Director","Summer Director","Cabinet","Officer"]};
+  var PROFILES = [{"userId":"amara-okafor-example-com","first":"Amara","last":"Okafor","pronouns":null,"year":2014,"location":"Boston, MA","photoUrl":null,"career":"Pediatrician · Boston Medical Center","industry":"Health & Medicine","concentration":"Human Developmental Biology","house":"Currier","bio":"Two summers at SUP turned into a career in community pediatrics. Happy to talk about medical school, or about running a program while taking orgo.","gender":"Woman","raceEthnicity":["Black or African American"],"showIdentity":true,"programs":["Chinatown Afterschool Program (CHAP)","Summer Urban Program"],"programYears":null,"pbhaRole":"Program Director","involvement":"Ran CHAP my sophomore and junior years, then two summers at SUP as a site director in Mission Hill.","openToMentor":true,"reachOut":"Anything about the pre-med path, or SUP director life.","claimedAt":"2026-09-14T02:26:43.909Z","isCurrentStudent":false,"searchText":"amara okafor boston, ma pediatrician · boston medical center health & medicine human developmental biology program director currier ran chap my sophomore and junior years, then two summers at sup as a site director in mission hill. chinatown afterschool program (chap) summer urban program"},{"userId":"daniel-reyes-example-com","first":"Daniel","last":"Reyes","pronouns":null,"year":2009,"location":"Washington, DC","photoUrl":null,"career":"Policy Counsel · National Housing Law Project","industry":"Law & Policy","concentration":"Social Studies","house":"Adams","bio":"Started in ESOL, ended up writing tenant protection legislation. The through-line is the same work.","gender":"Man","raceEthnicity":["Hispanic or Latino/a/e"],"showIdentity":true,"programs":["Adult ESOL Program","CIVICS"],"programYears":null,"pbhaRole":"Cabinet","involvement":"Taught the Tuesday and Thursday ESOL sections for three years, then chaired the Cabinet committee that rewrote the volunteer training.","openToMentor":true,"reachOut":"Law school, legal aid, housing policy.","claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":false,"searchText":"daniel reyes washington, dc policy counsel · national housing law project law & policy social studies cabinet adams taught the tuesday and thursday esol sections for three years, then chaired the cabinet committee that rewrote the volunteer training. adult esol program civics"},{"userId":"priya-nair-example-com","first":"Priya","last":"Nair","pronouns":null,"year":2018,"location":"New York, NY","photoUrl":null,"career":"Product Manager · Duolingo","industry":"Technology","concentration":"Computer Science","house":"Leverett","bio":"Teaching adult ESL is why I work on language learning now.","gender":"Woman","raceEthnicity":["Asian"],"showIdentity":true,"programs":["Chinatown ESL","BRYE Tutoring"],"programYears":null,"pbhaRole":"Program Coordinator","involvement":"Coordinated Chinatown ESL, and spent a year building the curriculum shared across the adult programs.","openToMentor":true,"reachOut":"Breaking into product, or tech recruiting timelines.","claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":false,"searchText":"priya nair new york, ny product manager · duolingo technology computer science program coordinator leverett coordinated chinatown esl, and spent a year building the curriculum shared across the adult programs. chinatown esl brye tutoring"},{"userId":"marcus-bell-example-com","first":"Marcus","last":"Bell","pronouns":null,"year":1996,"location":"Chicago, IL","photoUrl":null,"career":"Executive Director · Southside Youth Alliance","industry":"Nonprofit","concentration":"Government","house":"Dunster","bio":"Thirty years in youth development. Still use the site-director playbook I learned at PBHA.","gender":"Man","raceEthnicity":["Black or African American"],"showIdentity":true,"programs":["Cambridge After-School Program (CASP)","Summer Urban Program"],"programYears":null,"pbhaRole":"Officer","involvement":"Officer for two years. Before that, CASP and three summers at SUP.","openToMentor":true,"reachOut":"Running a nonprofit, board development, fundraising.","claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":false,"searchText":"marcus bell chicago, il executive director · southside youth alliance nonprofit government officer dunster officer for two years. before that, casp and three summers at sup. cambridge after-school program (casp) summer urban program"},{"userId":"hannah-kim-example-com","first":"Hannah","last":"Kim","pronouns":null,"year":2021,"location":"San Francisco, CA","photoUrl":null,"career":"Software Engineer · Stripe","industry":"Technology","concentration":"Applied Mathematics","house":"Quincy","bio":"Directed Big Sib through the pandemic. Learned more about logistics than any class taught me.","gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Chinatown Big Sibling","Chinatown Teen"],"programYears":null,"pbhaRole":"Program Director","involvement":"Directed Chinatown Big Sibling through the pandemic, including the year everything ran on Zoom.","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":false,"searchText":"hannah kim san francisco, ca software engineer · stripe technology applied mathematics program director quincy directed chinatown big sibling through the pandemic, including the year everything ran on zoom. chinatown big sibling chinatown teen"},{"userId":"tomas-lindqvist-example-com","first":"Tomás","last":"Lindqvist","pronouns":null,"year":2012,"location":"Cambridge, MA","photoUrl":null,"career":"Assistant Professor of Education · Boston College","industry":"Education","concentration":"Psychology","house":"Winthrop","bio":"I study summer learning loss, which is a fancy way of saying I still think about SUP.","gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Summer Urban Program","BRYE Summer"],"programYears":null,"pbhaRole":"Summer Director","involvement":"Summer director at two SUP sites, and on the summer staff hiring committee.","openToMentor":true,"reachOut":"PhD applications in education or psych.","claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":false,"searchText":"tomás lindqvist cambridge, ma assistant professor of education · boston college education psychology summer director winthrop summer director at two sup sites, and on the summer staff hiring committee. summer urban program brye summer"},{"userId":"rachel-adeyemi-example-com","first":"Rachel","last":"Adeyemi","pronouns":null,"year":2006,"location":"Atlanta, GA","photoUrl":null,"career":"VP of Community Impact · Regions Bank","industry":"Finance","concentration":"Economics","house":"Eliot","bio":null,"gender":"Woman","raceEthnicity":["Black or African American"],"showIdentity":true,"programs":["Chinatown Citizenship","Adult ESOL Program"],"programYears":null,"pbhaRole":"Cabinet","involvement":"Cabinet, and the Citizenship program before that.","openToMentor":true,"reachOut":"Corporate social responsibility, finance recruiting.","claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":false,"searchText":"rachel adeyemi atlanta, ga vp of community impact · regions bank finance economics cabinet eliot cabinet, and the citizenship program before that. chinatown citizenship adult esol program"},{"userId":"joseph-hartley-example-com","first":"Joseph","last":"Hartley","pronouns":null,"year":1984,"location":"Portland, ME","photoUrl":null,"career":"Retired · former Superintendent, Portland Public Schools","industry":"Education","concentration":"History","house":"Lowell","bio":"PBHA in the early eighties. I have a filing cabinet of program histories if anyone is writing about that era.","gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Cambridge After-School Program (CASP)"],"programYears":null,"pbhaRole":"Officer","involvement":"Officer in 1983-84, back when the whole association ran out of the Brooks House parlor.","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":false,"searchText":"joseph hartley portland, me retired · former superintendent, portland public schools education history officer lowell officer in 1983-84, back when the whole association ran out of the brooks house parlor. cambridge after-school program (casp)"},{"userId":"wei-zhang-example-com","first":"Wei","last":"Zhang","pronouns":null,"year":2016,"location":"Boston, MA","photoUrl":null,"career":"Immigration Attorney · Greater Boston Legal Services","industry":"Law & Policy","concentration":"East Asian Studies","house":"Mather","bio":"Citizenship program, then law school, then back to the same clients.","gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Chinatown Citizenship","Chinatown ESL","Chinatown Adventure"],"programYears":null,"pbhaRole":"Program Director","involvement":"Four years across the Chinatown programs, ending as director of Citizenship.","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":false,"searchText":"wei zhang boston, ma immigration attorney · greater boston legal services law & policy east asian studies program director mather four years across the chinatown programs, ending as director of citizenship. chinatown citizenship chinatown esl chinatown adventure"},{"userId":"elena-moreau-example-com","first":"Elena","last":"Moreau","pronouns":null,"year":2019,"location":"Brooklyn, NY","photoUrl":null,"career":"Documentary Producer · Field Notes Media","industry":"Media & Arts","concentration":"Visual and Environmental Studies","house":"Cabot","bio":null,"gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Boston Refugee Youth Enrichment (BRYE) Teen","BRYE 1-2-1"],"programYears":null,"pbhaRole":"Program Coordinator","involvement":"Coordinated BRYE Teen and shot the program's first documentary short.","openToMentor":true,"reachOut":"Film, documentary, freelance survival.","claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":false,"searchText":"elena moreau brooklyn, ny documentary producer · field notes media media & arts visual and environmental studies program coordinator cabot coordinated brye teen and shot the program's first documentary short. boston refugee youth enrichment (brye) teen brye 1-2-1"},{"userId":"samuel-osei-example-com","first":"Samuel","last":"Osei","pronouns":null,"year":2011,"location":"Accra, Ghana","photoUrl":null,"career":"Director of Programs · Ashesi Education Collaborative","industry":"Education","concentration":"Social Studies","house":"Pforzheimer","bio":null,"gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Summer Urban Program","Cambridge Youth Enrichment Program"],"programYears":null,"pbhaRole":"Summer Director","involvement":"Summer director at SUP, then stayed on to help with the following year's hiring.","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":false,"searchText":"samuel osei accra, ghana director of programs · ashesi education collaborative education social studies summer director pforzheimer summer director at sup, then stayed on to help with the following year's hiring. summer urban program cambridge youth enrichment program"},{"userId":"nora-feldman-example-com","first":"Nora","last":"Feldman","pronouns":null,"year":2002,"location":"Seattle, WA","photoUrl":null,"career":"Clinical Psychologist · private practice","industry":"Health & Medicine","concentration":"Psychology","house":"Kirkland","bio":"Alzheimer's Buddies is the reason I went into clinical work with older adults.","gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Alzheimer's Buddies","Best Buddies"],"programYears":null,"pbhaRole":"Program Director","involvement":"Directed Alzheimer's Buddies and helped start the Best Buddies chapter's partnership with it.","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":false,"searchText":"nora feldman seattle, wa clinical psychologist · private practice health & medicine psychology program director kirkland directed alzheimer's buddies and helped start the best buddies chapter's partnership with it. alzheimer's buddies best buddies"},{"userId":"andre-thompson-example-com","first":"André","last":"Thompson","pronouns":null,"year":2023,"location":"Cambridge, MA","photoUrl":null,"career":"Research Assistant · Harvard Kennedy School","industry":"Law & Policy","concentration":"Government","house":"Adams","bio":null,"gender":"Man","raceEthnicity":["Black or African American"],"showIdentity":true,"programs":["CIVICS","College High-School Alliance (CHANCE)"],"programYears":null,"pbhaRole":"Cabinet","involvement":"Cabinet, CIVICS classroom lead, and CHANCE tutor.","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":false,"searchText":"andré thompson cambridge, ma research assistant · harvard kennedy school law & policy government cabinet adams cabinet, civics classroom lead, and chance tutor. civics college high-school alliance (chance)"},{"userId":"mei-lin-chen-example-com","first":"Mei Lin","last":"Chen","pronouns":null,"year":2027,"location":"Cambridge, MA","photoUrl":null,"career":"Student","industry":"Student","concentration":"Sociology","house":"Currier","bio":"Current CHAP director. Looking for alumni who ran the program in the 2010s.","gender":"Woman","raceEthnicity":["Asian"],"showIdentity":true,"programs":["Chinatown Afterschool Program (CHAP)","Chinatown Teen"],"programYears":null,"pbhaRole":"Program Director","involvement":"Current CHAP director. Started as a Tuesday tutor first year.","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":true,"searchText":"mei lin chen cambridge, ma student student sociology program director currier current chap director. started as a tuesday tutor first year. chinatown afterschool program (chap) chinatown teen"},{"userId":"jordan-pierre-example-com","first":"Jordan","last":"Pierre","pronouns":null,"year":2028,"location":"Cambridge, MA","photoUrl":null,"career":"Student","industry":"Student","concentration":"Neuroscience","house":"Leverett","bio":null,"gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Boston Refugee Youth Enrichment (BRYE) Extension"],"programYears":null,"pbhaRole":"Program Coordinator","involvement":"BRYE Extension coordinator, second year with the program.","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":true,"searchText":"jordan pierre cambridge, ma student student neuroscience program coordinator leverett brye extension coordinator, second year with the program. boston refugee youth enrichment (brye) extension"},{"userId":"sofia-marchetti-example-com","first":"Sofia","last":"Marchetti","pronouns":null,"year":2026,"location":"Cambridge, MA","photoUrl":null,"career":"Student","industry":"Student","concentration":"History and Literature","house":"Dunster","bio":null,"gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Adult ESOL Program","CIVICS"],"programYears":null,"pbhaRole":"Volunteer","involvement":"Adult ESOL volunteer since first year, and a CIVICS classroom partner.","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":false,"searchText":"sofia marchetti cambridge, ma student student history and literature volunteer dunster adult esol volunteer since first year, and a civics classroom partner. adult esol program civics"},{"userId":"kenji-watanabe-example-com","first":"Kenji","last":"Watanabe","pronouns":null,"year":1999,"location":"Los Angeles, CA","photoUrl":null,"career":"Partner · Westline Ventures","industry":"Finance","concentration":"Economics","house":"Eliot","bio":null,"gender":"Man","raceEthnicity":["Asian"],"showIdentity":true,"programs":["Cambridge After-School Program (CASP)","Summer Urban Program"],"programYears":null,"pbhaRole":"Cabinet","involvement":"Cabinet, CASP, and three summers at SUP.","openToMentor":true,"reachOut":"Venture, startups, or how to fund a nonprofit side project.","claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":false,"searchText":"kenji watanabe los angeles, ca partner · westline ventures finance economics cabinet eliot cabinet, casp, and three summers at sup. cambridge after-school program (casp) summer urban program"},{"userId":"grace-mutua-example-com","first":"Grace","last":"Mutua","pronouns":null,"year":2020,"location":"Nairobi, Kenya","photoUrl":null,"career":"Health Systems Analyst · Ministry of Health","industry":"Health & Medicine","concentration":"Global Health and Health Policy","house":"Quincy","bio":null,"gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Alzheimer's Buddies","Adult ESOL Program"],"programYears":null,"pbhaRole":"Program Coordinator","involvement":"Coordinated Alzheimer's Buddies and volunteered with Adult ESOL.","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":false,"searchText":"grace mutua nairobi, kenya health systems analyst · ministry of health health & medicine global health and health policy program coordinator quincy coordinated alzheimer's buddies and volunteered with adult esol. alzheimer's buddies adult esol program"},{"userId":"patrick-donnelly-example-com","first":"Patrick","last":"Donnelly","pronouns":null,"year":1991,"location":"Dorchester, MA","photoUrl":null,"career":"Principal · Dorchester Collegiate Academy","industry":"Education","concentration":"English","house":"Winthrop","bio":null,"gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Summer Urban Program","BRYE Tutoring"],"programYears":null,"pbhaRole":"Summer Director","involvement":"Summer director at the Dorchester site for two years running.","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":false,"searchText":"patrick donnelly dorchester, ma principal · dorchester collegiate academy education english summer director winthrop summer director at the dorchester site for two years running. summer urban program brye tutoring"},{"userId":"leila-haddad-example-com","first":"Leila","last":"Haddad","pronouns":null,"year":2015,"location":"London, UK","photoUrl":null,"career":"Economist · Institute for Fiscal Studies","industry":"Research","concentration":"Economics","house":"Mather","bio":null,"gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Chinatown ESL","Adult ESOL Program"],"programYears":null,"pbhaRole":"Program Director","involvement":"Directed Chinatown ESL and wrote the placement test the adult programs still use.","openToMentor":true,"reachOut":"Econ PhD, UK moves, research careers.","claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":false,"searchText":"leila haddad london, uk economist · institute for fiscal studies research economics program director mather directed chinatown esl and wrote the placement test the adult programs still use. chinatown esl adult esol program"},{"userId":"c-whitfield-example-com","first":"Charles","last":"Whitfield","pronouns":null,"year":1978,"location":"Portland, ME","photoUrl":null,"career":"Retired · former City Planner, Boston Redevelopment Authority","industry":"Law & Policy","concentration":"Government","house":"Lowell","bio":"CASP in the late seventies, when the program ran out of two rooms. Glad to see it still going.","gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Cambridge After-School Program (CASP)"],"programYears":null,"pbhaRole":"Program Director","involvement":"CASP in the late seventies, when the program ran out of two rooms.","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":false,"searchText":"charles whitfield portland, me retired · former city planner, boston redevelopment authority law & policy government program director lowell casp in the late seventies, when the program ran out of two rooms. cambridge after-school program (casp)"},{"userId":"m-alvarez-example-com","first":"Marisol","last":"Alvarez","pronouns":null,"year":1988,"location":"Boston, MA","photoUrl":null,"career":"Deputy Director · Massachusetts Department of Public Health","industry":"Health & Medicine","concentration":"Biology","house":"Cabot","bio":null,"gender":"Woman","raceEthnicity":["Hispanic or Latino/a/e"],"showIdentity":true,"programs":["Summer Urban Program"],"programYears":null,"pbhaRole":"Summer Director","involvement":"Summer director at SUP, 1987 and 1988.","openToMentor":true,"reachOut":"Public health careers, state government, or running a summer site.","claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":false,"searchText":"marisol alvarez boston, ma deputy director · massachusetts department of public health health & medicine biology summer director cabot summer director at sup, 1987 and 1988. summer urban program"},{"userId":"t-nguyen-example-com","first":"Thao","last":"Nguyen","pronouns":null,"year":2004,"location":"Brooklyn, NY","photoUrl":null,"career":"Architect · Nguyen + Partners","industry":"Media & Arts","concentration":"Visual and Environmental Studies","house":"Kirkland","bio":"Big Sib matched me with a seven-year-old in 2001. We still email.","gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Chinatown Big Sibling"],"programYears":null,"pbhaRole":"Program Coordinator","involvement":"Chinatown Big Sibling for three years.","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":false,"searchText":"thao nguyen brooklyn, ny architect · nguyen + partners media & arts visual and environmental studies program coordinator kirkland chinatown big sibling for three years. chinatown big sibling"},{"userId":"r-okonkwo-example-com","first":"Reuben","last":"Okonkwo","pronouns":null,"year":2010,"location":"Boston, MA","photoUrl":null,"career":"Civics Teacher · Boston Latin Academy","industry":"Education","concentration":"History","house":"Pforzheimer","bio":null,"gender":"Man","raceEthnicity":["Black or African American"],"showIdentity":true,"programs":["CIVICS"],"programYears":null,"pbhaRole":"Program Director","involvement":"CIVICS classroom lead, and a CHANCE tutor before that.","openToMentor":true,"reachOut":"Teaching, licensure, and getting into a classroom after college.","claimedAt":"2026-09-14T02:26:43.910Z","isCurrentStudent":false,"searchText":"reuben okonkwo boston, ma civics teacher · boston latin academy education history program director pforzheimer civics classroom lead, and a chance tutor before that. civics"}];
+  var VOCAB = {"programs":["Adult ESOL Program","Alzheimer's Buddies","Best Buddies","Boston Refugee Youth Enrichment (BRYE) Extension","Boston Refugee Youth Enrichment (BRYE) Teen","BRYE 1-2-1","BRYE Summer","BRYE Tutoring","Cambridge After-School Program (CASP)","Cambridge Youth Enrichment Program","Chinatown Adventure","Chinatown Afterschool Program (CHAP)","Chinatown Big Sibling","Chinatown Citizenship","Chinatown ESL","Chinatown Teen","CIVICS","College High-School Alliance (CHANCE)","Summer Urban Program"],"roles":["Volunteer","Program Coordinator","Program Director","Summer Director","Cabinet","Officer"],"houses":["Adams","Cabot","Currier","Dudley","Dunster","Eliot","Kirkland","Leverett","Lowell","Mather","Pforzheimer","Quincy","Winthrop","First-year (Yard)","Non-resident"],"genders":["Woman","Man","Non-binary","Prefer to self-describe","Prefer not to say"],"races":["American Indian or Alaska Native","Asian","Black or African American","Hispanic or Latino/a/e","Middle Eastern or North African","Native Hawaiian or Pacific Islander","White","Prefer to self-describe","Prefer not to say"]};
   var VIEWER_ID = "amara-okafor-example-com";
   var STUDENT_BOUNDARY = 2027;
 
   function facets() {
-    var programs = {}, industries = {}, locations = {}, roles = {};
+    var programs = {}, industries = {}, locations = {}, roles = {}, houses = {};
     var alumni = 0, students = 0;
     PROFILES.forEach(function (p) {
       (p.programs || []).forEach(function (x) { programs[x] = (programs[x] || 0) + 1; });
       if (p.industry) industries[p.industry] = (industries[p.industry] || 0) + 1;
       if (p.location) locations[p.location] = (locations[p.location] || 0) + 1;
       if (p.pbhaRole) roles[p.pbhaRole] = (roles[p.pbhaRole] || 0) + 1;
+      if (p.house) houses[p.house] = (houses[p.house] || 0) + 1;
       if (p.year >= STUDENT_BOUNDARY) students++; else alumni++;
     });
     var toList = function (o, byCount) {
@@ -494,7 +627,7 @@ footer.site {
     };
     return {
       programs: toList(programs), industries: toList(industries),
-      locations: toList(locations, true), roles: toList(roles),
+      locations: toList(locations, true), roles: toList(roles), houses: toList(houses),
       totalAlumni: alumni, totalStudents: students,
     };
   }
@@ -507,7 +640,7 @@ footer.site {
     var yearFrom = Number(params.get("yearFrom")) || -Infinity;
     var yearTo = Number(params.get("yearTo")) || Infinity;
     var mentor = params.get("openToMentor") === "true";
-    var programs = all("program"), industries = all("industry"), roles = all("role");
+    var programs = all("program"), industries = all("industry"), roles = all("role"), houses = all("house");
 
     var out = PROFILES.filter(function (p) {
       if (who === "alumni" && p.year >= STUDENT_BOUNDARY) return false;
@@ -516,6 +649,7 @@ footer.site {
       if (mentor && !p.openToMentor) return false;
       if (industries.length && industries.indexOf(p.industry) === -1) return false;
       if (roles.length && roles.indexOf(p.pbhaRole) === -1) return false;
+      if (houses.length && houses.indexOf(p.house) === -1) return false;
       if (programs.length && !programs.some(function (x) { return (p.programs || []).indexOf(x) !== -1; })) return false;
       if (q && p.searchText.indexOf(q) === -1) return false;
       return true;
@@ -553,7 +687,7 @@ footer.site {
     if (url === "/api/directory/facets") return Promise.resolve(facets());
     if (url === "/api/directory") return Promise.resolve(search(params));
     if (url === "/api/users/me/privacy") {
-      if (method === "GET") return Promise.resolve({ profileVisibility: "ALUMNI", showInDirectory: true, openToMessages: true });
+      if (method === "GET") return Promise.resolve({ profileVisibility: "ALUMNI", showInDirectory: true, openToMessages: true, showIdentity: false });
       return Promise.reject(new Error("This is a static demo — nothing saves here."));
     }
     if (url === "/api/users/me" && method === "PATCH") {
@@ -643,6 +777,13 @@ const splitCareer = (career) => {
   const [title, org] = String(career || "").split(" · ");
   return { title: title || "", org: org || "" };
 };
+
+const SECTIONS = [
+  { key: "welcome", label: "Welcome" },
+  { key: "directory", label: "Directory" },
+  { key: "study", label: "Alumni Study" },
+  { key: "archives", label: "Archives" },
+];
 
 // The account control in the header: an orange avatar that opens the two
 // things it stands for — edit your profile, or sign out.
@@ -751,9 +892,6 @@ function ProgramChips({ programs, limit }) {
 
 function GateScreen({ onSignedIn }) {
   const [mode, setMode] = React.useState("signin");
-  // The static demo accepts any credentials, so the fields start filled —
-  // otherwise a visitor who signs out hits required-field validation with
-  // nothing to type.
   const demo = !!window.__demoRequest;
   const [form, setForm] = React.useState({
     email: demo ? "demo@pbha.example" : "",
@@ -796,94 +934,74 @@ function GateScreen({ onSignedIn }) {
 
   return (
     <div className="wrap page">
-      <div style={{ display: "grid", gridTemplateColumns: "1.15fr 1fr", gap: 72, alignItems: "start" }}
-        className="gate-layout">
-        <div>
-          <div className="eyebrow" style={{ marginBottom: 18 }}>Phillips Brooks House Association</div>
-          <h1 className="h-1 accent">The PBHA Alumni Directory</h1>
-          <p className="lede" style={{ marginTop: 24, maxWidth: 580 }}>
-            Since <span className="em-n">1904</span>, students have run
-            <span className="em-u"> the Phillips Brooks House Association</span> and its
-            <span className="em-n"> 80+</span> community programs across Boston and Cambridge.
-            This is where they find each other again.
-          </p>
+      <div className="gate">
+        <div className="eyebrow" style={{ marginBottom: 20 }}>Phillips Brooks House Association</div>
+        <h1 className="h-1 accent">PBHA Alumni Network</h1>
+        <p className="lede" style={{ marginTop: 20 }}>
+          Every PBHA volunteer, coordinator, and director, in one place. Find the people
+          you served with, and be findable by the students who came after you.
+        </p>
 
-          <hr className="rule" style={{ margin: "36px 0 28px" }} />
-
-          <ul className="fact-list" style={{ maxWidth: 520 }}>
-            <li>Search by <span className="em-n em-u">program</span>, class year, city, or field of work</li>
-            <li>Find alumni <span className="em-n em-u">open to mentoring</span> current students</li>
-            <li>Current students and alumni in <span className="em-n em-u">one</span> directory</li>
-          </ul>
-
-          <p className="meta" style={{ marginTop: 32, maxWidth: 520 }}>
-            Visible to signed-in members only. Profiles are never sold, exported, or added to
-            mailing lists, and any member can hide their own.
-          </p>
+        <div className="gate-tabs">
+          <button className={`btn ${mode === "signin" ? "btn-primary" : "btn-ghost"}`}
+            onClick={() => { setMode("signin"); setError(""); }}>Sign in</button>
+          <button className={`btn ${mode === "signup" ? "btn-primary" : "btn-ghost"}`}
+            onClick={() => { setMode("signup"); setError(""); }}>Join</button>
         </div>
 
-        <div className="card" style={{ padding: 32 }}>
-          <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
-            <button className={`btn btn-sm ${mode === "signin" ? "btn-ink" : "btn-ghost"}`}
-              onClick={() => { setMode("signin"); setError(""); }}>Sign in</button>
-            <button className={`btn btn-sm ${mode === "signup" ? "btn-ink" : "btn-ghost"}`}
-              onClick={() => { setMode("signup"); setError(""); }}>Join</button>
-          </div>
-
-          <form onSubmit={submit}>
-            {mode === "signup" && (
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-                <Field label="First name">
-                  <input className="input" value={form.first} onChange={set("first")} required />
-                </Field>
-                <Field label="Last name">
-                  <input className="input" value={form.last} onChange={set("last")} required />
-                </Field>
-              </div>
-            )}
-            {mode === "signup" && (
-              <Field label="Class year" hint="The year you graduated, or expect to.">
-                <input className="input" type="number" min="1930" max="2050"
-                  value={form.year} onChange={set("year")} required />
+        <form onSubmit={submit} className="gate-form">
+          {mode === "signup" && (
+            <div className="two-up">
+              <Field label="First name">
+                <input className="input" value={form.first} onChange={set("first")} required />
               </Field>
-            )}
-            <Field label="Email">
-              <input className="input" type="email" autoComplete="email"
-                value={form.email} onChange={set("email")} required />
-            </Field>
-            <Field label="Password"
-              hint={mode === "signup" ? "At least 10 characters." : undefined}>
-              <input className="input" type="password"
-                autoComplete={mode === "signup" ? "new-password" : "current-password"}
-                value={form.password} onChange={set("password")} required />
-            </Field>
-            {mode === "signup" && (
-              <Field label="Invite code" hint="Only if PBHA gave you one.">
-                <input className="input" value={form.inviteCode} onChange={set("inviteCode")} />
+              <Field label="Last name">
+                <input className="input" value={form.last} onChange={set("last")} required />
               </Field>
-            )}
+            </div>
+          )}
+          {mode === "signup" && (
+            <Field label="Class year" hint="The year you graduated, or expect to.">
+              <input className="input" type="number" min="1930" max="2050"
+                value={form.year} onChange={set("year")} required />
+            </Field>
+          )}
+          <Field label="Email">
+            <input className="input" type="email" autoComplete="email"
+              value={form.email} onChange={set("email")} required />
+          </Field>
+          <Field label="Password"
+            hint={mode === "signup" ? "At least 10 characters." : undefined}>
+            <input className="input" type="password"
+              autoComplete={mode === "signup" ? "new-password" : "current-password"}
+              value={form.password} onChange={set("password")} required />
+          </Field>
+          {mode === "signup" && (
+            <Field label="Invite code" hint="Only if PBHA gave you one.">
+              <input className="input" value={form.inviteCode} onChange={set("inviteCode")} />
+            </Field>
+          )}
 
-            {mode === "signup" && (
-              <p className="meta" style={{ marginBottom: 18 }}>
-                By joining you agree to use the directory to reconnect with PBHA members, and
-                not to export it, scrape it, or add anyone to a mailing list without asking.
-              </p>
-            )}
+          {mode === "signup" && (
+            <p className="meta" style={{ marginBottom: 18, textAlign: "left" }}>
+              By joining you agree to use the network to reconnect with PBHA members, and not
+              to export it, scrape it, or add anyone to a mailing list without asking.
+            </p>
+          )}
 
-            {error && <div className="banner banner-error" style={{ marginBottom: 16 }}>{error}</div>}
+          {error && <div className="banner banner-error" style={{ marginBottom: 16 }}>{error}</div>}
 
-            {demo && (
-              <p className="meta" style={{ marginBottom: 16, fontSize: 13 }}>
-                Preview of a directory that is not live yet — any email and password will
-                sign you in, and the members you will see are invented.
-              </p>
-            )}
+          {demo && (
+            <p className="meta" style={{ marginBottom: 16, fontSize: 13, textAlign: "left" }}>
+              Preview of a network that is not live yet — any email and password will sign you
+              in, and the members you will see are invented.
+            </p>
+          )}
 
-            <button className="btn btn-primary" style={{ width: "100%" }} disabled={busy}>
-              {busy ? "One moment…" : mode === "signin" ? "Sign in" : "Create account"}
-            </button>
-          </form>
-        </div>
+          <button className="btn btn-primary" style={{ width: "100%" }} disabled={busy}>
+            {busy ? "One moment…" : mode === "signin" ? "Sign in" : "Create account"}
+          </button>
+        </form>
       </div>
     </div>
   );
@@ -892,6 +1010,434 @@ function GateScreen({ onSignedIn }) {
 /* ------------------------------------------------------------------ *
  * Directory
  * ------------------------------------------------------------------ */
+
+/* ------------------------------------------------------------------ *
+ * Welcome — what a member can actually do, in the order it is useful.
+ *
+ * The links here are PBHA's real ones. Worth knowing while editing: of
+ * the involvement paths PBHA publishes today, most are giving or a
+ * mailing list, and the two participatory ones (mentoring, and an
+ * "ongoing involvement" Google Form) have no page describing them.
+ * That gap is the reason this network exists, so the page leads with
+ * what happens here and lists PBHA's own channels underneath.
+ * ------------------------------------------------------------------ */
+
+const GET_INVOLVED = [
+  {
+    title: "Alumni Weekend",
+    body: "Brings together generations of PBHAers in Cambridge every fall.",
+    href: "https://www.pbha.org/get-involved/join-the-alumni-network",
+    cta: "About PBHA-A",
+  },
+  {
+    title: "Tell your story",
+    body: "120 Stories collects accounts from alumni, participants, volunteers, and directors across the decades. Submissions are open.",
+    href: "https://www.tfaforms.com/5223933",
+    cta: "Submit a story",
+  },
+  {
+    title: "Say what you want to work on",
+    body: "PBHA-A's intake form for alumni who want to be involved in events, projects, or student connections.",
+    href: "https://docs.google.com/forms/d/e/1FAIpQLSeGqj4QHW-sD3iyCB7_3AYq8V5C2RL1MKFKrtGPGBpj7H0oFA/viewform",
+    cta: "Ongoing involvement form",
+  },
+  {
+    title: "Join the mailing list",
+    body: "News from PBHA and the Alumni Association.",
+    href: "http://eepurl.com/q5ZD9",
+    cta: "Subscribe",
+  },
+  {
+    title: "Road to the 125th",
+    body: "The five-year campaign toward PBHA's 125th anniversary in 2029, aiming to raise annual giving by $1.3 million and double alumni participation from one in ten to one in four.",
+    href: "https://connect.clickandpledge.com/Organization/pbha/campaign/125Donation",
+    cta: "Give",
+  },
+  {
+    title: "Write to the Alumni Association",
+    body: "Events, projects, undergraduate connections, fundraising — the officers read it.",
+    href: "mailto:alumnipresident@pbha.org",
+    cta: "alumnipresident@pbha.org",
+  },
+];
+
+function WelcomeScreen({ me, setScreen }) {
+  const first = (me.profile && me.profile.first) || "";
+  return (
+    <div className="wrap page">
+      <div className="eyebrow" style={{ marginBottom: 16 }}>Welcome</div>
+      <h1 className="h-1 accent">{first ? `Welcome back, ${first}.` : "Welcome to the network."}</h1>
+      <p className="lede" style={{ marginTop: 18, maxWidth: 720 }}>
+        You are a member of the Phillips Brooks House Alumni Association because you were
+        involved in a PBHA program. There is nothing to join and no dues:
+        <span className="em-u"> everyone who served is already in</span>, whether or not they
+        graduated from Harvard.
+      </p>
+
+      <hr className="rule" style={{ margin: "40px 0 32px" }} />
+
+      <h2 className="h-2" style={{ marginBottom: 20 }}>Start here</h2>
+      <div className="tile-row">
+        <button className="tile" onClick={() => setScreen("me")}>
+          <div className="h-3">Fill in your profile</div>
+          <p className="meta">
+            Your programs, where you landed, and what students can ask you about. A blank
+            profile is invisible to the people looking for you.
+          </p>
+          <span className="tile-cta">Edit your profile →</span>
+        </button>
+        <button className="tile" onClick={() => setScreen("directory")}>
+          <div className="h-3">Find people</div>
+          <p className="meta">
+            Search by program, class year, House, city, or the work someone does now.
+          </p>
+          <span className="tile-cta">Open the directory →</span>
+        </button>
+        <button className="tile" onClick={() => setScreen("study")}>
+          <div className="h-3">Read the alumni study</div>
+          <p className="meta">
+            What 1,078 PBHA alumni said about where their service years took them.
+          </p>
+          <span className="tile-cta">See the findings →</span>
+        </button>
+      </div>
+
+      <hr className="rule" style={{ margin: "44px 0 32px" }} />
+
+      <h2 className="h-2" style={{ marginBottom: 8 }}>Ways to stay involved</h2>
+      <p className="meta" style={{ marginBottom: 24, maxWidth: 640 }}>
+        Everything below is run by PBHA and opens on their site.
+      </p>
+      <div className="link-grid">
+        {GET_INVOLVED.map((g) => (
+          <a key={g.title} className="link-card" href={g.href} target="_blank" rel="noopener noreferrer">
+            <div className="h-3">{g.title}</div>
+            <p className="meta">{g.body}</p>
+            <span className="tile-cta">{g.cta} →</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Alumni Study
+ *
+ * Every figure here is PBHA's own, published across /alumni-impact and
+ * its subpages. Where a finding has two numbers, the first is all
+ * respondents and the second is alumni who took part in what PBHA calls
+ * intensive programming; both are reported rather than the flattering
+ * one. Nothing here is estimated or filled in — if PBHA has not
+ * published it, it is not on this page.
+ * ------------------------------------------------------------------ */
+
+const STUDY_HEADLINE = [
+  { n: "1,078", label: "alumni responded to the survey" },
+  { n: "95%", label: "voted in the last two years" },
+  { n: "93%", label: "gave money or goods to a social justice cause" },
+  { n: "91%", label: "came to think of themselves as a leader through PBHA" },
+];
+
+const STUDY_SECTIONS = [
+  {
+    title: "A lifetime of public service",
+    href: "https://www.pbha.org/alumni-impact/lifetime-of-public-service",
+    rows: [
+      ["Passion for public service was nurtured at PBHA", "82%", "96%"],
+      ["PBHA strengthened their commitment to social challenges", "80%", "94%"],
+      ["Volunteered in a political context in the last two years", "58%", null],
+    ],
+    tallies: [
+      ["962", "board seats held"],
+      ["2,671", "volunteer or pro bono roles"],
+      ["1,196", "executive or management roles at public service organizations"],
+    ],
+  },
+  {
+    title: "Lasting skills",
+    href: "https://www.pbha.org/alumni-impact/lasting-skills-for-lifelong-success",
+    rows: [
+      ["Developed a deeper belief in their own capabilities", null, "79%"],
+      ["Learned effective leadership and management skills", null, "88%"],
+      ["Came to think of themselves as a leader", null, "91%"],
+      ["Can work effectively with people of different backgrounds", "70%", "90%"],
+      ["Developed a connection to the communities they worked with", "75%", "96%"],
+      ["PBHA shaped their sense of the importance of empathy", "83%", "94%"],
+    ],
+  },
+];
+
+const STUDY_FIELDS = [
+  ["Education", 450], ["Healthcare", 278], ["Business", 216], ["Legal", 200],
+  ["Government", 185], ["Social Services", 173], ["Sciences", 100], ["Technology", 92],
+];
+
+function Bar({ label, value, max }) {
+  return (
+    <div className="bar-row">
+      <span className="bar-label">{label}</span>
+      <span className="bar-track">
+        <span className="bar-fill" style={{ width: `${(value / max) * 100}%` }} />
+      </span>
+      <span className="bar-value">{value}</span>
+    </div>
+  );
+}
+
+function StudyScreen() {
+  const max = STUDY_FIELDS[0][1];
+  return (
+    <div className="wrap page">
+      <div className="eyebrow" style={{ marginBottom: 16 }}>Alumni Study</div>
+      <h1 className="h-1 accent">What PBHA does to a life</h1>
+      <p className="lede" style={{ marginTop: 18, maxWidth: 720 }}>
+        The PBHA Alumni Association surveyed alumni about where their service years took them.
+        <span className="em-n"> 1,078</span> people answered. These are their findings, as PBHA
+        published them.
+      </p>
+
+      <div className="stat-band">
+        {STUDY_HEADLINE.map((h) => (
+          <div key={h.label}>
+            <div className="stat-n">{h.n}</div>
+            <div className="meta" style={{ marginTop: 6 }}>{h.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {STUDY_SECTIONS.map((sec) => (
+        <div key={sec.title} style={{ marginTop: 48 }}>
+          <h2 className="h-2" style={{ marginBottom: 6 }}>{sec.title}</h2>
+          <p className="meta" style={{ marginBottom: 20 }}>
+            First figure is all respondents; second is alumni who took part in intensive
+            programming. <a className="link-orange" href={sec.href} target="_blank" rel="noopener noreferrer">PBHA's write-up →</a>
+          </p>
+          <div className="card">
+            <div className="finding finding-head">
+              <span>Finding</span><span>All</span><span>Intensive</span>
+            </div>
+            {sec.rows.map((r) => (
+              <div className="finding" key={r[0]}>
+                <span>{r[0]}</span>
+                <span className={r[1] ? "em-n" : "meta"}>{r[1] || "—"}</span>
+                <span className={r[2] ? "em-n" : "meta"}>{r[2] || "—"}</span>
+              </div>
+            ))}
+          </div>
+          {sec.tallies && (
+            <div className="stat-band" style={{ marginTop: 24 }}>
+              {sec.tallies.map((t) => (
+                <div key={t[1]}>
+                  <div className="stat-n">{t[0]}</div>
+                  <div className="meta" style={{ marginTop: 6, maxWidth: 210 }}>{t[1]}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+
+      <div style={{ marginTop: 48 }}>
+        <h2 className="h-2" style={{ marginBottom: 6 }}>Where respondents work</h2>
+        <p className="meta" style={{ marginBottom: 20 }}>Respondents by professional field.</p>
+        <div className="card card-pad">
+          {STUDY_FIELDS.map(([label, value]) => (
+            <Bar key={label} label={label} value={value} max={max} />
+          ))}
+        </div>
+      </div>
+
+      <hr className="rule" style={{ margin: "48px 0 24px" }} />
+      <h2 className="h-2" style={{ marginBottom: 12 }}>Who did this</h2>
+      <p style={{ maxWidth: 720, margin: "0 0 16px" }}>
+        The study was envisioned and supported by the PBHA Alumni Association board.
+        <strong> Leah Robinson</strong> developed the survey as a student at the Harvard Graduate
+        School of Education, advised by <strong>Professors Alexis Redding</strong> and
+        <strong> Julie Reuben</strong>. <strong>Christine Tran</strong> and <strong>Sammy Lee</strong> ran
+        the primary analysis as their Vanderbilt Leadership &amp; Learning in Organizations PhD
+        capstone. <strong>Nancy Sato '75</strong> guided the overall study and
+        <strong> Sam Greenberg</strong> analysed and summarised the outcomes.
+      </p>
+      <p className="meta" style={{ maxWidth: 720, marginBottom: 20 }}>
+        PBHA publishes headline figures rather than methodology: response rate, fielding dates,
+        and how "intensive programming" was defined are not stated in the public write-up.
+        Read the findings with that in mind.
+      </p>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <a className="btn btn-primary" href="https://drive.google.com/file/d/19xNKOQVA9zn8Vbt5ah7iosz1l-EsMqlG/view?usp=sharing"
+          target="_blank" rel="noopener noreferrer">Read the full report</a>
+        <a className="btn btn-ghost" href="https://www.pbha.org/alumni-impact"
+          target="_blank" rel="noopener noreferrer">PBHA's impact pages</a>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Archives
+ *
+ * PBHA has no archive. There is a prose institutional history at
+ * /our-history, and 120 Stories, a numbered series of written accounts.
+ * This section puts both in one place and gives alumni somewhere to add
+ * to it — which is the whole point, since the people who remember the
+ * 1970s collapse or the 1995 rally are the ones reading this.
+ * ------------------------------------------------------------------ */
+
+const ERAS = [
+  {
+    era: "Origins",
+    years: "1893–1904",
+    items: [
+      "Phillips Brooks House is built in memory of Reverend Phillips Brooks, a Trinity Church preacher, Harvard graduate, and advocate for social service. Plans are completed on his death in 1893.",
+      "The House is dedicated on 23 January 1900, to serve “the ideal of piety, charity, and hospitality.”",
+      "In 1904, six organizations formally organize as the Phillips Brooks House Association.",
+    ],
+  },
+  {
+    era: "The first half-century",
+    years: "1900s–1940s",
+    items: ["By the 1920s every religious group has withdrawn, leaving PBHA a secular service association."],
+  },
+  {
+    era: "Opening up",
+    years: "1950s–1960s",
+    items: [
+      "1954: Radcliffe students are admitted to full participation.",
+      "A Mental Health Committee forms; students organize with the Roosevelt Towers tenants' council.",
+      "1969: PBHA commits the house to being a common meeting ground during the protests, and produces a twelve-page report, The Critique of Harvard Expansion.",
+    ],
+  },
+  {
+    era: "Collapse and rebuilding",
+    years: "1970s",
+    items: [
+      "Membership falls from over 1,000 students to fewer than 200.",
+      "PBHA incorporates in 1973 and hires its first full-time graduate secretary — now the executive director — in 1974.",
+      "The Environmental Action Committee, the Committee on Women's Issues, and Harvard's first women's center are founded, the last on the second floor of Phillips Brooks House.",
+      "Michael Robinson '74: “The approach quickly evolved from arms-length charity to an involved attack on basic social and political problems.”",
+    ],
+  },
+  {
+    era: "Shelter and scale",
+    years: "1980s",
+    items: [
+      "The Harvard Square Homeless Shelter opens at University Lutheran Church.",
+      "A $1 million capital campaign runs in 1986.",
+      "The Summer Urban Program grows into a twelve-camp network serving more than 700 children.",
+    ],
+  },
+  {
+    era: "Independence",
+    years: "1990s–2000s",
+    items: [
+      "1992: the cabinet votes to create a student board of directors.",
+      "November 1995: a cabinet resolution urges “a more rational, autonomous structure.” On 7 December, more than 2,000 people join a rally.",
+      "By-laws are rewritten in spring 1996, a one-year trial agreement follows that summer, and a final agreement is signed in September 1997.",
+      "A $7.25 million Centennial Campaign follows. The Living Wage Campaign runs through PSLM, later SLAM, including a Massachusetts Hall sit-in and a plane over commencement.",
+    ],
+  },
+  {
+    era: "Present day",
+    years: "2004–",
+    items: [
+      "More than 85 programs and over 1,400 volunteers.",
+      "2024: PBHA marks 120 years and begins 120 Stories.",
+      "The Road to the 125th runs toward the anniversary in 2029.",
+    ],
+  },
+];
+
+// Named subjects from PBHA's published 120 Stories series. Numbers are
+// theirs; the series counts down.
+const STORIES = [
+  ["120", "Remi Cruz", "Founder of Keylatch, on Jorge Palmarin's legacy"],
+  ["119", "Meherina Khan & Farah Afify", "Leading through the pandemic"],
+  ["118", "Ian Simmons", "The Harvard Living Wage Campaign"],
+  ["117", "Van Le", "Vietnamese refugee to Cambridge Youth Enrichment Program"],
+  ["116", "Darin McKeever", "Co-founder of Heads Up"],
+  ["115", "Arnold Hiatt", "The Stride Rite sponsorship"],
+  ["114", "Priscilla Chan", "FASE, and the Chan Zuckerberg Initiative"],
+  ["113", "Richard Buery", "Founded the Mission Hill Summer Program; CEO of Robin Hood"],
+  ["112", "Roger Baldwin", "Co-founder of the ACLU"],
+  ["110", "Sara Lockridge-Steckel", "The Collective Blueprint"],
+  ["109", "Eric Dawson", "Peace Games"],
+  ["108", "Lindsay Hyde", "Strong Women, Strong Girls"],
+];
+
+function ArchivesScreen() {
+  const [open, setOpen] = React.useState(ERAS[0].era);
+  return (
+    <div className="wrap page">
+      <div className="eyebrow" style={{ marginBottom: 16 }}>Archives</div>
+      <h1 className="h-1 accent">A hundred and twenty years of it</h1>
+      <p className="lede" style={{ marginTop: 18, maxWidth: 720 }}>
+        PBHA has been running since <span className="em-n">1904</span>, and almost none of it is
+        written down anywhere a member can find. What follows is PBHA's published history and
+        its 120 Stories series, in one place.
+      </p>
+
+      <hr className="rule" style={{ margin: "40px 0 32px" }} />
+
+      <h2 className="h-2" style={{ marginBottom: 20 }}>The record so far</h2>
+      <div className="card">
+        {ERAS.map((e) => {
+          const isOpen = open === e.era;
+          return (
+            <div key={e.era} className="era">
+              <button className="era-head" onClick={() => setOpen(isOpen ? null : e.era)}
+                aria-expanded={isOpen}>
+                <span className="era-years">{e.years}</span>
+                <span className="era-title">{e.era}</span>
+                <span className="era-mark">{isOpen ? "−" : "+"}</span>
+              </button>
+              {isOpen && (
+                <ul className="era-body">
+                  {e.items.map((it, i) => <li key={i}>{it}</li>)}
+                </ul>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <p className="meta" style={{ marginTop: 12 }}>
+        Drawn from <a className="link-orange" href="https://www.pbha.org/our-history" target="_blank" rel="noopener noreferrer">PBHA's history page</a>.
+      </p>
+
+      <hr className="rule" style={{ margin: "44px 0 32px" }} />
+
+      <h2 className="h-2" style={{ marginBottom: 8 }}>120 Stories</h2>
+      <p className="meta" style={{ marginBottom: 24, maxWidth: 700 }}>
+        For its 120th anniversary PBHA began collecting accounts from alumni, participants,
+        volunteers, and directors. A selection of what is published so far.
+      </p>
+      <div className="story-grid">
+        {STORIES.map(([n, who, what]) => (
+          <a key={n} className="story" href="https://www.pbha.org/120stories"
+            target="_blank" rel="noopener noreferrer">
+            <span className="story-n">#{n}</span>
+            <span className="story-who">{who}</span>
+            <span className="meta">{what}</span>
+          </a>
+        ))}
+      </div>
+
+      <div className="card card-pad" style={{ marginTop: 32 }}>
+        <h3 className="h-3" style={{ marginBottom: 8 }}>Add to the record</h3>
+        <p className="meta" style={{ marginBottom: 18, maxWidth: 620 }}>
+          If you were there for the 1970s rebuilding, the 1995 rally, the first winter of the
+          shelter, or a summer nobody has written up, that account exists nowhere but with you.
+          Submissions are read by the PBHA team.
+        </p>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <a className="btn btn-primary" href="https://www.tfaforms.com/5223933"
+            target="_blank" rel="noopener noreferrer">Submit your story</a>
+          <a className="btn btn-ghost" href="mailto:120Stories@pbha.org">120Stories@pbha.org</a>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /* ------------------------------------------------------------------ *
  * Directory map — where members are, on a Robinson world projection.
@@ -1317,6 +1863,7 @@ function DirectoryScreen({ onOpenProfile }) {
   const [programs, setPrograms] = React.useState([]);
   const [industries, setIndustries] = React.useState([]);
   const [roles, setRoles] = React.useState([]);
+  const [houses, setHouses] = React.useState([]);
   const [yearFrom, setYearFrom] = React.useState(YEAR_MIN);
   const [yearTo, setYearTo] = React.useState(YEAR_MAX);
   const [mentorOnly, setMentorOnly] = React.useState(false);
@@ -1327,7 +1874,8 @@ function DirectoryScreen({ onOpenProfile }) {
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState("");
   const [facets, setFacets] = React.useState({
-    programs: [], industries: [], locations: [], roles: [], totalAlumni: 0, totalStudents: 0,
+    programs: [], industries: [], locations: [], roles: [], houses: [],
+    totalAlumni: 0, totalStudents: 0,
   });
 
   // Facets do not depend on the filters, so they are fetched once.
@@ -1354,6 +1902,7 @@ function DirectoryScreen({ onOpenProfile }) {
       programs.forEach((p) => params.append("program", p));
       industries.forEach((i) => params.append("industry", i));
       roles.forEach((r) => params.append("role", r));
+      houses.forEach((h) => params.append("house", h));
       // The page renders everything in one fetch — no load-more UI — so the
       // page size matches the server's cap.
       params.set("pageSize", "2000");
@@ -1372,18 +1921,19 @@ function DirectoryScreen({ onOpenProfile }) {
         .finally(() => { if (!cancelled) setLoading(false); });
     }, 250);
     return () => { cancelled = true; clearTimeout(handle); };
-  }, [q, who, sort, yearFrom, yearTo, mentorOnly, programs, industries, roles]);
+  }, [q, who, sort, yearFrom, yearTo, mentorOnly, programs, industries, roles, houses]);
 
   const total = facets.totalAlumni + facets.totalStudents;
   const activeFilters = [
     ...programs.map((p) => ({ label: p, clear: () => toggle(programs, p, setPrograms) })),
     ...industries.map((i) => ({ label: i, clear: () => toggle(industries, i, setIndustries) })),
     ...roles.map((r) => ({ label: r, clear: () => toggle(roles, r, setRoles) })),
+    ...houses.map((h) => ({ label: h, clear: () => toggle(houses, h, setHouses) })),
     ...(mentorOnly ? [{ label: "open to mentor", clear: () => setMentorOnly(false) }] : []),
   ];
 
   const clearAll = () => {
-    setQ(""); setWho("all"); setPrograms([]); setIndustries([]); setRoles([]);
+    setQ(""); setWho("all"); setPrograms([]); setIndustries([]); setRoles([]); setHouses([]);
     setYearFrom(YEAR_MIN); setYearTo(YEAR_MAX); setMentorOnly(false);
   };
 
@@ -1466,6 +2016,16 @@ function DirectoryScreen({ onOpenProfile }) {
                 </label>
               ))}
               {facets.programs.length === 0 && <span className="meta">—</span>}
+            </div>
+          </FilterGroup>
+
+          <FilterGroup label="House">
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {facets.houses.map((h) => (
+                <button key={h.name} className={`chip ${houses.includes(h.name) ? "is-on" : ""}`}
+                  onClick={() => toggle(houses, h.name, setHouses)}>{h.name}</button>
+              ))}
+              {facets.houses.length === 0 && <span className="meta">—</span>}
             </div>
           </FilterGroup>
 
@@ -1619,6 +2179,7 @@ function ProfileScreen({ userId, onBack }) {
               )}
               {person.industry && <span>{person.industry}</span>}
               {person.concentration && <span>Concentrated in {person.concentration}</span>}
+              {person.house && <span>{person.house} House</span>}
             </div>
           </div>
 
@@ -1642,6 +2203,11 @@ function ProfileScreen({ userId, onBack }) {
           ) : (
             <p className="meta">No programs listed yet.</p>
           )}
+          {person.involvement && (
+            <p style={{ margin: "16px 0 0", whiteSpace: "pre-wrap", maxWidth: 640 }}>
+              {person.involvement}
+            </p>
+          )}
 
           {person.bio && (
             <>
@@ -1654,8 +2220,31 @@ function ProfileScreen({ userId, onBack }) {
           {person.reachOut && (
             <>
               <hr className="rule" style={{ margin: "28px 0" }} />
-              <h2 className="h-2" style={{ marginBottom: 12 }}>Reach out about</h2>
+              <h2 className="h-2" style={{ marginBottom: 12 }}>Students should reach out about</h2>
               <p style={{ margin: 0, whiteSpace: "pre-wrap", maxWidth: 640 }}>{person.reachOut}</p>
+            </>
+          )}
+
+          {/* Only rendered when its owner has chosen to show it — the server
+              blanks these fields for everyone else, so there is nothing here
+              to reveal by inspecting the response. */}
+          {(person.gender || (person.raceEthnicity && person.raceEthnicity.length > 0)) && (
+            <>
+              <hr className="rule" style={{ margin: "28px 0" }} />
+              <h2 className="h-2" style={{ marginBottom: 12 }}>Identity</h2>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {person.gender && <span className="chip chip-static">{person.gender}</span>}
+                {(person.raceEthnicity || []).map((r) => (
+                  <span key={r} className="chip chip-static">{r}</span>
+                ))}
+              </div>
+              {person.isSelf && (
+                <p className="meta" style={{ marginTop: 10 }}>
+                  {person.showIdentity
+                    ? "Visible to other signed-in members."
+                    : "Only you can see this. Turn it on in your profile to share it."}
+                </p>
+              )}
             </>
           )}
         </div>
@@ -1671,7 +2260,7 @@ function ProfileScreen({ userId, onBack }) {
 function MyProfileScreen({ me, onSaved }) {
   const [form, setForm] = React.useState(null);
   const [privacy, setPrivacy] = React.useState(null);
-  const [vocab, setVocab] = React.useState({ programs: [], roles: [] });
+  const [vocab, setVocab] = React.useState({ programs: [], roles: [], houses: [], genders: [], races: [] });
   const [status, setStatus] = React.useState("");
   const [error, setError] = React.useState("");
   const [busy, setBusy] = React.useState(false);
@@ -1693,9 +2282,13 @@ function MyProfileScreen({ me, onSaved }) {
           career: profile.career || "",
           industry: profile.industry || "",
           concentration: profile.concentration || "",
+          house: profile.house || "",
           bio: profile.bio || "",
           programs: profile.programs || [],
           pbhaRole: profile.pbhaRole || "",
+          involvement: profile.involvement || "",
+          gender: profile.gender || "",
+          raceEthnicity: profile.raceEthnicity || [],
           openToMentor: !!profile.openToMentor,
           reachOut: profile.reachOut || "",
         });
@@ -1712,13 +2305,13 @@ function MyProfileScreen({ me, onSaved }) {
     const v = e.target.type === "checkbox" ? e.target.checked : e.target.value;
     setForm((f) => ({ ...f, [k]: v }));
   };
-  const toggleProgram = (name) =>
+  const toggleIn = (key) => (name) =>
     setForm((f) => ({
       ...f,
-      programs: f.programs.includes(name)
-        ? f.programs.filter((p) => p !== name)
-        : [...f.programs, name],
+      [key]: f[key].includes(name) ? f[key].filter((x) => x !== name) : [...f[key], name],
     }));
+  const toggleProgram = toggleIn("programs");
+  const toggleRace = toggleIn("raceEthnicity");
 
   const save = async (e) => {
     e.preventDefault();
@@ -1737,9 +2330,13 @@ function MyProfileScreen({ me, onSaved }) {
         career: blank(form.career),
         industry: blank(form.industry),
         concentration: blank(form.concentration),
+        house: blank(form.house),
         bio: blank(form.bio),
         programs: form.programs,
         pbhaRole: blank(form.pbhaRole),
+        involvement: blank(form.involvement),
+        gender: blank(form.gender),
+        raceEthnicity: form.raceEthnicity,
         openToMentor: form.openToMentor,
         reachOut: blank(form.reachOut),
       });
@@ -1771,32 +2368,42 @@ function MyProfileScreen({ me, onSaved }) {
       <hr className="rule" style={{ margin: "28px 0 32px" }} />
 
       <form onSubmit={save}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+        <h2 className="h-2" style={{ marginBottom: 18 }}>You at Harvard</h2>
+        <div className="two-up">
           <Field label="First name"><input className="input" value={form.first} onChange={set("first")} required /></Field>
           <Field label="Last name"><input className="input" value={form.last} onChange={set("last")} required /></Field>
-          <Field label="Pronouns"><input className="input" value={form.pronouns} onChange={set("pronouns")} /></Field>
+          <Field label="Pronouns"><input className="input" value={form.pronouns} onChange={set("pronouns")} placeholder="she/her" /></Field>
           <Field label="Class year"><input className="input" type="number" min="1930" max="2050" value={form.year} onChange={set("year")} required /></Field>
-          <Field label="City"><input className="input" value={form.location} onChange={set("location")} placeholder="Boston, MA" /></Field>
-          <Field label="Concentration"><input className="input" value={form.concentration} onChange={set("concentration")} /></Field>
+          <Field label="Concentration"><input className="input" value={form.concentration} onChange={set("concentration")} placeholder="Social Studies" /></Field>
+          <Field label="House">
+            <input className="input" list="house-options" value={form.house} onChange={set("house")} placeholder="Currier" />
+            <datalist id="house-options">
+              {vocab.houses.map((h) => <option key={h} value={h} />)}
+            </datalist>
+          </Field>
         </div>
 
-        <Field label="Work" hint='Written as "Title · Organization" so the directory can show both.'>
+        <hr className="rule" style={{ margin: "36px 0 28px" }} />
+        <h2 className="h-2" style={{ marginBottom: 18 }}>You now</h2>
+        <div className="two-up">
+          <Field label="Where you live"><input className="input" value={form.location} onChange={set("location")} placeholder="Boston, MA" /></Field>
+          <Field label="Field of work" hint="Used as a directory filter."><input className="input" value={form.industry} onChange={set("industry")} placeholder="Law & Policy" /></Field>
+        </div>
+        <Field label="What you do" hint='Written as "Title · Organization" so the directory can show both.'>
           <input className="input" value={form.career} onChange={set("career")}
             placeholder="Immigration Attorney · Greater Boston Legal Services" />
         </Field>
+        <Field label="Photo URL"><input className="input" value={form.photoUrl} onChange={set("photoUrl")} placeholder="https://…" /></Field>
+        <Field label="About you"><textarea className="input" value={form.bio} onChange={set("bio")} /></Field>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
-          <Field label="Field of work" hint="Used as a directory filter."><input className="input" value={form.industry} onChange={set("industry")} placeholder="Law & Policy" /></Field>
-          <Field label="Photo URL"><input className="input" value={form.photoUrl} onChange={set("photoUrl")} placeholder="https://…" /></Field>
-        </div>
-
-        <Field label="PBHA role">
+        <hr className="rule" style={{ margin: "36px 0 28px" }} />
+        <h2 className="h-2" style={{ marginBottom: 18 }}>You at PBHA</h2>
+        <Field label="Role" hint="The most senior role you held.">
           <select className="select" value={form.pbhaRole} onChange={set("pbhaRole")}>
             <option value="">Not listed</option>
             {vocab.roles.map((r) => <option key={r} value={r}>{r}</option>)}
           </select>
         </Field>
-
         <div className="field">
           <span className="eyebrow" style={{ display: "block", marginBottom: 10 }}>Programs</span>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
@@ -1807,20 +2414,58 @@ function MyProfileScreen({ me, onSaved }) {
             ))}
           </div>
         </div>
+        <Field label="Your involvement"
+          hint="Anything the list above misses — a committee, a summer, how you got started.">
+          <textarea className="input" value={form.involvement} onChange={set("involvement")} />
+        </Field>
 
-        <Field label="About"><textarea className="input" value={form.bio} onChange={set("bio")} /></Field>
-
+        <hr className="rule" style={{ margin: "36px 0 28px" }} />
+        <h2 className="h-2" style={{ marginBottom: 12 }}>Mentoring</h2>
         <div className="field">
           <label className={`check ${form.openToMentor ? "is-on" : ""}`}
             onClick={(e) => { e.preventDefault(); setForm((f) => ({ ...f, openToMentor: !f.openToMentor })); }}>
             <span className="box" />
-            <span>I'm open to mentoring current students</span>
+            <span>I'm open to hearing from current students</span>
           </label>
         </div>
-
         {form.openToMentor && (
-          <Field label="Reach out about"><textarea className="input" value={form.reachOut} onChange={set("reachOut")} /></Field>
+          <Field label="Students should reach out to me about:"
+            hint="Be specific. This is what a student sees before they write to you.">
+            <textarea className="input" value={form.reachOut} onChange={set("reachOut")}
+              placeholder="Public health careers, state government, or what running a summer site is actually like." />
+          </Field>
         )}
+
+        <hr className="rule" style={{ margin: "36px 0 28px" }} />
+        <h2 className="h-2" style={{ marginBottom: 12 }}>Identity</h2>
+        <p className="meta" style={{ marginBottom: 20, maxWidth: 620 }}>
+          Optional, and hidden from everyone unless you turn it on below. PBHA asks so it can
+          see who its alumni body actually is, and so members who want to can find people who
+          share their background. You can leave all of it blank.
+        </p>
+        <Field label="Gender">
+          <input className="input" list="gender-options" value={form.gender} onChange={set("gender")} placeholder="Optional" />
+          <datalist id="gender-options">
+            {vocab.genders.map((g) => <option key={g} value={g} />)}
+          </datalist>
+        </Field>
+        <div className="field">
+          <span className="eyebrow" style={{ display: "block", marginBottom: 10 }}>Race and ethnicity</span>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {vocab.races.map((r) => (
+              <button type="button" key={r}
+                className={`chip ${form.raceEthnicity.includes(r) ? "is-on" : ""}`}
+                onClick={() => toggleRace(r)}>{r}</button>
+            ))}
+          </div>
+        </div>
+        <div className="field">
+          <label className={`check ${privacy?.showIdentity ? "is-on" : ""}`}
+            onClick={(e) => { e.preventDefault(); savePrivacy({ showIdentity: !privacy.showIdentity }); }}>
+            <span className="box" />
+            <span>Show my identity on my profile to other signed-in members</span>
+          </label>
+        </div>
 
         {error && <div className="banner banner-error" style={{ marginBottom: 16 }}>{error}</div>}
         {status && <div className="banner" style={{ marginBottom: 16 }}>{status}</div>}
@@ -1855,7 +2500,7 @@ function MyProfileScreen({ me, onSaved }) {
 
 function App() {
   const [me, setMe] = React.useState(undefined); // undefined = still checking
-  const [screen, setScreen] = React.useState("directory");
+  const [screen, setScreen] = React.useState("welcome");
   const [profileId, setProfileId] = React.useState(null);
 
   const loadMe = React.useCallback(async () => {
@@ -1871,7 +2516,7 @@ function App() {
   const signOut = async () => {
     await api.post("/api/auth/signout").catch(() => {});
     setMe(null);
-    setScreen("directory");
+    setScreen("welcome");
     setProfileId(null);
   };
 
@@ -1893,12 +2538,15 @@ function App() {
               pbha.org means adding one Alumni item to their nav and pointing
               it here — see "Integrating with pbha.org" in the README — so
               there is nothing to be gained by restating their menu. */}
+          {/* Editing your own profile lives in the account menu, not here,
+              so it is not offered in two places at once. */}
           {me && (
             <nav className="site-nav">
-              {/* Editing your own profile lives in the account menu, not here,
-                  so it is not offered in two places at once. */}
-              <button className={screen === "directory" || screen === "profile" ? "is-active" : ""}
-                onClick={() => { setScreen("directory"); setProfileId(null); }}>Directory</button>
+              {SECTIONS.map((t) => (
+                <button key={t.key}
+                  className={t.key === screen || (t.key === "directory" && screen === "profile") ? "is-active" : ""}
+                  onClick={() => { setScreen(t.key); setProfileId(null); }}>{t.label}</button>
+              ))}
             </nav>
           )}
 
@@ -1916,7 +2564,10 @@ function App() {
 
       {me === undefined && <div className="wrap page"><p className="meta">Loading…</p></div>}
       {me === null && <GateScreen onSignedIn={loadMe} />}
+      {me && screen === "welcome" && <WelcomeScreen me={me} setScreen={setScreen} />}
       {me && screen === "directory" && <DirectoryScreen onOpenProfile={openProfile} />}
+      {me && screen === "study" && <StudyScreen />}
+      {me && screen === "archives" && <ArchivesScreen />}
       {me && screen === "profile" && profileId && (
         <ProfileScreen userId={profileId} onBack={() => { setScreen("directory"); setProfileId(null); }} />
       )}

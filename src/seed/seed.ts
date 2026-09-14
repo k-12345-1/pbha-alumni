@@ -27,7 +27,13 @@ type Seed = {
   career?: string;
   industry?: string;
   concentration?: string;
+  house?: string;
   pbhaRole?: string;
+  involvement?: string;
+  gender?: string;
+  raceEthnicity?: string[];
+  // Whether this demo member has opted into showing their identity fields.
+  showIdentity?: boolean;
   programs: string[];
   bio?: string;
   openToMentor?: boolean;
@@ -51,7 +57,11 @@ const main = async () => {
       career: p.career ?? null,
       industry: p.industry ?? null,
       concentration: p.concentration ?? null,
+      house: p.house ?? null,
       pbhaRole: p.pbhaRole ?? null,
+      involvement: p.involvement ?? null,
+      gender: p.gender ?? null,
+      raceEthnicity: p.raceEthnicity ?? [],
       programs: p.programs,
       bio: p.bio ?? null,
       openToMentor: p.openToMentor ?? false,
@@ -68,11 +78,16 @@ const main = async () => {
         emailVerified: !p.unclaimed,
         termsAcceptedAt: p.unclaimed ? null : new Date(),
         profile: { create: profileData },
-        privacy: { create: {} },
+        privacy: { create: { showIdentity: !!p.showIdentity } },
       },
       update: {
         profile: { upsert: { create: profileData, update: profileData } },
-        privacy: { upsert: { create: {}, update: {} } },
+        privacy: {
+          upsert: {
+            create: { showIdentity: !!p.showIdentity },
+            update: { showIdentity: !!p.showIdentity },
+          },
+        },
       },
     });
   }

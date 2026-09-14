@@ -84,6 +84,16 @@ model Profile {
   concentration String?
   bio           String?
 
+  // Harvard House. Free text rather than an enum so "Dudley", "Currier",
+  // a renamed House, or a blank all work without a migration.
+  house String?
+
+  // Self-reported identity. Optional, free-form, and never shown to anyone
+  // unless the member turns on PrivacySettings.showIdentity — see the
+  // comment there. raceEthnicity is a list because people are.
+  gender        String?
+  raceEthnicity String[]
+
   // PBHA programs this person served in, as free-form program names drawn
   // from the shared PROGRAMS list. A plain String[] rather than an enum:
   // PBHA runs 80+ programs and the roster changes every year, so a new
@@ -96,6 +106,10 @@ model Profile {
   // PBHA role at its most senior, e.g. "Program Director", "Cabinet",
   // "Summer Urban Program Director". Free text for the same reason.
   pbhaRole String?
+
+  // Anything about their PBHA years that the program list and role do not
+  // capture — a committee, a summer, a campaign, how they got involved.
+  involvement String?
 
   openToMentor Boolean @default(false)
   reachOut     String?
@@ -125,6 +139,13 @@ model PrivacySettings {
   profileVisibility ProfileVisibility @default(ALUMNI)
   showInDirectory   Boolean           @default(true)
   openToMessages    Boolean           @default(true)
+
+  // Identity (gender, race/ethnicity) is off by default and stays off until
+  // the member deliberately turns it on. It is collected so PBHA can see who
+  // its alumni body actually is and so members can find people like them —
+  // neither of which requires publishing it on a card by default. The
+  // directory's select never reads these columns while this is false.
+  showIdentity Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

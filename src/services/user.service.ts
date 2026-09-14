@@ -16,10 +16,14 @@ const profileSelect = {
   career: true,
   industry: true,
   concentration: true,
+  house: true,
   bio: true,
+  gender: true,
+  raceEthnicity: true,
   programs: true,
   programYears: true,
   pbhaRole: true,
+  involvement: true,
   openToMentor: true,
   reachOut: true,
   claimedAt: true,
@@ -36,6 +40,8 @@ export const buildSearchText = (p: {
   industry?: string | null;
   concentration?: string | null;
   pbhaRole?: string | null;
+  house?: string | null;
+  involvement?: string | null;
   programs?: string[];
 }): string =>
   [
@@ -46,6 +52,8 @@ export const buildSearchText = (p: {
     p.industry,
     p.concentration,
     p.pbhaRole,
+    p.house,
+    p.involvement,
     ...(p.programs ?? []),
   ]
     .filter(Boolean)
@@ -70,11 +78,20 @@ export const getProfile = async (userId: string, viewerId: string) => {
   }
 
   const { user, ...rest } = profile;
+
+  // Identity is withheld unless its owner has turned it on. Stripping it here
+  // rather than filtering in the UI means it never leaves the server for
+  // someone who is not entitled to it.
+  const identityVisible = isSelf || user.privacy?.showIdentity === true;
+
   return {
     ...rest,
+    gender: identityVisible ? rest.gender : null,
+    raceEthnicity: identityVisible ? rest.raceEthnicity : [],
     isCurrentStudent: isCurrentStudent(rest.year),
     isSelf,
     openToMessages: user.privacy?.openToMessages ?? true,
+    showIdentity: user.privacy?.showIdentity ?? false,
   };
 };
 
@@ -96,6 +113,8 @@ export const updateMyProfile = async (userId: string, input: ProfileUpdateInput)
         industry: merged.industry,
         concentration: merged.concentration,
         pbhaRole: merged.pbhaRole,
+        house: merged.house,
+        involvement: merged.involvement,
         programs: merged.programs,
       }),
     },

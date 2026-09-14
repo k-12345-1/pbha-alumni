@@ -4,13 +4,22 @@ An alumni directory for the [Phillips Brooks House Association](https://www.pbha
 built on the same shape as the FOP Alumni Network: an Express + Prisma API and a
 single-file React front end served from the same origin.
 
-This first cut is the directory only. Events, messages, mentorship requests, news,
-and donations are deliberately not modeled.
+It is the Alumni section of pbha.org: a sign-in page, then Welcome, Directory,
+Alumni Study, and Archives. Messages, events, and donations are deliberately not
+modeled — PBHA already runs giving, and this exists to fill the gap those
+channels leave.
 
 ## What it does
 
-- **Sign in / join.** Email and password, JWT in an httpOnly session cookie.
-  Signing in somewhere new invalidates the older session.
+- **Sign in / join.** A centred landing page, then email and password, with the
+  JWT in an httpOnly session cookie. Signing in somewhere new invalidates the
+  older session.
+- **Welcome.** What a member can do here, then PBHA's own involvement channels.
+- **Alumni Study.** PBHA's alumni survey (n=1,078), reported as PBHA published it:
+  both the all-respondent and intensive-programming figures where two exist, with
+  the researchers credited and the missing methodology noted.
+- **Archives.** PBHA has no archive. This assembles their published decade history
+  and the 120 Stories series in one place, and points alumni at the submission form.
 - **Directory.** Search across name, city, employer, field, and program. Filter by
   scope (everyone / alumni / current students), a dual-handle class-year range,
   PBHA role, program, field of work, and whether someone is open to mentoring.
@@ -19,8 +28,9 @@ and donations are deliberately not modeled.
   by how many are in each place; clicking a place lists them underneath so the
   map keeps its zoom. Ported from the FOP alumni directory, which this is
   modeled on.
-- **Profiles.** Full profile page with programs, PBHA role, work, and what the
-  person is happy to be contacted about.
+- **Profiles.** Name, class year, concentration, House, where they live now, what
+  they do now, PBHA role and programs, how they were involved, optional identity,
+  and "Students should reach out to me about:".
 - **Your profile.** Self-service editing, plus the two privacy switches that decide
   whether a profile is listed and whether other members can open it.
 
@@ -132,7 +142,15 @@ A location with no entry simply has no dot; it is never guessed at.
   leak private profiles to anyone who passes a query string.
 - **Programs are plain strings, not an enum.** PBHA runs 80+ programs and the roster
   changes yearly, so adding one to `src/lib/programs.ts` is a content change rather
-  than a migration.
+  than a migration. House is free text for the same reason.
+- **Identity is off by default and stripped server-side.** `gender` and
+  `raceEthnicity` are only returned when their owner has set
+  `PrivacySettings.showIdentity`; `getProfile` blanks them for everyone else, so
+  they never reach a client that is not entitled to them, and the directory's card
+  select does not read those columns at all.
+- **The Study and Archives content is PBHA's, hard-coded in the front end.** Every
+  figure and date comes from pbha.org. If they publish new findings, those constants
+  at the top of the Study and Archives components are where they change.
 - **Unclaimed profiles** (`claimedAt: null`) model a bulk import. They show name and
   class year only, and signing up with that email claims the row instead of being
   rejected as a duplicate.

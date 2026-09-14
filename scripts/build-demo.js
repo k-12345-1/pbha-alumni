@@ -17,7 +17,7 @@ const path = require("node:path");
 
 const ROOT = path.resolve(__dirname, "..");
 const people = require(path.join(ROOT, "src/seed/demo-people.json"));
-const { PROGRAMS, PBHA_ROLES } = require("./vocab.js");
+const { PROGRAMS, PBHA_ROLES, HOUSES, GENDER_OPTIONS, RACE_OPTIONS } = require("./vocab.js");
 
 // Same rule as src/lib/class-year.ts: the boundary rolls on June 1.
 const studentBoundaryYear = () => {
@@ -38,16 +38,24 @@ const profiles = people.map((p) => ({
   career: p.career ?? null,
   industry: p.industry ?? null,
   concentration: p.concentration ?? null,
+  house: p.house ?? null,
   bio: p.bio ?? null,
+  // Identity rides along only for members who opted to show it, mirroring
+  // what the server sends: it blanks these for everyone else rather than
+  // shipping them and hiding them in the UI.
+  gender: p.showIdentity ? (p.gender ?? null) : null,
+  raceEthnicity: p.showIdentity ? (p.raceEthnicity ?? []) : [],
+  showIdentity: !!p.showIdentity,
   programs: p.programs || [],
   programYears: null,
   pbhaRole: p.pbhaRole ?? null,
+  involvement: p.involvement ?? null,
   openToMentor: !!p.openToMentor,
   reachOut: p.reachOut ?? null,
   // Unclaimed rows keep their INVITED treatment in the demo too.
   claimedAt: p.unclaimed ? null : new Date().toISOString(),
   isCurrentStudent: p.year >= studentBoundaryYear(),
-  searchText: [p.first, p.last, p.location, p.career, p.industry, p.concentration, p.pbhaRole, ...(p.programs || [])]
+  searchText: [p.first, p.last, p.location, p.career, p.industry, p.concentration, p.pbhaRole, p.house, p.involvement, ...(p.programs || [])]
     .filter(Boolean).join(" ").toLowerCase(),
 }));
 
@@ -57,18 +65,19 @@ const runtime = `
 <script>
 (function () {
   var PROFILES = ${JSON.stringify(profiles)};
-  var VOCAB = ${JSON.stringify({ programs: PROGRAMS, roles: PBHA_ROLES })};
+  var VOCAB = ${JSON.stringify({ programs: PROGRAMS, roles: PBHA_ROLES, houses: HOUSES, genders: GENDER_OPTIONS, races: RACE_OPTIONS })};
   var VIEWER_ID = ${JSON.stringify(DEMO_VIEWER.userId)};
   var STUDENT_BOUNDARY = ${studentBoundaryYear()};
 
   function facets() {
-    var programs = {}, industries = {}, locations = {}, roles = {};
+    var programs = {}, industries = {}, locations = {}, roles = {}, houses = {};
     var alumni = 0, students = 0;
     PROFILES.forEach(function (p) {
       (p.programs || []).forEach(function (x) { programs[x] = (programs[x] || 0) + 1; });
       if (p.industry) industries[p.industry] = (industries[p.industry] || 0) + 1;
       if (p.location) locations[p.location] = (locations[p.location] || 0) + 1;
       if (p.pbhaRole) roles[p.pbhaRole] = (roles[p.pbhaRole] || 0) + 1;
+      if (p.house) houses[p.house] = (houses[p.house] || 0) + 1;
       if (p.year >= STUDENT_BOUNDARY) students++; else alumni++;
     });
     var toList = function (o, byCount) {
@@ -79,7 +88,7 @@ const runtime = `
     };
     return {
       programs: toList(programs), industries: toList(industries),
-      locations: toList(locations, true), roles: toList(roles),
+      locations: toList(locations, true), roles: toList(roles), houses: toList(houses),
       totalAlumni: alumni, totalStudents: students,
     };
   }
@@ -92,7 +101,7 @@ const runtime = `
     var yearFrom = Number(params.get("yearFrom")) || -Infinity;
     var yearTo = Number(params.get("yearTo")) || Infinity;
     var mentor = params.get("openToMentor") === "true";
-    var programs = all("program"), industries = all("industry"), roles = all("role");
+    var programs = all("program"), industries = all("industry"), roles = all("role"), houses = all("house");
 
     var out = PROFILES.filter(function (p) {
       if (who === "alumni" && p.year >= STUDENT_BOUNDARY) return false;
@@ -101,6 +110,7 @@ const runtime = `
       if (mentor && !p.openToMentor) return false;
       if (industries.length && industries.indexOf(p.industry) === -1) return false;
       if (roles.length && roles.indexOf(p.pbhaRole) === -1) return false;
+      if (houses.length && houses.indexOf(p.house) === -1) return false;
       if (programs.length && !programs.some(function (x) { return (p.programs || []).indexOf(x) !== -1; })) return false;
       if (q && p.searchText.indexOf(q) === -1) return false;
       return true;
@@ -138,7 +148,7 @@ const runtime = `
     if (url === "/api/directory/facets") return Promise.resolve(facets());
     if (url === "/api/directory") return Promise.resolve(search(params));
     if (url === "/api/users/me/privacy") {
-      if (method === "GET") return Promise.resolve({ profileVisibility: "ALUMNI", showInDirectory: true, openToMessages: true });
+      if (method === "GET") return Promise.resolve({ profileVisibility: "ALUMNI", showInDirectory: true, openToMessages: true, showIdentity: false });
       return Promise.reject(new Error("This is a static demo — nothing saves here."));
     }
     if (url === "/api/users/me" && method === "PATCH") {

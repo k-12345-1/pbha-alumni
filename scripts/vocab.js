@@ -36,12 +36,29 @@ const PBHA_ROLES = [
   "Officer",
 ];
 
+
+const HOUSES = [
+  "Adams", "Cabot", "Currier", "Dudley", "Dunster", "Eliot", "Kirkland", "Leverett",
+  "Lowell", "Mather", "Pforzheimer", "Quincy", "Winthrop", "First-year (Yard)", "Non-resident",
+];
+
+const GENDER_OPTIONS = [
+  "Woman", "Man", "Non-binary", "Prefer to self-describe", "Prefer not to say",
+];
+
+const RACE_OPTIONS = [
+  "American Indian or Alaska Native", "Asian", "Black or African American",
+  "Hispanic or Latino/a/e", "Middle Eastern or North African",
+  "Native Hawaiian or Pacific Islander", "White",
+  "Prefer to self-describe", "Prefer not to say",
+];
+
 // Drift guard: every name here must appear in the TypeScript source.
 const ts = fs.readFileSync(path.resolve(__dirname, "../src/lib/programs.ts"), "utf8");
-for (const name of [...PROGRAMS, ...PBHA_ROLES]) {
+for (const name of [...PROGRAMS, ...PBHA_ROLES, ...HOUSES, ...GENDER_OPTIONS, ...RACE_OPTIONS]) {
   if (!ts.includes(JSON.stringify(name).slice(1, -1).replace(/\\"/g, '"'))) {
     throw new Error(`scripts/vocab.js is out of sync with src/lib/programs.ts: "${name}" is missing there`);
   }
 }
 
-module.exports = { PROGRAMS, PBHA_ROLES };
+module.exports = { PROGRAMS, PBHA_ROLES, HOUSES, GENDER_OPTIONS, RACE_OPTIONS };

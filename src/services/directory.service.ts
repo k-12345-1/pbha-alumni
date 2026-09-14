@@ -15,12 +15,18 @@ const directoryCardSelect = {
   career: true,
   industry: true,
   concentration: true,
+  house: true,
   bio: true,
+  // gender / raceEthnicity are deliberately absent. Identity is not a
+  // directory card field even for members who have made it visible; it is
+  // shown on the profile itself, and only then. See PrivacySettings.
+
   programs: true,
   // Ships with the list so the years on each program chip are present the
   // moment a profile opens, instead of appearing a beat late after refetch.
   programYears: true,
   pbhaRole: true,
+  involvement: true,
   openToMentor: true,
   reachOut: true,
   // Null marks a bulk-imported profile nobody has claimed. The frontend
@@ -71,6 +77,7 @@ export const searchDirectory = async (q: DirectoryQuery, viewerId: string) => {
 
   if (q.industry?.length) and.push({ industry: { in: q.industry } });
   if (q.program?.length) and.push({ programs: { hasSome: q.program } });
+  if (q.house?.length) and.push({ house: { in: q.house } });
   if (q.role?.length) and.push({ pbhaRole: { in: q.role } });
   if (q.openToMentor === true) and.push({ openToMentor: true });
 
@@ -84,6 +91,7 @@ export const searchDirectory = async (q: DirectoryQuery, viewerId: string) => {
         { career: { contains: term, mode: "insensitive" } },
         { industry: { contains: term, mode: "insensitive" } },
         { location: { contains: term, mode: "insensitive" } },
+        { house: { contains: term, mode: "insensitive" } },
         { programs: { hasSome: [q.q.trim()] } },
       ],
     });
@@ -133,6 +141,7 @@ type DirectoryFacets = {
   industries: { name: string; count: number }[];
   locations: { name: string; count: number }[];
   roles: { name: string; count: number }[];
+  houses: { name: string; count: number }[];
   totalAlumni: number;
   totalStudents: number;
 };
@@ -151,7 +160,7 @@ const computeDirectoryFacets = async (): Promise<DirectoryFacets> => {
     user: { ...LISTABLE_USER, privacy: { is: { showInDirectory: true } } },
   } satisfies Prisma.ProfileWhereInput;
 
-  const [industries, locations, roles, totalAlumni, totalStudents, programRows] =
+  const [industries, locations, roles, houses, totalAlumni, totalStudents, programRows] =
     await Promise.all([
       prisma.profile.groupBy({
         by: ["industry"],
@@ -174,6 +183,13 @@ const computeDirectoryFacets = async (): Promise<DirectoryFacets> => {
         orderBy: { pbhaRole: "asc" },
         take: 40,
       }),
+      prisma.profile.groupBy({
+        by: ["house"],
+        _count: { _all: true },
+        where: { ...listed, house: { not: null } },
+        orderBy: { house: "asc" },
+        take: 40,
+      }),
       prisma.profile.count({ where: { ...listed, year: { lt: cutoff } } }),
       prisma.profile.count({ where: { ...listed, year: { gte: cutoff } } }),
       // programs is a String[], which groupBy cannot unnest, so the counts are
@@ -193,6 +209,7 @@ const computeDirectoryFacets = async (): Promise<DirectoryFacets> => {
     industries: industries.map((i) => ({ name: i.industry!, count: i._count._all })),
     locations: locations.map((l) => ({ name: l.location!, count: l._count._all })),
     roles: roles.map((r) => ({ name: r.pbhaRole!, count: r._count._all })),
+    houses: houses.map((h) => ({ name: h.house!, count: h._count._all })),
     totalAlumni,
     totalStudents,
   };

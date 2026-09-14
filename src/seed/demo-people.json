@@ -15,7 +15,14 @@
     ],
     "bio": "Two summers at SUP turned into a career in community pediatrics. Happy to talk about medical school, or about running a program while taking orgo.",
     "openToMentor": true,
-    "reachOut": "Anything about the pre-med path, or SUP director life."
+    "reachOut": "Anything about the pre-med path, or SUP director life.",
+    "house": "Currier",
+    "involvement": "Ran CHAP my sophomore and junior years, then two summers at SUP as a site director in Mission Hill.",
+    "gender": "Woman",
+    "raceEthnicity": [
+      "Black or African American"
+    ],
+    "showIdentity": true
   },
   {
     "email": "daniel.reyes@example.com",
@@ -33,7 +40,14 @@
     ],
     "bio": "Started in ESOL, ended up writing tenant protection legislation. The through-line is the same work.",
     "openToMentor": true,
-    "reachOut": "Law school, legal aid, housing policy."
+    "reachOut": "Law school, legal aid, housing policy.",
+    "house": "Adams",
+    "involvement": "Taught the Tuesday and Thursday ESOL sections for three years, then chaired the Cabinet committee that rewrote the volunteer training.",
+    "gender": "Man",
+    "raceEthnicity": [
+      "Hispanic or Latino/a/e"
+    ],
+    "showIdentity": true
   },
   {
     "email": "priya.nair@example.com",
@@ -51,7 +65,14 @@
     ],
     "bio": "Teaching adult ESL is why I work on language learning now.",
     "openToMentor": true,
-    "reachOut": "Breaking into product, or tech recruiting timelines."
+    "reachOut": "Breaking into product, or tech recruiting timelines.",
+    "house": "Leverett",
+    "involvement": "Coordinated Chinatown ESL, and spent a year building the curriculum shared across the adult programs.",
+    "gender": "Woman",
+    "raceEthnicity": [
+      "Asian"
+    ],
+    "showIdentity": true
   },
   {
     "email": "marcus.bell@example.com",
@@ -69,7 +90,14 @@
     ],
     "bio": "Thirty years in youth development. Still use the site-director playbook I learned at PBHA.",
     "openToMentor": true,
-    "reachOut": "Running a nonprofit, board development, fundraising."
+    "reachOut": "Running a nonprofit, board development, fundraising.",
+    "house": "Dunster",
+    "involvement": "Officer for two years. Before that, CASP and three summers at SUP.",
+    "gender": "Man",
+    "raceEthnicity": [
+      "Black or African American"
+    ],
+    "showIdentity": true
   },
   {
     "email": "hannah.kim@example.com",
@@ -86,7 +114,9 @@
       "Chinatown Teen"
     ],
     "bio": "Directed Big Sib through the pandemic. Learned more about logistics than any class taught me.",
-    "openToMentor": true
+    "openToMentor": true,
+    "house": "Quincy",
+    "involvement": "Directed Chinatown Big Sibling through the pandemic, including the year everything ran on Zoom."
   },
   {
     "email": "tomas.lindqvist@example.com",
@@ -104,7 +134,9 @@
     ],
     "bio": "I study summer learning loss, which is a fancy way of saying I still think about SUP.",
     "openToMentor": true,
-    "reachOut": "PhD applications in education or psych."
+    "reachOut": "PhD applications in education or psych.",
+    "house": "Winthrop",
+    "involvement": "Summer director at two SUP sites, and on the summer staff hiring committee."
   },
   {
     "email": "rachel.adeyemi@example.com",
@@ -121,7 +153,14 @@
       "Adult ESOL Program"
     ],
     "openToMentor": true,
-    "reachOut": "Corporate social responsibility, finance recruiting."
+    "reachOut": "Corporate social responsibility, finance recruiting.",
+    "house": "Eliot",
+    "involvement": "Cabinet, and the Citizenship program before that.",
+    "gender": "Woman",
+    "raceEthnicity": [
+      "Black or African American"
+    ],
+    "showIdentity": true
   },
   {
     "email": "joseph.hartley@example.com",
@@ -136,7 +175,9 @@
     "programs": [
       "Cambridge After-School Program (CASP)"
     ],
-    "bio": "PBHA in the early eighties. I have a filing cabinet of program histories if anyone is writing about that era."
+    "bio": "PBHA in the early eighties. I have a filing cabinet of program histories if anyone is writing about that era.",
+    "house": "Lowell",
+    "involvement": "Officer in 1983-84, back when the whole association ran out of the Brooks House parlor."
   },
   {
     "email": "wei.zhang@example.com",
@@ -154,7 +195,9 @@
       "Chinatown Adventure"
     ],
     "bio": "Citizenship program, then law school, then back to the same clients.",
-    "openToMentor": true
+    "openToMentor": true,
+    "house": "Mather",
+    "involvement": "Four years across the Chinatown programs, ending as director of Citizenship."
   },
   {
     "email": "elena.moreau@example.com",
@@ -171,7 +214,11 @@
       "BRYE 1-2-1"
     ],
     "openToMentor": true,
-    "reachOut": "Film, documentary, freelance survival."
+    "reachOut": "Film, documentary, freelance survival.",
+    "house": "Cabot",
+    "involvement": "Coordinated BRYE Teen and shot the program's first documentary short.",
+    "gender": "Woman",
+    "showIdentity": false
   },
   {
     "email": "samuel.osei@example.com",
@@ -187,7 +234,9 @@
       "Summer Urban Program",
       "Cambridge Youth Enrichment Program"
     ],
-    "openToMentor": true
+    "openToMentor": true,
+    "house": "Pforzheimer",
+    "involvement": "Summer director at SUP, then stayed on to help with the following year's hiring."
   },
   {
     "email": "nora.feldman@example.com",
@@ -204,7 +253,9 @@
       "Best Buddies"
     ],
     "bio": "Alzheimer's Buddies is the reason I went into clinical work with older adults.",
-    "openToMentor": true
+    "openToMentor": true,
+    "house": "Kirkland",
+    "involvement": "Directed Alzheimer's Buddies and helped start the Best Buddies chapter's partnership with it."
   },
   {
     "email": "andre.thompson@example.com",
@@ -220,7 +271,14 @@
       "CIVICS",
       "College High-School Alliance (CHANCE)"
     ],
-    "openToMentor": false
+    "openToMentor": false,
+    "house": "Adams",
+    "involvement": "Cabinet, CIVICS classroom lead, and CHANCE tutor.",
+    "gender": "Man",
+    "raceEthnicity": [
+      "Black or African American"
+    ],
+    "showIdentity": true
   },
   {
     "email": "mei.lin.chen@example.com",
@@ -236,7 +294,14 @@
       "Chinatown Afterschool Program (CHAP)",
       "Chinatown Teen"
     ],
-    "bio": "Current CHAP director. Looking for alumni who ran the program in the 2010s."
+    "bio": "Current CHAP director. Looking for alumni who ran the program in the 2010s.",
+    "house": "Currier",
+    "involvement": "Current CHAP director. Started as a Tuesday tutor first year.",
+    "gender": "Woman",
+    "raceEthnicity": [
+      "Asian"
+    ],
+    "showIdentity": true
   },
   {
     "email": "jordan.pierre@example.com",
@@ -250,7 +315,9 @@
     "pbhaRole": "Program Coordinator",
     "programs": [
       "Boston Refugee Youth Enrichment (BRYE) Extension"
-    ]
+    ],
+    "house": "Leverett",
+    "involvement": "BRYE Extension coordinator, second year with the program."
   },
   {
     "email": "sofia.marchetti@example.com",
@@ -265,7 +332,9 @@
     "programs": [
       "Adult ESOL Program",
       "CIVICS"
-    ]
+    ],
+    "house": "Dunster",
+    "involvement": "Adult ESOL volunteer since first year, and a CIVICS classroom partner."
   },
   {
     "email": "kenji.watanabe@example.com",
@@ -282,7 +351,14 @@
       "Summer Urban Program"
     ],
     "openToMentor": true,
-    "reachOut": "Venture, startups, or how to fund a nonprofit side project."
+    "reachOut": "Venture, startups, or how to fund a nonprofit side project.",
+    "house": "Eliot",
+    "involvement": "Cabinet, CASP, and three summers at SUP.",
+    "gender": "Man",
+    "raceEthnicity": [
+      "Asian"
+    ],
+    "showIdentity": true
   },
   {
     "email": "grace.mutua@example.com",
@@ -298,7 +374,14 @@
       "Alzheimer's Buddies",
       "Adult ESOL Program"
     ],
-    "openToMentor": true
+    "openToMentor": true,
+    "house": "Quincy",
+    "involvement": "Coordinated Alzheimer's Buddies and volunteered with Adult ESOL.",
+    "gender": "Woman",
+    "raceEthnicity": [
+      "Black or African American"
+    ],
+    "showIdentity": false
   },
   {
     "email": "patrick.donnelly@example.com",
@@ -314,7 +397,9 @@
       "Summer Urban Program",
       "BRYE Tutoring"
     ],
-    "openToMentor": true
+    "openToMentor": true,
+    "house": "Winthrop",
+    "involvement": "Summer director at the Dorchester site for two years running."
   },
   {
     "email": "leila.haddad@example.com",
@@ -331,7 +416,14 @@
       "Adult ESOL Program"
     ],
     "openToMentor": true,
-    "reachOut": "Econ PhD, UK moves, research careers."
+    "reachOut": "Econ PhD, UK moves, research careers.",
+    "house": "Mather",
+    "involvement": "Directed Chinatown ESL and wrote the placement test the adult programs still use.",
+    "gender": "Woman",
+    "raceEthnicity": [
+      "Middle Eastern or North African"
+    ],
+    "showIdentity": false
   },
   {
     "email": "c.whitfield@example.com",
@@ -346,7 +438,9 @@
     "industry": "Law & Policy",
     "concentration": "Government",
     "pbhaRole": "Program Director",
-    "bio": "CASP in the late seventies, when the program ran out of two rooms. Glad to see it still going."
+    "bio": "CASP in the late seventies, when the program ran out of two rooms. Glad to see it still going.",
+    "house": "Lowell",
+    "involvement": "CASP in the late seventies, when the program ran out of two rooms."
   },
   {
     "email": "m.alvarez@example.com",
@@ -362,7 +456,14 @@
     "concentration": "Biology",
     "pbhaRole": "Summer Director",
     "openToMentor": true,
-    "reachOut": "Public health careers, state government, or running a summer site."
+    "reachOut": "Public health careers, state government, or running a summer site.",
+    "house": "Cabot",
+    "involvement": "Summer director at SUP, 1987 and 1988.",
+    "gender": "Woman",
+    "raceEthnicity": [
+      "Hispanic or Latino/a/e"
+    ],
+    "showIdentity": true
   },
   {
     "email": "t.nguyen@example.com",
@@ -377,7 +478,14 @@
     "industry": "Media & Arts",
     "concentration": "Visual and Environmental Studies",
     "pbhaRole": "Program Coordinator",
-    "bio": "Big Sib matched me with a seven-year-old in 2001. We still email."
+    "bio": "Big Sib matched me with a seven-year-old in 2001. We still email.",
+    "house": "Kirkland",
+    "involvement": "Chinatown Big Sibling for three years.",
+    "gender": "Woman",
+    "raceEthnicity": [
+      "Asian"
+    ],
+    "showIdentity": false
   },
   {
     "email": "r.okonkwo@example.com",
@@ -393,6 +501,13 @@
     "concentration": "History",
     "pbhaRole": "Program Director",
     "openToMentor": true,
-    "reachOut": "Teaching, licensure, and getting into a classroom after college."
+    "reachOut": "Teaching, licensure, and getting into a classroom after college.",
+    "house": "Pforzheimer",
+    "involvement": "CIVICS classroom lead, and a CHANCE tutor before that.",
+    "gender": "Man",
+    "raceEthnicity": [
+      "Black or African American"
+    ],
+    "showIdentity": true
   }
 ]
