@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { authRouter } from "./auth.routes";
 import { directoryRouter } from "./directory.routes";
+import { messagesRouter } from "./messages.routes";
 import { usersRouter } from "./users.routes";
 import { GENDER_OPTIONS, HOUSES, INDUSTRIES, PBHA_ROLES, PROGRAMS, RACE_OPTIONS } from "../lib/programs";
 
@@ -24,4 +25,5 @@ apiRouter.get("/vocab", (_req, res) =>
 
 apiRouter.use("/auth", authRouter);
 apiRouter.use("/directory", directoryRouter);
+apiRouter.use("/messages", messagesRouter);
 apiRouter.use("/users", usersRouter);

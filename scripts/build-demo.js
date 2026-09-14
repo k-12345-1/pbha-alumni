@@ -131,6 +131,23 @@ const runtime = `
 
   var signedIn = false;
 
+  // Messages, in memory. The static build has no server, so a conversation
+  // lives for as long as the tab does — enough to show the feature working,
+  // and it says so rather than pretending to persist.
+  var THREADS = [
+    {
+      threadId: "t1",
+      with: PROFILES.filter(function (p) { return p.first === "Mei Lin"; })[0] || PROFILES[0],
+      messages: [
+        { id: "m1", body: "Hi! I'm directing CHAP this year and found you in the directory. Could I ask how you handled the Tuesday tutoring split?", createdAt: new Date(Date.now() - 86400000 * 2).toISOString(), fromMe: false },
+        { id: "m2", body: "Of course. We ran two rooms with a shared check-in, which meant one coordinator could cover both. Happy to talk it through.", createdAt: new Date(Date.now() - 86400000 * 2 + 3600000).toISOString(), fromMe: true },
+        { id: "m3", body: "That would be really helpful. Are you free any evening next week?", createdAt: new Date(Date.now() - 3600000 * 5).toISOString(), fromMe: false },
+      ],
+      unread: 1,
+    },
+  ];
+  var nextId = 100;
+
   window.__demoRequest = function (method, path, body) {
     var url = path.split("?")[0];
     var params = new URLSearchParams(path.split("?")[1] || "");
@@ -145,6 +162,52 @@ const runtime = `
     if (url === "/api/auth/signin" || url === "/api/auth/signup") { signedIn = true; return Promise.resolve({ userId: VIEWER_ID }); }
     if (url === "/api/auth/signout") { signedIn = false; return Promise.resolve(null); }
     if (url === "/api/vocab") return Promise.resolve(VOCAB);
+
+    if (url === "/api/messages/unread") {
+      return Promise.resolve({ unread: THREADS.reduce(function (n, t) { return n + t.unread; }, 0) });
+    }
+    if (url === "/api/messages" && method === "GET") {
+      return Promise.resolve({
+        threads: THREADS.map(function (t) {
+          var last = t.messages[t.messages.length - 1];
+          return {
+            threadId: t.threadId,
+            updatedAt: last ? last.createdAt : new Date().toISOString(),
+            unread: t.unread,
+            lastMessage: last ? { body: last.body, createdAt: last.createdAt, fromMe: last.fromMe } : null,
+            with: t.with,
+          };
+        }),
+      });
+    }
+    if (url === "/api/messages/open") {
+      var who = PROFILES.filter(function (p) { return p.userId === (body && body.userId); })[0];
+      var found = THREADS.filter(function (t) { return t.with && who && t.with.userId === who.userId; })[0];
+      if (!found) {
+        found = { threadId: "t" + (++nextId), with: who, messages: [], unread: 0 };
+        THREADS.unshift(found);
+      }
+      return Promise.resolve({ threadId: found.threadId });
+    }
+    if (url.indexOf("/api/messages/") === 0) {
+      var rest = url.slice("/api/messages/".length);
+      var readMark = rest.indexOf("/read") > -1;
+      var id = rest.replace("/read", "");
+      var th = THREADS.filter(function (t) { return t.threadId === id; })[0];
+      if (!th) return Promise.reject(Object.assign(new Error("Conversation not found"), { status: 404 }));
+      if (readMark) { th.unread = 0; return Promise.resolve(null); }
+      if (method === "POST") {
+        var msg = { id: "m" + (++nextId), body: body.body, createdAt: new Date().toISOString(), fromMe: true };
+        th.messages.push(msg);
+        THREADS = [th].concat(THREADS.filter(function (t) { return t !== th; }));
+        return Promise.resolve(msg);
+      }
+      // A copy, not the live array. Handing back the array the mock keeps
+      // means the UI's optimistic append mutates the mock's own copy too,
+      // and the message renders twice. The real API serialises fresh JSON
+      // per request, so only the mock can make this mistake.
+      return Promise.resolve({ threadId: th.threadId, with: th.with, messages: th.messages.slice() });
+    }
     if (url === "/api/directory/facets") return Promise.resolve(facets());
     if (url === "/api/directory") return Promise.resolve(search(params));
     if (url === "/api/users/me/privacy") {

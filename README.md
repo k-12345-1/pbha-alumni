@@ -18,6 +18,9 @@ channels leave.
 - **Alumni Study.** PBHA's alumni survey (n=1,078), reported as PBHA published it:
   both the all-respondent and intensive-programming figures where two exist, with
   the researchers credited and the missing methodology noted.
+- **Messages.** One-to-one, between signed-in members, opened from a profile.
+  A thread is keyed on the pair of people in it, so writing to someone twice
+  continues the conversation rather than starting a second one beside it.
 - **Archives.** PBHA has no archive. This assembles their published decade history
   and the 120 Stories series in one place, and points alumni at the submission form.
 - **Directory.** Search across name, city, employer, field, and program. Filter by
@@ -108,7 +111,7 @@ hook at the top of `api.request`, which nothing defines in the real build.
 
 ```
 prisma/schema.prisma        User, Profile, PrivacySettings
-src/routes/                 auth, directory, users
+src/routes/                 auth, directory, messages, users
 src/services/               the query and privacy logic
 src/lib/class-year.ts       student vs alumni, derived from class year
 src/lib/programs.ts         the PBHA program and role vocabulary

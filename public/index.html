@@ -471,7 +471,7 @@ footer.site {
    contact details — stays selectable. */
 .chip, .stamp, .stamp-year, .scope-btn, .btn, .check, .eyebrow,
 .person-card, .row-person, nav.site-nav button, .map-btn, .account-btn, .account-menu button,
-.pill-select, .pill-menu button, .site-bar-here, .combo-toggle, .amount {
+.pill-select, .pill-menu button, .site-bar-here, .combo-toggle, .amount, .msg-row, .tab-count {
   -webkit-user-select: none;
   user-select: none;
 }
@@ -782,6 +782,76 @@ footer.site {
 @media (max-width: 620px) {
   .society-row { grid-template-columns: 1fr; }
 }
+
+/* ---------- messages ---------- */
+
+.tab-count {
+  display: inline-grid; place-items: center;
+  min-width: 18px; height: 18px; padding: 0 5px; margin-left: 7px;
+  border-radius: 300px;
+  background: var(--orange); color: var(--white);
+  font-size: 11px; font-weight: 700; line-height: 1;
+  vertical-align: 1px;
+}
+
+.msg-layout { display: grid; grid-template-columns: 320px 1fr; gap: 18px; align-items: start; }
+.msg-list { overflow: hidden; max-height: 620px; overflow-y: auto; }
+.msg-row {
+  display: grid; grid-template-columns: 38px 1fr auto; gap: 12px; align-items: center;
+  width: 100%; text-align: left;
+  padding: 14px 16px;
+  border: 0; border-bottom: 1px solid var(--rule);
+  background: none; cursor: pointer; font: inherit;
+}
+.msg-row:last-child { border-bottom: 0; }
+.msg-row:hover { background: var(--wash); }
+.msg-row.is-on { background: var(--wash-2); }
+.msg-row .avatar { width: 38px; height: 38px; }
+.msg-name { display: block; font-size: 14.5px; font-weight: 600; }
+.msg-dot {
+  display: inline-block; width: 7px; height: 7px; margin-left: 7px;
+  border-radius: 50%; background: var(--orange);
+}
+.msg-snippet {
+  display: block; font-size: 13px; color: var(--ink-mute);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.msg-pane { display: flex; flex-direction: column; min-height: 520px; max-height: 620px; }
+.msg-head { padding: 14px 20px; border-bottom: 1px solid var(--rule); }
+.msg-head-name {
+  background: none; border: 0; padding: 0; cursor: pointer;
+  font: inherit; font-size: 16px; font-weight: 600; color: var(--ink);
+}
+.msg-head-name:hover { color: var(--orange); }
+.msg-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+
+.bubble-row { display: flex; }
+.bubble-row.mine { justify-content: flex-end; }
+.bubble {
+  max-width: 78%;
+  background: var(--wash);
+  border-radius: 14px;
+  padding: 10px 14px 20px;
+  font-size: 14.5px;
+  line-height: 1.5;
+  position: relative;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.bubble-row.mine .bubble { background: var(--orange); color: var(--white); }
+.bubble-time {
+  position: absolute; right: 12px; bottom: 5px;
+  font-size: 10.5px; opacity: .6;
+}
+
+.msg-compose { display: flex; gap: 10px; align-items: flex-end; padding: 14px 20px; border-top: 1px solid var(--rule); }
+.msg-compose textarea { min-height: 44px; resize: none; }
+
+@media (max-width: 860px) {
+  .msg-layout { grid-template-columns: 1fr; }
+  .msg-list { max-height: 260px; }
+}
 </style>
 </head>
 <body>
@@ -933,6 +1003,7 @@ function SiteBar() {
 const SECTIONS = [
   { key: "welcome", label: "Home" },
   { key: "directory", label: "Directory" },
+  { key: "messages", label: "Messages" },
   { key: "study", label: "Alumni Study" },
   { key: "archives", label: "Archives" },
 ];
@@ -1190,10 +1261,10 @@ function GateScreen({ onSignedIn }) {
           {mode === "signup" && (
             <div className="two-up">
               <Field label="First name">
-                <input className="input" value={form.first} onChange={set("first")} required />
+                <input className="input" value={form.first} onChange={set("first")} placeholder="First name" required />
               </Field>
               <Field label="Last name">
-                <input className="input" value={form.last} onChange={set("last")} required />
+                <input className="input" value={form.last} onChange={set("last")} placeholder="Last name" required />
               </Field>
             </div>
           )}
@@ -1566,6 +1637,171 @@ function DonateScreen({ me }) {
           <span className="tile-cta">Pledge form →</span>
         </a>
       </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Messages — one-to-one, between signed-in members.
+ * ------------------------------------------------------------------ */
+
+const when = (iso) => {
+  const d = new Date(iso);
+  const now = new Date();
+  const sameDay = d.toDateString() === now.toDateString();
+  if (sameDay) return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  const sameYear = d.getFullYear() === now.getFullYear();
+  return d.toLocaleDateString([], sameYear
+    ? { month: "short", day: "numeric" }
+    : { month: "short", day: "numeric", year: "numeric" });
+};
+
+function MessagesScreen({ openThreadId, onOpenProfile, onUnreadChange }) {
+  const [threads, setThreads] = React.useState([]);
+  const [active, setActive] = React.useState(openThreadId || null);
+  const [thread, setThread] = React.useState(null);
+  const [draft, setDraft] = React.useState("");
+  const [busy, setBusy] = React.useState(false);
+  const [error, setError] = React.useState("");
+  const endRef = React.useRef(null);
+
+  const loadThreads = React.useCallback(() => {
+    api.get("/api/messages")
+      .then((r) => {
+        setThreads(r.threads);
+        // Nothing selected yet: open the most recent conversation rather
+        // than showing an empty pane beside a full list.
+        setActive((cur) => cur || (r.threads[0] ? r.threads[0].threadId : null));
+      })
+      .catch((err) => setError(err.message));
+  }, []);
+
+  React.useEffect(() => { loadThreads(); }, [loadThreads]);
+  React.useEffect(() => { if (openThreadId) setActive(openThreadId); }, [openThreadId]);
+
+  React.useEffect(() => {
+    if (!active) { setThread(null); return; }
+    let dead = false;
+    api.get("/api/messages/" + encodeURIComponent(active))
+      .then((t) => {
+        if (dead) return;
+        setThread(t);
+        // Opening a conversation reads it.
+        return api.post("/api/messages/" + encodeURIComponent(active) + "/read");
+      })
+      .then(() => { if (!dead) { loadThreads(); onUnreadChange && onUnreadChange(); } })
+      .catch((err) => { if (!dead) setError(err.message); });
+    return () => { dead = true; };
+  }, [active, loadThreads, onUnreadChange]);
+
+  React.useEffect(() => {
+    if (endRef.current) endRef.current.scrollIntoView({ block: "end" });
+  }, [thread && thread.messages.length]);
+
+  const send = async (e) => {
+    e.preventDefault();
+    const body = draft.trim();
+    if (!body || !active) return;
+    setBusy(true);
+    setError("");
+    try {
+      const sent = await api.post("/api/messages/" + encodeURIComponent(active), { body });
+      setThread((t) => (t ? { ...t, messages: [...t.messages, sent] } : t));
+      setDraft("");
+      loadThreads();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="wrap page">
+      <h1 className="h-1 accent">Messages</h1>
+      <hr className="rule" style={{ margin: "22px 0 32px" }} />
+
+      {error && <div className="banner banner-error" style={{ marginBottom: 20 }}>{error}</div>}
+
+      {threads.length === 0 && !active ? (
+        <p className="meta">
+          No conversations yet. Open someone&rsquo;s profile in the directory and write to them.
+        </p>
+      ) : (
+        <div className="msg-layout">
+          <div className="msg-list card">
+            {threads.map((t) => (
+              <button key={t.threadId}
+                className={`msg-row ${t.threadId === active ? "is-on" : ""}`}
+                onClick={() => setActive(t.threadId)}>
+                <span className="avatar">
+                  {t.with && t.with.photoUrl
+                    ? <img src={t.with.photoUrl} alt="" />
+                    : <span className="initials" style={{ fontSize: 13, opacity: .5 }}>
+                        {t.with ? initials(t.with.first, t.with.last) : "?"}
+                      </span>}
+                </span>
+                <span style={{ minWidth: 0 }}>
+                  <span className="msg-name">
+                    {t.with ? `${t.with.first} ${t.with.last}` : "Former member"}
+                    {t.unread > 0 && <span className="msg-dot" aria-label={`${t.unread} unread`} />}
+                  </span>
+                  <span className="msg-snippet">
+                    {t.lastMessage ? (t.lastMessage.fromMe ? "You: " : "") + t.lastMessage.body : ""}
+                  </span>
+                </span>
+                <span className="meta" style={{ fontSize: 12 }}>
+                  {t.lastMessage ? when(t.lastMessage.createdAt) : ""}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          <div className="msg-pane card">
+            {!thread ? (
+              <p className="meta" style={{ padding: 24 }}>Pick a conversation.</p>
+            ) : (
+              <>
+                <div className="msg-head">
+                  {thread.with ? (
+                    <button className="msg-head-name"
+                      onClick={() => onOpenProfile(thread.with.userId)}>
+                      {thread.with.first} {thread.with.last}
+                      {thread.with.year && <span className="meta"> · {shortYear(thread.with.year)}</span>}
+                    </button>
+                  ) : <span className="msg-head-name">Former member</span>}
+                </div>
+
+                <div className="msg-body">
+                  {thread.messages.length === 0 && (
+                    <p className="meta">Nothing here yet. Say hello.</p>
+                  )}
+                  {thread.messages.map((m) => (
+                    <div key={m.id} className={`bubble-row ${m.fromMe ? "mine" : ""}`}>
+                      <div className="bubble">
+                        {m.body}
+                        <span className="bubble-time">{when(m.createdAt)}</span>
+                      </div>
+                    </div>
+                  ))}
+                  <div ref={endRef} />
+                </div>
+
+                <form className="msg-compose" onSubmit={send}>
+                  <textarea className="input" value={draft} rows={2}
+                    placeholder="Write a message" aria-label="Write a message"
+                    onChange={(e) => setDraft(e.target.value)}
+                    onKeyDown={(e) => {
+                      // Enter sends; Shift+Enter breaks the line.
+                      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(e); }
+                    }} />
+                  <button className="btn btn-primary" disabled={busy || !draft.trim()}>Send</button>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -2128,10 +2364,14 @@ function DirectoryScreen({ onOpenProfile }) {
           </FilterGroup>
 
           <FilterGroup label="PBHA role">
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {facets.roles.map((r) => (
-                <button key={r.name} className={`chip ${roles.includes(r.name) ? "is-on" : ""}`}
-                  onClick={() => toggle(roles, r.name, setRoles)}>{r.name}</button>
+                <label key={r.name}
+                  className={`check ${roles.includes(r.name) ? "is-on" : ""}`}
+                  onClick={(e) => { e.preventDefault(); toggle(roles, r.name, setRoles); }}>
+                  <span className="box" />
+                  <span>{r.name} <span className="meta">· {r.count}</span></span>
+                </label>
               ))}
               {facets.roles.length === 0 && <span className="meta">—</span>}
             </div>
@@ -2248,9 +2488,22 @@ function DirectoryScreen({ onOpenProfile }) {
  * Profile
  * ------------------------------------------------------------------ */
 
-function ProfileScreen({ userId, onBack }) {
+function ProfileScreen({ userId, onBack, onMessage }) {
   const [person, setPerson] = React.useState(null);
   const [error, setError] = React.useState("");
+  const [opening, setOpening] = React.useState(false);
+
+  const write = async () => {
+    setOpening(true);
+    try {
+      const { threadId } = await api.post("/api/messages/open", { userId });
+      onMessage(threadId);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setOpening(false);
+    }
+  };
 
   React.useEffect(() => {
     setPerson(null);
@@ -2291,6 +2544,14 @@ function ProfileScreen({ userId, onBack }) {
             </span>
             {person.openToMentor && <span className="chip chip-accent">Open to mentoring</span>}
           </div>
+          {/* Hidden for your own profile, and for anyone who has turned
+              messages off — though the server is what actually refuses. */}
+          {!person.isSelf && person.openToMessages !== false && (
+            <button className="btn btn-primary btn-sm" style={{ marginTop: 16, width: "100%" }}
+              onClick={write} disabled={opening}>
+              {opening ? "One moment…" : "Message"}
+            </button>
+          )}
         </div>
 
         <div>
@@ -2501,8 +2762,8 @@ function MyProfileScreen({ me, onSaved }) {
         <div className="two-up">
           <Field label="First name"><input className="input" value={form.first} onChange={set("first")} required /></Field>
           <Field label="Last name"><input className="input" value={form.last} onChange={set("last")} required /></Field>
-          <Field label="Pronouns"><input className="input" value={form.pronouns} onChange={set("pronouns")} placeholder="she/her" /></Field>
-          <Field label="Class year"><input className="input" type="number" min="1904" max="2050" value={form.year} onChange={set("year")} required /></Field>
+          <Field label="Pronouns"><input className="input" value={form.pronouns} onChange={set("pronouns")} placeholder="Pronouns" /></Field>
+          <Field label="Class year"><input className="input" type="number" min="1904" max="2050" value={form.year} onChange={set("year")} placeholder="Class year" required /></Field>
           <Field label="Concentration">
             <input className="input" value={form.concentration} onChange={set("concentration")} placeholder="Concentration" />
           </Field>
@@ -2515,7 +2776,7 @@ function MyProfileScreen({ me, onSaved }) {
         <hr className="rule" style={{ margin: "36px 0 28px" }} />
         <h2 className="h-2" style={{ marginBottom: 18 }}>You now</h2>
         <div className="two-up">
-          <Field label="Where you live"><input className="input" value={form.location} onChange={set("location")} placeholder="Boston, MA" /></Field>
+          <Field label="Where you live"><input className="input" value={form.location} onChange={set("location")} placeholder="Where you live" /></Field>
           <Field label="Field of work" hint="Used as a directory filter.">
             <Combo label="Field of work" placeholder="Field of work" options={vocab.industries}
               value={form.industry} onChange={(v) => setForm((f) => ({ ...f, industry: v }))} />
@@ -2523,10 +2784,10 @@ function MyProfileScreen({ me, onSaved }) {
         </div>
         <Field label="What you do" hint='Written as "Title · Organization" so the directory can show both.'>
           <input className="input" value={form.career} onChange={set("career")}
-            placeholder="Immigration Attorney · Greater Boston Legal Services" />
+            placeholder="What you do" />
         </Field>
-        <Field label="Photo URL"><input className="input" value={form.photoUrl} onChange={set("photoUrl")} placeholder="https://…" /></Field>
-        <Field label="About you"><textarea className="input" value={form.bio} onChange={set("bio")} /></Field>
+        <Field label="Photo URL"><input className="input" value={form.photoUrl} onChange={set("photoUrl")} placeholder="Photo URL" /></Field>
+        <Field label="About you"><textarea className="input" value={form.bio} onChange={set("bio")} placeholder="About you" /></Field>
 
         <hr className="rule" style={{ margin: "36px 0 28px" }} />
         <h2 className="h-2" style={{ marginBottom: 18 }}>You at PBHA</h2>
@@ -2548,7 +2809,7 @@ function MyProfileScreen({ me, onSaved }) {
         </div>
         <Field label="Your involvement"
           hint="Anything the list above misses — a committee, a summer, how you got started.">
-          <textarea className="input" value={form.involvement} onChange={set("involvement")} />
+          <textarea className="input" value={form.involvement} onChange={set("involvement")} placeholder="Your involvement" />
         </Field>
 
         <hr className="rule" style={{ margin: "36px 0 28px" }} />
@@ -2564,7 +2825,7 @@ function MyProfileScreen({ me, onSaved }) {
           <Field label="Students should reach out to me about:"
             hint="Be specific. This is what a student sees before they write to you.">
             <textarea className="input" value={form.reachOut} onChange={set("reachOut")}
-              placeholder="Public health careers, state government, or what running a summer site is actually like." />
+              placeholder="Students should reach out to me about" />
           </Field>
         )}
 
@@ -2615,6 +2876,8 @@ function App() {
   const [me, setMe] = React.useState(undefined); // undefined = still checking
   const [screen, setScreen] = React.useState("welcome");
   const [profileId, setProfileId] = React.useState(null);
+  const [threadId, setThreadId] = React.useState(null);
+  const [unread, setUnread] = React.useState(0);
 
   const loadMe = React.useCallback(async () => {
     try {
@@ -2626,11 +2889,26 @@ function App() {
 
   React.useEffect(() => { loadMe(); }, [loadMe]);
 
+  // The unread badge on the Messages tab. Refreshed on sign-in, whenever a
+  // conversation is read, and on a slow poll so a message that arrives while
+  // someone is reading the directory still shows up.
+  const refreshUnread = React.useCallback(() => {
+    if (!me) return;
+    api.get("/api/messages/unread").then((r) => setUnread(r.unread)).catch(() => {});
+  }, [me]);
+  React.useEffect(() => {
+    if (!me) { setUnread(0); return; }
+    refreshUnread();
+    const handle = setInterval(refreshUnread, 60000);
+    return () => clearInterval(handle);
+  }, [me, refreshUnread]);
+
   const signOut = async () => {
     await api.post("/api/auth/signout").catch(() => {});
     setMe(null);
     setScreen("welcome");
     setProfileId(null);
+    setThreadId(null);
   };
 
   const openProfile = (id) => { setProfileId(id); setScreen("profile"); };
@@ -2645,7 +2923,10 @@ function App() {
             {SECTIONS.map((t) => (
               <button key={t.key}
                 className={t.key === screen || (t.key === "directory" && screen === "profile") ? "is-active" : ""}
-                onClick={() => { setScreen(t.key); setProfileId(null); }}>{t.label}</button>
+                onClick={() => { setScreen(t.key); setProfileId(null); if (t.key === "messages") setThreadId(null); }}>
+                {t.label}
+                {t.key === "messages" && unread > 0 && <span className="tab-count">{unread}</span>}
+              </button>
             ))}
           </nav>
           <AccountMenu me={me} onProfile={() => setScreen("me")} onSignOut={signOut} />
@@ -2657,10 +2938,16 @@ function App() {
       {screen !== "donate" && me === null && <GateScreen onSignedIn={loadMe} />}
       {me && screen === "welcome" && <WelcomeScreen me={me} setScreen={setScreen} />}
       {me && screen === "directory" && <DirectoryScreen onOpenProfile={openProfile} />}
+      {me && screen === "messages" && (
+        <MessagesScreen openThreadId={threadId} onOpenProfile={openProfile}
+          onUnreadChange={refreshUnread} />
+      )}
       {me && screen === "study" && <StudyScreen />}
       {me && screen === "archives" && <ArchivesScreen />}
       {me && screen === "profile" && profileId && (
-        <ProfileScreen userId={profileId} onBack={() => { setScreen("directory"); setProfileId(null); }} />
+        <ProfileScreen userId={profileId}
+          onBack={() => { setScreen("directory"); setProfileId(null); }}
+          onMessage={(id) => { setThreadId(id); setScreen("messages"); }} />
       )}
       {me && screen === "me" && <MyProfileScreen me={me} onSaved={loadMe} />}
 
