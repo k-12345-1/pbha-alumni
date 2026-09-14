@@ -507,13 +507,12 @@ footer.site {
 
 /* ---------- welcome ---------- */
 
-.tile-row, .link-grid {
+.link-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
 }
-.link-grid { grid-template-columns: repeat(3, 1fr); }
-.tile, .link-card {
+.link-card {
   display: block;
   text-align: left;
   background: var(--white);
@@ -526,8 +525,8 @@ footer.site {
   font: inherit;
   transition: border-color .15s;
 }
-.tile:hover, .link-card:hover { border-color: var(--orange); }
-.tile p, .link-card p { margin: 10px 0 16px; }
+.link-card:hover { border-color: var(--orange); }
+.link-card p { margin: 10px 0 16px; }
 .tile-cta { font-size: 13px; font-weight: 600; color: var(--orange); }
 
 /* ---------- study ---------- */
@@ -615,10 +614,10 @@ footer.site {
 .story-who { display: block; font-size: 16px; font-weight: 600; margin: 4px 0 4px; }
 
 @media (max-width: 1000px) {
-  .tile-row, .link-grid, .story-grid { grid-template-columns: repeat(2, 1fr); }
+  .link-grid, .story-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 700px) {
-  .tile-row, .link-grid, .story-grid { grid-template-columns: 1fr; }
+  .link-grid, .story-grid { grid-template-columns: 1fr; }
   .era-head { grid-template-columns: 100px 1fr 20px; gap: 10px; }
   .era-body { padding-left: 20px; }
   .finding { grid-template-columns: 1fr 60px 70px; gap: 10px; }
@@ -1274,36 +1273,6 @@ function WelcomeScreen({ me, setScreen }) {
     <div className="wrap page">
       <h1 className="h-1 accent">{first ? `Hi, ${first}.` : "Hi."}</h1>
       <hr className="rule" style={{ margin: "22px 0 32px" }} />
-
-      <h2 className="h-2" style={{ marginBottom: 20 }}>Start here</h2>
-      <div className="tile-row">
-        <button className="tile" onClick={() => setScreen("me")}>
-          <div className="h-3">Fill in your profile</div>
-          <p className="meta">
-            Your programs, where you landed, and what students can ask you about. A blank
-            profile is invisible to the people looking for you.
-          </p>
-          <span className="tile-cta">Edit your profile →</span>
-        </button>
-        <button className="tile" onClick={() => setScreen("directory")}>
-          <div className="h-3">Find people</div>
-          <p className="meta">
-            Search by program, class year, House, city, or the work someone does now.
-          </p>
-          <span className="tile-cta">Open the directory →</span>
-        </button>
-        <button className="tile" onClick={() => setScreen("study")}>
-          <div className="h-3">Alumni study</div>
-          {/* Deliberately not describing findings while that section is
-              empty — the tile should not promise a page that is blank. */}
-          <p className="meta">
-            The Alumni Association's survey of PBHA alumni.
-          </p>
-          <span className="tile-cta">Open →</span>
-        </button>
-      </div>
-
-      <hr className="rule" style={{ margin: "44px 0 32px" }} />
 
       <h2 className="h-2" style={{ marginBottom: 8 }}>Ways to stay involved</h2>
       <p className="meta" style={{ marginBottom: 24, maxWidth: 640 }}>
