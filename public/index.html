@@ -113,7 +113,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: 0.01em; }
 /* Vertical only. A padding shorthand here resets the horizontal gutter
    .wrap sets, which pins the tabs to the window edge — the same trap that
    caught .page. */
-.section-tabs { padding-top: 30px; }
+.section-tabs { padding-top: 30px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 
 /* Sentence case, 15px/500, black — not uppercase. */
 nav.site-nav { display: flex; align-items: center; gap: 24px; }
@@ -139,12 +139,14 @@ nav.site-nav button.is-active { color: var(--orange); border-bottom-color: var(-
   text-transform: uppercase;
   line-height: 1;
   cursor: pointer;
-  transition: background .15s, color .15s, border-color .15s;
+  transition: opacity .1s linear, background .15s, color .15s, border-color .15s;
   white-space: nowrap;
   text-decoration: none;
 }
 .btn-primary { background: var(--orange); color: var(--white); border-color: var(--orange); }
-.btn-primary:hover { background: var(--orange-dark); border-color: var(--orange-dark); }
+/* pbha.org fades its buttons on hover — transition: opacity .1s linear —
+   rather than shifting the fill. */
+.btn-primary:hover { opacity: .8; }
 .btn-ink { background: var(--ink); color: var(--white); border-color: var(--ink); }
 .btn-ink:hover { background: var(--ink-soft); border-color: var(--ink-soft); }
 .btn-ghost { background: transparent; color: var(--ink); border-color: var(--ink); }
@@ -314,11 +316,29 @@ footer.site {
   padding: 56px 0 64px;
   margin-top: 64px;
 }
+/* Two 370px columns at their measured positions: the left one at the page
+   gutter, the right one starting a little past the halfway mark. */
 .footer-grid {
   display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr;
-  gap: 48px;
+  grid-template-columns: 370px 1fr;
+  gap: 422px;
 }
+.footer-col { max-width: 370px; }
+.footer-search {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 40px;
+  border: 1px solid #eeeeee;
+  padding: 11px 14px;
+  width: 370px;
+  max-width: 100%;
+  color: var(--ink-soft);
+}
+.footer-search input {
+  border: 0; outline: 0; background: transparent;
+  font-size: 15px; font-weight: 500; color: var(--ink);
+  width: 100%;
+}
+.footer-search input::placeholder { color: var(--ink-soft); opacity: .75; }
 .footer-h { font-size: 18.5px; font-weight: 700; color: var(--ink); margin-bottom: 20px; }
 .footer-p { font-size: 15px; font-weight: 500; color: var(--ink); margin: 0 0 16px; }
 .footer-p strong { font-weight: 700; }
@@ -327,17 +347,13 @@ footer.site {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
-.footer-links { display: flex; flex-direction: column; gap: 14px; align-items: flex-start; font-size: 15px; font-weight: 500; }
-/* The site-wide column lines up with the other two rather than sitting under
-   a heading of its own, since theirs carries no heading either. */
-.footer-links-last { padding-top: 44px; gap: 18px; }
+.footer-links { display: flex; flex-direction: column; gap: 18px; align-items: flex-start; font-size: 15px; font-weight: 500; }
 
-@media (max-width: 1000px) {
-  .footer-grid { grid-template-columns: 1fr 1fr; }
-  .footer-links-last { padding-top: 0; }
+@media (max-width: 1240px) {
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 48px; }
 }
 @media (max-width: 700px) {
-  .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+  .footer-grid { grid-template-columns: 1fr; gap: 36px; }
 }
 
 /* ---------- responsive ---------- */
@@ -668,10 +684,18 @@ footer.site {
 .site-bar-nav a, .site-bar-here {
   font-size: 15px; font-weight: 500; color: var(--ink);
   text-decoration: none; white-space: nowrap;
-  padding: 4px 0; border-bottom: 2px solid transparent;
 }
 .site-bar-nav a:hover { color: var(--orange); }
-.site-bar-here { color: var(--orange); border-bottom-color: var(--orange); }
+/* Exactly how pbha.org marks the section you are in: a 1px black rule
+   painted as a background gradient, sitting 1.5px above the bottom of the
+   text box. Not orange, and not a border. */
+.site-bar-here {
+  color: var(--ink);
+  background-image: linear-gradient(rgb(0, 0, 0), rgb(0, 0, 0));
+  background-repeat: repeat-x;
+  background-size: 1px 1px;
+  background-position: 0 calc(100% - 1.5px);
+}
 .site-bar-actions { margin-left: auto; display: flex; align-items: center; gap: 18px; }
 .site-bar-actions a { color: var(--ink); display: flex; text-decoration: none; }
 .site-bar-actions a:hover { color: var(--orange); }
@@ -820,7 +844,7 @@ const Social = {
   ),
 };
 
-function SiteBar({ me, onProfile, onSignOut }) {
+function SiteBar() {
   return (
     <div className="site-bar">
       <div className="site-bar-inner">
@@ -844,7 +868,6 @@ function SiteBar({ me, onProfile, onSignOut }) {
           <a href="mailto:pbha@pbha.org" aria-label="Email PBHA"><Social.mail /></a>
           <a className="btn btn-primary btn-sm" href="https://donatenow.networkforgood.org/1439676"
             target="_blank" rel="noopener noreferrer">Donate</a>
-          {me && <AccountMenu me={me} onProfile={onProfile} onSignOut={onSignOut} />}
         </div>
       </div>
     </div>
@@ -1212,14 +1235,6 @@ function WelcomeScreen({ me, setScreen }) {
     <div className="wrap page">
       <h1 className="h-1 accent">{first ? `Hi, ${first}.` : "Hi."}</h1>
       <hr className="rule" style={{ margin: "22px 0 32px" }} />
-      <p className="lede" style={{ maxWidth: 720 }}>
-        You are a member of the Phillips Brooks House Alumni Association because you were
-        involved in a PBHA program. There is nothing to join and no dues:
-        <span className="em-u"> everyone who served is already in</span>, whether or not they
-        graduated from Harvard.
-      </p>
-
-      <hr className="rule" style={{ margin: "36px 0 32px" }} />
 
       <h2 className="h-2" style={{ marginBottom: 20 }}>Start here</h2>
       <div className="tile-row">
@@ -2362,7 +2377,7 @@ function App() {
 
   return (
     <>
-      <SiteBar me={me} onProfile={() => setScreen("me")} onSignOut={signOut} />
+      <SiteBar />
 
       {me && (
         <div className="wrap section-tabs">
@@ -2373,6 +2388,7 @@ function App() {
                 onClick={() => { setScreen(t.key); setProfileId(null); }}>{t.label}</button>
             ))}
           </nav>
+          <AccountMenu me={me} onProfile={() => setScreen("me")} onSignOut={signOut} />
         </div>
       )}
 
@@ -2388,8 +2404,10 @@ function App() {
       {me && screen === "me" && <MyProfileScreen me={me} onSaved={loadMe} />}
 
       <footer className="site">
+        {/* Their footer is two blocks, each 370px wide, at x=86 and x=878 on a
+            1440 window, with the search box under the right-hand one. */}
         <div className="wrap footer-grid">
-          <div>
+          <div className="footer-col">
             <h4 className="footer-h">Phillips Brooks House Association</h4>
             <p className="footer-p">HARVARD YARD<br/>CAMBRIDGE, MA 02138</p>
             <p className="footer-p"><strong>PHONE:</strong> (617) 495-5526</p>
@@ -2397,33 +2415,29 @@ function App() {
             <p className="footer-p"><strong>EMAIL:</strong>{" "}
               <a href="mailto:pbha@pbha.org">pbha@pbha.org</a></p>
           </div>
-          <div>
-            <h4 className="footer-h">Alumni</h4>
-            <div className="footer-links">
-              <a href="https://www.pbha.org/get-involved/join-the-alumni-network"
-                target="_blank" rel="noopener noreferrer">Join the Alumni Network</a>
-              <a href="https://www.pbha.org/alumni-impact"
-                target="_blank" rel="noopener noreferrer">Alumni Impact</a>
-              <a href="https://www.pbha.org/reunions"
-                target="_blank" rel="noopener noreferrer">PBHA&rsquo;s Reunions</a>
-              <a href="https://www.pbha.org/125"
-                target="_blank" rel="noopener noreferrer">Road to the 125th</a>
-              <a href="https://www.pbha.org/120stories"
-                target="_blank" rel="noopener noreferrer">120 Stories</a>
-              <a href="https://www.pbha.org/coles-2026"
-                target="_blank" rel="noopener noreferrer">Robert Coles &ldquo;Call of Service&rdquo; Lecture</a>
-            </div>
-          </div>
 
-          <div className="footer-links footer-links-last">
-            <a href="https://accessibility.huit.harvard.edu/digital-accessibility-policy"
-              target="_blank" rel="noopener noreferrer">Digital Accessibility</a>
-            <a href="https://www.pbha.org/accessibility-2"
-              target="_blank" rel="noopener noreferrer">Accessibility Information &amp; Bias Report</a>
-            <a href="https://www.pbha.org/contact-us"
-              target="_blank" rel="noopener noreferrer">Contact Us</a>
-            <a href="https://pbha.us4.list-manage.com/subscribe?u=12a6d114426de46cf2848b3a6&amp;id=3f7724366c"
-              target="_blank" rel="noopener noreferrer">Subscribe to PBHA&rsquo;s email list</a>
+          <div className="footer-col">
+            <div className="footer-links">
+              <a href="https://accessibility.huit.harvard.edu/digital-accessibility-policy"
+                target="_blank" rel="noopener noreferrer">Digital Accessibility</a>
+              <a href="https://www.pbha.org/accessibility-2"
+                target="_blank" rel="noopener noreferrer">Accessibility Information &amp; Bias Report</a>
+              <a href="https://www.pbha.org/contact-us"
+                target="_blank" rel="noopener noreferrer">Contact Us</a>
+              <a href="https://pbha.us4.list-manage.com/subscribe?u=12a6d114426de46cf2848b3a6&amp;id=3f7724366c"
+                target="_blank" rel="noopener noreferrer">Subscribe to PBHA&rsquo;s email list</a>
+            </div>
+
+            <form className="footer-search" onSubmit={(e) => {
+              e.preventDefault();
+              const q = e.target.elements.q.value.trim();
+              if (q) window.open("https://www.pbha.org/search?q=" + encodeURIComponent(q), "_blank", "noopener");
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/>
+              </svg>
+              <input name="q" type="text" placeholder="Search" aria-label="Search pbha.org" />
+            </form>
           </div>
         </div>
       </footer>
