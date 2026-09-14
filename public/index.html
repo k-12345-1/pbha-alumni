@@ -31,11 +31,11 @@
   --orange: #f98715;
   --orange-dark: #d96f06;
   --orange-wash: #fdf0e0;
-  /* The band their footer sits on. Their section declares their navy at
-     .44 alpha; over a white page that flattens to a pale lilac, well short
-     of how saturated the band actually reads on their site. Same navy,
-     carried at .62 — #646d9c flat. */
-  --footer-band: rgba(5, 20, 96, 0.62);
+  /* The band their footer sits on. Their section declares their navy at .44
+     alpha, but that is not what it paints as — read off a screenshot of the
+     two footers side by side, theirs lands here. Deriving it from the alpha
+     kept coming out too dark and too grey, so this is the sampled value. */
+  --footer-band: #6b72ab;
 
   --sans: "Work Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
@@ -429,7 +429,8 @@ footer.site {
    label and leaves it highlighted. Prose — bios, names on the profile page,
    contact details — stays selectable. */
 .chip, .stamp, .stamp-year, .scope-btn, .btn, .check, .eyebrow,
-.person-card, .row-person, nav.site-nav button, .map-btn, .account-btn, .account-menu button {
+.person-card, .row-person, nav.site-nav button, .map-btn, .account-btn, .account-menu button,
+.pill-select, .pill-menu button {
   -webkit-user-select: none;
   user-select: none;
 }
@@ -595,6 +596,44 @@ footer.site {
   .finding { grid-template-columns: 1fr 60px 70px; gap: 10px; }
   .bar-row { grid-template-columns: 110px 1fr 40px; }
 }
+
+/* A dropdown that belongs to the site rather than to the OS. */
+.pill-select {
+  display: inline-flex; align-items: center; gap: 10px;
+  border: 1px solid var(--ink);
+  background: var(--white);
+  color: var(--ink);
+  border-radius: 300px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.pill-select:hover { border-color: var(--orange); color: var(--orange); }
+.pill-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .1);
+  padding: 6px;
+  z-index: 50;
+}
+.pill-menu button {
+  display: block; width: 100%; text-align: left;
+  padding: 10px 12px;
+  background: none; border: 0;
+  font-size: 14px; font-weight: 500; color: var(--ink);
+  cursor: pointer;
+}
+.pill-menu button:hover { background: var(--wash); color: var(--orange); }
+.pill-menu button.is-on { background: var(--orange); color: var(--white); }
+
+.account-initials { font-size: 13px; font-weight: 700; letter-spacing: 0.04em; }
 </style>
 </head>
 <body>
@@ -684,6 +723,50 @@ const SECTIONS = [
 
 // The account control in the header: an orange avatar that opens the two
 // things it stands for — edit your profile, or sign out.
+// A dropdown the site can actually style. A native <select> renders its
+// list with the operating system's own chrome — grey panel, blue highlight,
+// system font — which no amount of CSS reaches.
+function Select({ value, options, onChange, label }) {
+  const [open, setOpen] = React.useState(false);
+  const ref = React.useRef(null);
+  const current = options.find((o) => o.value === value);
+
+  React.useEffect(() => {
+    if (!open) return;
+    const onDocClick = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const onKey = (e) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  return (
+    <div ref={ref} style={{ position: "relative" }}>
+      <button className="pill-select" onClick={() => setOpen((o) => !o)}
+        aria-haspopup="listbox" aria-expanded={open} aria-label={label}>
+        <span>{current ? current.label : ""}</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+          <path d="M5 8.5l7 7 7-7" />
+        </svg>
+      </button>
+      {open && (
+        <div className="pill-menu" role="listbox">
+          {options.map((o) => (
+            <button key={o.value} role="option" aria-selected={o.value === value}
+              className={o.value === value ? "is-on" : ""}
+              onClick={() => { onChange(o.value); setOpen(false); }}>
+              {o.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function AccountMenu({ me, onProfile, onSignOut }) {
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef(null);
@@ -712,10 +795,7 @@ function AccountMenu({ me, onProfile, onSignOut }) {
         aria-label={`Account menu for ${first} ${last}`.trim()}>
         {me.profile?.photoUrl
           ? <img src={me.profile.photoUrl} alt="" />
-          : <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor">
-              <circle cx="12" cy="8" r="4"/>
-              <path d="M4 21c0-4.2 3.6-7 8-7s8 2.8 8 7z"/>
-            </svg>}
+          : <span className="account-initials">{initials(first, last)}</span>}
       </button>
       {open && (
         <div className="account-menu" role="menu">
@@ -1852,7 +1932,7 @@ function DirectoryScreen({ onOpenProfile }) {
 
           <label className="search" style={{ marginBottom: 24 }}>
             <SearchIcon />
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Name, city, employer" />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Name, city, PBHA Role, etc..." />
           </label>
 
           <FilterGroup label="Show">
@@ -1950,9 +2030,7 @@ function DirectoryScreen({ onOpenProfile }) {
         <section>
           <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", marginBottom: 20 }}>
             <span className="meta">
-              {loading ? "Searching…" : (
-                <><span className="em-n">{results.length}</span> of {total} members</>
-              )}
+              {loading ? "Searching…" : `${results.length} of ${total} members`}
             </span>
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
               {activeFilters.map((f) => (
@@ -1960,13 +2038,13 @@ function DirectoryScreen({ onOpenProfile }) {
               ))}
             </div>
             <div style={{ display: "flex", gap: 8, marginLeft: "auto", alignItems: "center" }}>
-              <select className="select" value={sort} onChange={(e) => setSort(e.target.value)}
-                style={{ width: "auto", padding: "8px 12px", fontSize: 13 }}>
-                <option value="recent">Recently joined</option>
-                <option value="year-desc">Class year — newest</option>
-                <option value="year-asc">Class year — oldest</option>
-                <option value="name">Last name (A–Z)</option>
-              </select>
+              <Select value={sort} onChange={setSort} label="Sort the directory"
+                options={[
+                  { value: "recent", label: "Recently joined" },
+                  { value: "year-desc", label: "Class year — newest" },
+                  { value: "year-asc", label: "Class year — oldest" },
+                  { value: "name", label: "Last name (A–Z)" },
+                ]} />
               <button className={`btn btn-sm ${layout === "grid" ? "btn-ink" : "btn-ghost"}`}
                 onClick={() => setLayout("grid")}>Grid</button>
               <button className={`btn btn-sm ${layout === "list" ? "btn-ink" : "btn-ghost"}`}
