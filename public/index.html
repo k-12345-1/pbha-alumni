@@ -260,7 +260,10 @@ textarea.input { min-height: 100px; resize: vertical; line-height: 1.55; }
   overflow: hidden;
 }
 .person-photo img { width: 100%; height: 100%; object-fit: cover; }
-.initials { font-size: 23px; font-weight: 600; color: var(--ink); opacity: .26; letter-spacing: 0.08em; }
+.initials {
+  font-size: 23px; font-weight: 600; color: var(--ink); opacity: .26;
+  letter-spacing: 0.01em; text-indent: 0.01em;
+}
 .stamp {
   position: absolute; top: 12px; left: 12px;
   background: var(--white);
@@ -631,7 +634,7 @@ footer.site {
 .pill-menu button:hover { background: var(--wash); color: var(--orange); }
 .pill-menu button.is-on { background: var(--orange); color: var(--white); }
 
-.account-initials { font-size: 13px; font-weight: 700; letter-spacing: 0.04em; }
+.account-initials { font-size: 13px; font-weight: 700; letter-spacing: 0.01em; text-indent: 0.01em; }
 
 /* ---------- pbha.org's own bar, above the alumni section ---------- */
 
@@ -1126,7 +1129,7 @@ function WelcomeScreen({ me, setScreen }) {
   const first = (me.profile && me.profile.first) || "";
   return (
     <div className="wrap page">
-      <h1 className="h-1 accent">{first ? `Welcome back, ${first}.` : "Welcome to the network."}</h1>
+      <h1 className="h-1 accent">{first ? `Hi, ${first}.` : "Hi."}</h1>
       <hr className="rule" style={{ margin: "22px 0 32px" }} />
       <p className="lede" style={{ maxWidth: 720 }}>
         You are a member of the Phillips Brooks House Alumni Association because you were
@@ -1155,11 +1158,13 @@ function WelcomeScreen({ me, setScreen }) {
           <span className="tile-cta">Open the directory →</span>
         </button>
         <button className="tile" onClick={() => setScreen("study")}>
-          <div className="h-3">Read the alumni study</div>
+          <div className="h-3">Alumni study</div>
+          {/* Deliberately not describing findings while that section is
+              empty — the tile should not promise a page that is blank. */}
           <p className="meta">
-            What 1,078 PBHA alumni said about where their service years took them.
+            The Alumni Association's survey of PBHA alumni.
           </p>
-          <span className="tile-cta">See the findings →</span>
+          <span className="tile-cta">Open →</span>
         </button>
       </div>
 
@@ -1183,154 +1188,17 @@ function WelcomeScreen({ me, setScreen }) {
 }
 
 /* ------------------------------------------------------------------ *
- * Alumni Study
- *
- * Every figure here is PBHA's own, published across /alumni-impact and
- * its subpages. Where a finding has two numbers, the first is all
- * respondents and the second is alumni who took part in what PBHA calls
- * intensive programming; both are reported rather than the flattering
- * one. Nothing here is estimated or filled in — if PBHA has not
- * published it, it is not on this page.
+ * Alumni Study — header only for now. PBHA's survey findings (n=1,078),
+ * the field breakdown, and the researcher credits were built out and
+ * then held back pending a decision on what to publish here; they are
+ * one `git revert` away.
  * ------------------------------------------------------------------ */
 
-const STUDY_HEADLINE = [
-  { n: "1,078", label: "alumni responded to the survey" },
-  { n: "95%", label: "voted in the last two years" },
-  { n: "93%", label: "gave money or goods to a social justice cause" },
-  { n: "91%", label: "came to think of themselves as a leader through PBHA" },
-];
-
-const STUDY_SECTIONS = [
-  {
-    title: "A lifetime of public service",
-    href: "https://www.pbha.org/alumni-impact/lifetime-of-public-service",
-    rows: [
-      ["Passion for public service was nurtured at PBHA", "82%", "96%"],
-      ["PBHA strengthened their commitment to social challenges", "80%", "94%"],
-      ["Volunteered in a political context in the last two years", "58%", null],
-    ],
-    tallies: [
-      ["962", "board seats held"],
-      ["2,671", "volunteer or pro bono roles"],
-      ["1,196", "executive or management roles at public service organizations"],
-    ],
-  },
-  {
-    title: "Lasting skills",
-    href: "https://www.pbha.org/alumni-impact/lasting-skills-for-lifelong-success",
-    rows: [
-      ["Developed a deeper belief in their own capabilities", null, "79%"],
-      ["Learned effective leadership and management skills", null, "88%"],
-      ["Came to think of themselves as a leader", null, "91%"],
-      ["Can work effectively with people of different backgrounds", "70%", "90%"],
-      ["Developed a connection to the communities they worked with", "75%", "96%"],
-      ["PBHA shaped their sense of the importance of empathy", "83%", "94%"],
-    ],
-  },
-];
-
-const STUDY_FIELDS = [
-  ["Education", 450], ["Healthcare", 278], ["Business", 216], ["Legal", 200],
-  ["Government", 185], ["Social Services", 173], ["Sciences", 100], ["Technology", 92],
-];
-
-function Bar({ label, value, max }) {
-  return (
-    <div className="bar-row">
-      <span className="bar-label">{label}</span>
-      <span className="bar-track">
-        <span className="bar-fill" style={{ width: `${(value / max) * 100}%` }} />
-      </span>
-      <span className="bar-value">{value}</span>
-    </div>
-  );
-}
-
 function StudyScreen() {
-  const max = STUDY_FIELDS[0][1];
   return (
     <div className="wrap page">
       <h1 className="h-1 accent">Alumni Study</h1>
       <hr className="rule" style={{ margin: "22px 0 32px" }} />
-      <p className="lede" style={{ maxWidth: 720 }}>
-        The PBHA Alumni Association surveyed alumni about where their service years took them.
-        <span className="em-n"> 1,078</span> people answered. These are their findings, as PBHA
-        published them.
-      </p>
-
-      <div className="stat-band">
-        {STUDY_HEADLINE.map((h) => (
-          <div key={h.label}>
-            <div className="stat-n">{h.n}</div>
-            <div className="meta" style={{ marginTop: 6 }}>{h.label}</div>
-          </div>
-        ))}
-      </div>
-
-      {STUDY_SECTIONS.map((sec) => (
-        <div key={sec.title} style={{ marginTop: 48 }}>
-          <h2 className="h-2" style={{ marginBottom: 6 }}>{sec.title}</h2>
-          <p className="meta" style={{ marginBottom: 20 }}>
-            First figure is all respondents; second is alumni who took part in intensive
-            programming. <a className="link-orange" href={sec.href} target="_blank" rel="noopener noreferrer">PBHA's write-up →</a>
-          </p>
-          <div className="card">
-            <div className="finding finding-head">
-              <span>Finding</span><span>All</span><span>Intensive</span>
-            </div>
-            {sec.rows.map((r) => (
-              <div className="finding" key={r[0]}>
-                <span>{r[0]}</span>
-                <span className={r[1] ? "em-n" : "meta"}>{r[1] || "—"}</span>
-                <span className={r[2] ? "em-n" : "meta"}>{r[2] || "—"}</span>
-              </div>
-            ))}
-          </div>
-          {sec.tallies && (
-            <div className="stat-band" style={{ marginTop: 24 }}>
-              {sec.tallies.map((t) => (
-                <div key={t[1]}>
-                  <div className="stat-n">{t[0]}</div>
-                  <div className="meta" style={{ marginTop: 6, maxWidth: 210 }}>{t[1]}</div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      ))}
-
-      <div style={{ marginTop: 48 }}>
-        <h2 className="h-2" style={{ marginBottom: 6 }}>Where respondents work</h2>
-        <p className="meta" style={{ marginBottom: 20 }}>Respondents by professional field.</p>
-        <div className="card card-pad">
-          {STUDY_FIELDS.map(([label, value]) => (
-            <Bar key={label} label={label} value={value} max={max} />
-          ))}
-        </div>
-      </div>
-
-      <hr className="rule" style={{ margin: "48px 0 24px" }} />
-      <h2 className="h-2" style={{ marginBottom: 12 }}>Who did this</h2>
-      <p style={{ maxWidth: 720, margin: "0 0 16px" }}>
-        The study was envisioned and supported by the PBHA Alumni Association board.
-        <strong> Leah Robinson</strong> developed the survey as a student at the Harvard Graduate
-        School of Education, advised by <strong>Professors Alexis Redding</strong> and
-        <strong> Julie Reuben</strong>. <strong>Christine Tran</strong> and <strong>Sammy Lee</strong> ran
-        the primary analysis as their Vanderbilt Leadership &amp; Learning in Organizations PhD
-        capstone. <strong>Nancy Sato '75</strong> guided the overall study and
-        <strong> Sam Greenberg</strong> analysed and summarised the outcomes.
-      </p>
-      <p className="meta" style={{ maxWidth: 720, marginBottom: 20 }}>
-        PBHA publishes headline figures rather than methodology: response rate, fielding dates,
-        and how "intensive programming" was defined are not stated in the public write-up.
-        Read the findings with that in mind.
-      </p>
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-        <a className="btn btn-primary" href="https://drive.google.com/file/d/19xNKOQVA9zn8Vbt5ah7iosz1l-EsMqlG/view?usp=sharing"
-          target="_blank" rel="noopener noreferrer">Read the full report</a>
-        <a className="btn btn-ghost" href="https://www.pbha.org/alumni-impact"
-          target="_blank" rel="noopener noreferrer">PBHA's impact pages</a>
-      </div>
     </div>
   );
 }
@@ -1977,10 +1845,7 @@ function DirectoryScreen({ onOpenProfile }) {
           {error && <div className="banner banner-error" style={{ marginBottom: 20 }}>{error}</div>}
 
           {!loading && results.length === 0 && !error && layout !== "map" && (
-            <div className="card empty">
-              <div className="h-3" style={{ marginBottom: 8 }}>No members match those filters</div>
-              <p className="meta">Try widening the class years or clearing a program.</p>
-            </div>
+            <div className="card empty">No members match those filters.</div>
           )}
 
           {layout === "map" ? (
