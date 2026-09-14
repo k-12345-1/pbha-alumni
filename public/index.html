@@ -86,6 +86,17 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: 0.01em; }
 .em-u { text-decoration: underline; text-underline-offset: 3px; }
 
 .lede { font-size: 18.5px; line-height: 1.6; font-weight: 500; color: var(--ink); }
+/* The treatment their homepage gives "Each year, 1,200 student volunteers
+   join the Phillips Brooks House Association...": large and bold, with the
+   figures in orange and the organisation underlined. */
+.statement {
+  font-size: clamp(22px, 2.3vw, 30px);
+  line-height: 1.4;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  margin: 0;
+  max-width: 940px;
+}
 
 .eyebrow {
   font-size: 11px;
@@ -1272,12 +1283,18 @@ function WelcomeScreen({ me, setScreen }) {
   return (
     <div className="wrap page">
       <h1 className="h-1 accent">{first ? `Hi, ${first}.` : "Hi."}</h1>
-      <hr className="rule" style={{ margin: "22px 0 32px" }} />
+      <hr className="rule" style={{ margin: "22px 0 36px" }} />
 
-      <h2 className="h-2" style={{ marginBottom: 8 }}>Ways to stay involved</h2>
-      <p className="meta" style={{ marginBottom: 24, maxWidth: 640 }}>
-        Mostly run by PBHA, and opening on their site.
+      <p className="statement">
+        More than <span className="em-n">30,000</span> alumni have run
+        <span className="em-u"> the Phillips Brooks House Association</span>&rsquo;s programs
+        since <span className="em-n">1904</span>. The Alumni Network is where they find each
+        other again &mdash; by program, class year, House, city, and the work they do now.
       </p>
+
+      <hr className="rule" style={{ margin: "40px 0 32px" }} />
+
+      <h2 className="h-2" style={{ marginBottom: 20 }}>Ways to stay involved</h2>
       <div className="link-grid">
         {GET_INVOLVED.map((g) => {
           const inner = (
@@ -2145,12 +2162,14 @@ function DirectoryScreen({ onOpenProfile }) {
           </FilterGroup>
 
           <FilterGroup label="Field of work">
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {facets.industries.map((i) => (
-                <button key={i.name} className={`chip ${industries.includes(i.name) ? "is-on" : ""}`}
-                  onClick={() => toggle(industries, i.name, setIndustries)}>
-                  {i.name}
-                </button>
+                <label key={i.name}
+                  className={`check ${industries.includes(i.name) ? "is-on" : ""}`}
+                  onClick={(e) => { e.preventDefault(); toggle(industries, i.name, setIndustries); }}>
+                  <span className="box" />
+                  <span>{i.name} <span className="meta">· {i.count}</span></span>
+                </label>
               ))}
               {facets.industries.length === 0 && <span className="meta">—</span>}
             </div>
@@ -2370,7 +2389,7 @@ function ProfileScreen({ userId, onBack }) {
 function MyProfileScreen({ me, onSaved }) {
   const [form, setForm] = React.useState(null);
   const [privacy, setPrivacy] = React.useState(null);
-  const [vocab, setVocab] = React.useState({ programs: [], roles: [], houses: [], genders: [], races: [] });
+  const [vocab, setVocab] = React.useState({ programs: [], roles: [], houses: [], genders: [], races: [], industries: [] });
   const [status, setStatus] = React.useState("");
   const [error, setError] = React.useState("");
   const [busy, setBusy] = React.useState(false);
@@ -2497,7 +2516,10 @@ function MyProfileScreen({ me, onSaved }) {
         <h2 className="h-2" style={{ marginBottom: 18 }}>You now</h2>
         <div className="two-up">
           <Field label="Where you live"><input className="input" value={form.location} onChange={set("location")} placeholder="Boston, MA" /></Field>
-          <Field label="Field of work" hint="Used as a directory filter."><input className="input" value={form.industry} onChange={set("industry")} placeholder="Law & Policy" /></Field>
+          <Field label="Field of work" hint="Used as a directory filter.">
+            <Combo label="Field of work" placeholder="Field of work" options={vocab.industries}
+              value={form.industry} onChange={(v) => setForm((f) => ({ ...f, industry: v }))} />
+          </Field>
         </div>
         <Field label="What you do" hint='Written as "Title · Organization" so the directory can show both.'>
           <input className="input" value={form.career} onChange={set("career")}

@@ -17,7 +17,7 @@ const path = require("node:path");
 
 const ROOT = path.resolve(__dirname, "..");
 const people = require(path.join(ROOT, "src/seed/demo-people.json"));
-const { PROGRAMS, PBHA_ROLES, HOUSES, GENDER_OPTIONS, RACE_OPTIONS } = require("./vocab.js");
+const { PROGRAMS, PBHA_ROLES, HOUSES, GENDER_OPTIONS, RACE_OPTIONS, INDUSTRIES } = require("./vocab.js");
 
 // Same rule as src/lib/class-year.ts: the boundary rolls on June 1.
 const studentBoundaryYear = () => {
@@ -65,7 +65,7 @@ const runtime = `
 <script>
 (function () {
   var PROFILES = ${JSON.stringify(profiles)};
-  var VOCAB = ${JSON.stringify({ programs: PROGRAMS, roles: PBHA_ROLES, houses: HOUSES, genders: GENDER_OPTIONS, races: RACE_OPTIONS })};
+  var VOCAB = ${JSON.stringify({ programs: PROGRAMS, roles: PBHA_ROLES, houses: HOUSES, genders: GENDER_OPTIONS, races: RACE_OPTIONS, industries: INDUSTRIES })};
   var VIEWER_ID = ${JSON.stringify(DEMO_VIEWER.userId)};
   var STUDENT_BOUNDARY = ${studentBoundaryYear()};
 

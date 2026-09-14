@@ -2,7 +2,7 @@ import { Router } from "express";
 import { authRouter } from "./auth.routes";
 import { directoryRouter } from "./directory.routes";
 import { usersRouter } from "./users.routes";
-import { GENDER_OPTIONS, HOUSES, PBHA_ROLES, PROGRAMS, RACE_OPTIONS } from "../lib/programs";
+import { GENDER_OPTIONS, HOUSES, INDUSTRIES, PBHA_ROLES, PROGRAMS, RACE_OPTIONS } from "../lib/programs";
 
 export const apiRouter = Router();
 
@@ -16,6 +16,7 @@ apiRouter.get("/vocab", (_req, res) =>
     programs: PROGRAMS,
     roles: PBHA_ROLES,
     houses: HOUSES,
+    industries: INDUSTRIES,
     genders: GENDER_OPTIONS,
     races: RACE_OPTIONS,
   }),

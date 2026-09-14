@@ -79,3 +79,31 @@ export const RACE_OPTIONS = [
   "Prefer to self-describe",
   "Prefer not to say",
 ] as const;
+
+// Fields of work. The first eight are the professional fields PBHA reports
+// in its own alumni study; the rest cover where the roster actually lands.
+// Offered as suggestions in the profile editor so the directory filter
+// groups people instead of scattering them across near-identical strings
+// ("Law", "Legal", "law & policy"). The column stays free text.
+export const INDUSTRIES = [
+  "Education",
+  "Healthcare",
+  "Business",
+  "Legal",
+  "Government",
+  "Social Services",
+  "Sciences",
+  "Technology",
+  "Arts & Media",
+  "Community Organizing",
+  "Finance",
+  "Health & Medicine",
+  "Housing",
+  "Journalism",
+  "Law & Policy",
+  "Nonprofit",
+  "Philanthropy",
+  "Public Health",
+  "Research",
+  "Student",
+] as const;

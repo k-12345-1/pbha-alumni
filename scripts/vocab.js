@@ -27,6 +27,13 @@ const PROGRAMS = [
   "Summer Urban Program",
 ];
 
+const INDUSTRIES = [
+  "Education", "Healthcare", "Business", "Legal", "Government", "Social Services",
+  "Sciences", "Technology", "Arts & Media", "Community Organizing", "Finance",
+  "Health & Medicine", "Housing", "Journalism", "Law & Policy", "Nonprofit",
+  "Philanthropy", "Public Health", "Research", "Student",
+];
+
 const PBHA_ROLES = [
   "Volunteer",
   "Program Coordinator",
@@ -55,10 +62,10 @@ const RACE_OPTIONS = [
 
 // Drift guard: every name here must appear in the TypeScript source.
 const ts = fs.readFileSync(path.resolve(__dirname, "../src/lib/programs.ts"), "utf8");
-for (const name of [...PROGRAMS, ...PBHA_ROLES, ...HOUSES, ...GENDER_OPTIONS, ...RACE_OPTIONS]) {
+for (const name of [...PROGRAMS, ...PBHA_ROLES, ...HOUSES, ...GENDER_OPTIONS, ...RACE_OPTIONS, ...INDUSTRIES]) {
   if (!ts.includes(JSON.stringify(name).slice(1, -1).replace(/\\"/g, '"'))) {
     throw new Error(`scripts/vocab.js is out of sync with src/lib/programs.ts: "${name}" is missing there`);
   }
 }
 
-module.exports = { PROGRAMS, PBHA_ROLES, HOUSES, GENDER_OPTIONS, RACE_OPTIONS };
+module.exports = { PROGRAMS, PBHA_ROLES, HOUSES, GENDER_OPTIONS, RACE_OPTIONS, INDUSTRIES };
