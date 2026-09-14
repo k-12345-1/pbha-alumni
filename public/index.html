@@ -360,7 +360,12 @@ footer.site {
   .gate-layout { grid-template-columns: 1fr !important; gap: 40px !important; }
   .profile-layout { grid-template-columns: 1fr !important; gap: 28px !important; }
   .directory-layout { grid-template-columns: 1fr !important; }
-  .directory-rail { position: static !important; }
+  .directory-rail {
+    position: static;
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
   .grid-people { grid-template-columns: 1fr; }
   .row-person { grid-template-columns: 46px 1fr; }
   .row-person > :nth-child(n+3) { grid-column: 2; }
@@ -412,6 +417,23 @@ footer.site {
 .map-btn:hover { border-color: var(--orange); color: var(--orange); }
 
 .card-pad { padding: 24px; }
+
+/* The filter rail sticks below the section header, and scrolls within
+   whatever height is left so the filters at its bottom stay reachable on a
+   short window. overscroll-behavior stops a flick at the end of the rail
+   from carrying on into the page behind it. */
+.directory-rail {
+  position: sticky;
+  top: 92px;
+  align-self: start;
+  max-height: calc(100vh - 116px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 10px;
+}
+.directory-rail::-webkit-scrollbar { width: 6px; }
+.directory-rail::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 300px; }
+.directory-rail::-webkit-scrollbar-thumb:hover { background: var(--ink-mute); }
 
 /* The signed-out landing: one centred column rather than a split hero. */
 .gate { max-width: 560px; margin: 40px auto 0; text-align: center; }
@@ -1791,7 +1813,7 @@ function DirectoryScreen({ onOpenProfile }) {
       <hr className="rule" style={{ margin: "22px 0 32px" }} />
 
       <div className="directory-layout" style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: 44 }}>
-        <aside className="directory-rail" style={{ position: "sticky", top: 92, alignSelf: "start" }}>
+        <aside className="directory-rail">
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
             <span className="eyebrow">Filters</span>
             <button onClick={clearAll}
@@ -1854,7 +1876,7 @@ function DirectoryScreen({ onOpenProfile }) {
           </FilterGroup>
 
           <FilterGroup label="Program">
-            <div style={{ display: "flex", flexDirection: "column", gap: 6, maxHeight: 260, overflowY: "auto" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {facets.programs.map((p) => (
                 <label key={p.name}
                   className={`check ${programs.includes(p.name) ? "is-on" : ""}`}
