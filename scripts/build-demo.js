@@ -142,10 +142,12 @@ const runtime = `
   var THREADS = [
     {
       threadId: "t1",
-      with: PROFILES.filter(function (p) { return p.first === "Mei Lin"; })[0] || PROFILES[0],
+      // A current student writing to the signed-in demo member, about a
+      // program that member actually ran.
+      with: PROFILES.filter(function (p) { return p.first === "Sofia"; })[0] || PROFILES[0],
       messages: [
-        { id: "m1", body: "Hi! I'm directing CHAP this year and found you in the directory. Could I ask how you handled the Tuesday tutoring split?", createdAt: new Date(Date.now() - 86400000 * 2).toISOString(), fromMe: false },
-        { id: "m2", body: "Of course. We ran two rooms with a shared check-in, which meant one coordinator could cover both. Happy to talk it through.", createdAt: new Date(Date.now() - 86400000 * 2 + 3600000).toISOString(), fromMe: true },
+        { id: "m1", body: "Hi! I'm applying to direct SUP this summer and found you in the directory. Could I ask how you handled hiring the junior counsellors?", createdAt: new Date(Date.now() - 86400000 * 2).toISOString(), fromMe: false },
+        { id: "m2", body: "Of course. We interviewed in pairs and kept a standing slot every Friday, which meant nobody waited two weeks to hear back. Happy to talk it through.", createdAt: new Date(Date.now() - 86400000 * 2 + 3600000).toISOString(), fromMe: true },
         { id: "m3", body: "That would be really helpful. Are you free any evening next week?", createdAt: new Date(Date.now() - 3600000 * 5).toISOString(), fromMe: false },
       ],
       unread: 1,

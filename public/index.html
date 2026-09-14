@@ -2774,6 +2774,14 @@ function ProfileScreen({ userId, onBack, onUnreadChange }) {
             </div>
           </div>
 
+          {person.bio && (
+            <>
+              <hr className="rule" style={{ margin: "28px 0" }} />
+              <h2 className="h-2" style={{ marginBottom: 12 }}>About</h2>
+              <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{person.bio}</p>
+            </>
+          )}
+
           <hr className="rule" style={{ margin: "28px 0" }} />
 
           <h2 className="h-2" style={{ marginBottom: 12 }}>At PBHA</h2>
@@ -2800,22 +2808,6 @@ function ProfileScreen({ userId, onBack, onUnreadChange }) {
             </p>
           )}
 
-          {person.bio && (
-            <>
-              <hr className="rule" style={{ margin: "28px 0" }} />
-              <h2 className="h-2" style={{ marginBottom: 12 }}>About</h2>
-              <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{person.bio}</p>
-            </>
-          )}
-
-          {person.reachOut && (
-            <>
-              <hr className="rule" style={{ margin: "28px 0" }} />
-              <h2 className="h-2" style={{ marginBottom: 12 }}>Students should reach out about</h2>
-              <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{person.reachOut}</p>
-            </>
-          )}
-
           {/* Only rendered when its owner has chosen to show it — the server
               blanks these fields for everyone else, so there is nothing here
               to reveal by inspecting the response. */}
@@ -2834,6 +2826,14 @@ function ProfileScreen({ userId, onBack, onUnreadChange }) {
                   Only you can see this. Turn it on in your profile to share it.
                 </p>
               )}
+            </>
+          )}
+
+          {person.reachOut && (
+            <>
+              <hr className="rule" style={{ margin: "28px 0" }} />
+              <h2 className="h-2" style={{ marginBottom: 12 }}>Students should reach out about</h2>
+              <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{person.reachOut}</p>
             </>
           )}
         </div>

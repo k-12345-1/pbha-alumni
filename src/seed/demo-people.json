@@ -281,29 +281,6 @@
     "showIdentity": true
   },
   {
-    "email": "mei.lin.chen@example.com",
-    "first": "Mei Lin",
-    "last": "Chen",
-    "year": 2027,
-    "location": "Cambridge, MA",
-    "career": "Student",
-    "industry": "Student",
-    "concentration": "Sociology",
-    "pbhaRole": "Program Director",
-    "programs": [
-      "Chinatown Afterschool Program (CHAP)",
-      "Chinatown Teen"
-    ],
-    "bio": "Current CHAP director. Looking for alumni who ran the program in the 2010s.",
-    "house": "Currier",
-    "involvement": "Current CHAP director. Started as a Tuesday tutor first year.",
-    "gender": "Woman",
-    "raceEthnicity": [
-      "Asian"
-    ],
-    "showIdentity": true
-  },
-  {
     "email": "jordan.pierre@example.com",
     "first": "Jordan",
     "last": "Pierre",
