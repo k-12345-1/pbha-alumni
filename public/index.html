@@ -35,11 +35,11 @@
   --orange: #f98715;
   --orange-dark: #d96f06;
   --orange-wash: #fdf0e0;
-  /* The band their footer sits on. Their section declares their navy at .44
-     alpha, but that is not what it paints as — read off a screenshot of the
-     two footers side by side, theirs lands here. Deriving it from the alpha
-     kept coming out too dark and too grey, so this is the sampled value. */
-  --footer-band: #6b72ab;
+  /* The band their footer sits on: their navy, carried far enough over the
+     white page to read at the depth theirs does. Sampled against their
+     footer rather than computed from the .44 alpha their section declares,
+     which paints much lighter than the real thing. */
+  --footer-band: #5a619b;
 
   --sans: "Work Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
@@ -1203,13 +1203,6 @@ function GateScreen({ onSignedIn }) {
               autoComplete={mode === "signup" ? "new-password" : "current-password"}
               value={form.password} onChange={set("password")} required />
           </Field>
-          {mode === "signup" && (
-            <p className="meta" style={{ marginBottom: 18, textAlign: "left" }}>
-              By joining you agree to use the network to reconnect with PBHA members, and not
-              to export it, scrape it, or add anyone to a mailing list without asking.
-            </p>
-          )}
-
           {error && <div className="banner banner-error" style={{ marginBottom: 16 }}>{error}</div>}
 
           <button className="btn btn-primary" style={{ width: "100%" }} disabled={busy}>
@@ -1967,7 +1960,7 @@ function PersonCard({ person, onOpen }) {
         {org && <div className="meta">{org}</div>}
         {(person.pbhaRole || person.programs.length > 0) && (
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 12 }}>
-            {person.pbhaRole && <span className="chip chip-accent">{person.pbhaRole}</span>}
+            {person.pbhaRole && <span className="chip chip-static">{person.pbhaRole}</span>}
             {person.programs.slice(0, 2).map((p) => (
               <span key={p} className="chip chip-static">{p}</span>
             ))}
@@ -2004,7 +1997,7 @@ function PersonRow({ person, onOpen }) {
         {person.location ? <><Pin /> {person.location}</> : "—"}
       </span>
       <span style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
-        {person.pbhaRole && <span className="chip chip-accent">{person.pbhaRole}</span>}
+        {person.pbhaRole && <span className="chip chip-static">{person.pbhaRole}</span>}
       </span>
     </button>
   );
@@ -2336,7 +2329,7 @@ function ProfileScreen({ userId, onBack }) {
           <h2 className="h-2" style={{ marginBottom: 12 }}>At PBHA</h2>
           {person.pbhaRole && (
             <div style={{ marginBottom: 12 }}>
-              <span className="chip chip-accent">{person.pbhaRole}</span>
+              <span className="chip chip-static">{person.pbhaRole}</span>
             </div>
           )}
           {person.programs.length > 0 ? (
