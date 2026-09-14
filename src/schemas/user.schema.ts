@@ -2,14 +2,15 @@ import { z } from "zod";
 import { noEmoji, NO_EMOJI_MSG } from "./auth.schema";
 import { pageFields } from "../lib/pagination";
 
-// Rejects javascript: / data: URLs, so a photo URL cannot become an XSS
-// vector if it is ever rendered into an href rather than an img src.
-const httpUrl = (label: string) =>
-  z
-    .string()
-    .trim()
-    .max(500)
-    .refine((s) => /^https?:\/\//i.test(s), `${label} must be an http(s) URL`);
+// A photo is uploaded, not linked, so the only URL the client may send back
+// is one this site issued. Everything else — including data: URLs — is
+// refused, which is what keeps a photo from becoming an XSS vector if it is
+// ever rendered into an href rather than an img src.
+const ownPhotoUrl = z
+  .string()
+  .trim()
+  .max(120)
+  .refine((s) => /^\/api\/photos\/[A-Za-z0-9_-]+$/.test(s), "photoUrl must be an uploaded photo");
 
 export const profileUpdateSchema = z
   .object({
@@ -18,7 +19,7 @@ export const profileUpdateSchema = z
     pronouns: z.string().max(40).nullable().optional(),
     year: z.coerce.number().int().min(1904).max(2050).optional(),
     location: z.string().max(120).nullable().optional(),
-    photoUrl: httpUrl("photoUrl").nullable().optional(),
+    photoUrl: ownPhotoUrl.nullable().optional(),
 
     career: z.string().max(160).nullable().optional(),
     industry: z.string().max(60).nullable().optional(),
@@ -75,3 +76,10 @@ export const directoryQuerySchema = z.object({
 export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;
 export type PrivacyUpdateInput = z.infer<typeof privacyUpdateSchema>;
 export type DirectoryQuery = z.infer<typeof directoryQuerySchema>;
+
+// The photo itself, as a base64 data URL. The ceiling here is the JSON
+// string; the byte cap that matters is enforced in the service, after
+// decoding, where a caller cannot pad its way past it.
+export const photoUploadSchema = z.object({
+  dataUrl: z.string().min(32).max(700_000),
+});

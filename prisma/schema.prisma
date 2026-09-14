@@ -58,6 +58,7 @@ model User {
 
   profile Profile?
   privacy PrivacySettings?
+  photo   ProfilePhoto?
 
   threads  ThreadParticipant[]
   messages Message[]
@@ -198,4 +199,27 @@ model Message {
   createdAt DateTime @default(now())
 
   @@index([threadId, createdAt])
+}
+
+// An uploaded profile photo, stored as bytes rather than as a link to
+// somewhere else. A URL to another host breaks when that host goes away,
+// and leaks every viewer's IP to it. One row per user: uploading again
+// replaces what is there, so nothing accumulates.
+//
+// Bytes in Postgres is the right call only because these are small — the
+// client downscales to a 512px square JPEG before sending, which lands
+// under 100KB. A directory of ten thousand alumni is under a gigabyte. If
+// that ever stops being true the fix is object storage and a URL column,
+// not a bigger row.
+model ProfilePhoto {
+  id String @id @default(cuid())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  data        Bytes
+  contentType String @default("image/jpeg")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -2,7 +2,7 @@ import type { Prisma } from "@prisma/client";
 import { normalizeLocation } from "../lib/place";
 import { prisma } from "../db";
 import { isCurrentStudent } from "../lib/class-year";
-import { NotFound } from "../lib/errors";
+import { BadRequest, NotFound } from "../lib/errors";
 import type { PrivacyUpdateInput, ProfileUpdateInput } from "../schemas/user.schema";
 import { invalidateDirectoryFacets } from "./directory.service";
 
@@ -148,4 +148,62 @@ export const updateMyPrivacy = async (userId: string, input: PrivacyUpdateInput)
   });
   invalidateDirectoryFacets();
   return privacy;
+};
+
+/**
+ * A profile photo the site holds itself.
+ *
+ * The client downscales to a square JPEG before sending, so what arrives
+ * here is small. The cap below is a backstop against a caller that is not
+ * the client, not a guess at what a photo weighs.
+ */
+const MAX_PHOTO_BYTES = 400 * 1024;
+const ALLOWED_PHOTO_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+
+export const setMyPhoto = async (userId: string, dataUrl: string) => {
+  const match = /^data:([a-z/+-]+);base64,(.+)$/i.exec(dataUrl.trim());
+  if (!match) throw BadRequest("Send the photo as a base64 data URL");
+
+  const [, contentType, base64] = match;
+  if (!ALLOWED_PHOTO_TYPES.has(contentType.toLowerCase())) {
+    throw BadRequest("A photo must be a JPEG, PNG, or WebP");
+  }
+
+  const data = Buffer.from(base64, "base64");
+  if (data.length === 0) throw BadRequest("That photo is empty");
+  if (data.length > MAX_PHOTO_BYTES) throw BadRequest("That photo is too large");
+
+  // Re-check the bytes rather than trusting the declared type: the magic
+  // number is the only thing here the caller cannot simply assert.
+  if (!looksLikeImage(data)) throw BadRequest("That file is not an image");
+
+  const photo = await prisma.profilePhoto.upsert({
+    where: { userId },
+    create: { userId, data, contentType: contentType.toLowerCase() },
+    update: { data, contentType: contentType.toLowerCase() },
+  });
+
+  // The URL carries the photo's id, which changes on every upload, so a
+  // replaced photo is never served from a cache under its old address.
+  const url = `/api/photos/${photo.id}`;
+  await prisma.profile.update({ where: { userId }, data: { photoUrl: url } });
+  return { photoUrl: url };
+};
+
+export const clearMyPhoto = async (userId: string) => {
+  await prisma.profilePhoto.deleteMany({ where: { userId } });
+  await prisma.profile.update({ where: { userId }, data: { photoUrl: null } });
+  return { photoUrl: null };
+};
+
+export const getPhoto = async (id: string) =>
+  prisma.profilePhoto.findUnique({ where: { id }, select: { data: true, contentType: true } });
+
+const looksLikeImage = (buf: Buffer) => {
+  if (buf.length < 12) return false;
+  // JPEG: FF D8 FF. PNG: 89 50 4E 47. WebP: "RIFF"...."WEBP".
+  if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return true;
+  if (buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47) return true;
+  if (buf.toString("ascii", 0, 4) === "RIFF" && buf.toString("ascii", 8, 12) === "WEBP") return true;
+  return false;
 };

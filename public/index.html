@@ -269,6 +269,32 @@ textarea.input { min-height: 100px; resize: vertical; line-height: 1.55; }
   overflow: hidden;
 }
 .person-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+/* A profile: square photo, name and chips beside it, then the text at the
+   full width of the page. */
+.profile-head {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 32px;
+  align-items: center;
+  margin-bottom: 36px;
+}
+.profile-photo {
+  aspect-ratio: 1 / 1;
+  background: var(--wash-2);
+  display: grid; place-items: center;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.profile-photo img { width: 100%; height: 100%; object-fit: cover; }
+.profile-chips { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 16px; }
+.profile-body { max-width: none; }
+
+@media (max-width: 720px) {
+  .profile-head { grid-template-columns: 1fr; gap: 20px; align-items: start; }
+  .profile-photo { max-width: 220px; }
+}
 .initials {
   font-size: 23px; font-weight: 600; color: var(--ink); opacity: .26;
   letter-spacing: 0.01em; text-indent: 0.01em;
@@ -287,6 +313,7 @@ textarea.input { min-height: 100px; resize: vertical; line-height: 1.55; }
   font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
 }
 .person-body { padding: 18px 20px 22px; }
+.person-actions { margin-top: 14px; }
 
 .grid-people { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
 
@@ -381,7 +408,6 @@ footer.site {
 }
 @media (max-width: 860px) {
   .gate-layout { grid-template-columns: 1fr !important; gap: 40px !important; }
-  .profile-layout { grid-template-columns: 1fr !important; gap: 28px !important; }
   .directory-layout { grid-template-columns: 1fr !important; }
   .directory-rail {
     position: static;
@@ -635,10 +661,12 @@ footer.site {
   white-space: nowrap;
 }
 .pill-select:hover { border-color: var(--orange); color: var(--orange); }
+.pill-wrap { position: relative; display: inline-block; }
 .pill-menu {
   position: absolute;
   top: calc(100% + 8px);
-  right: 0;
+  left: 0;
+  right: auto;
   min-width: 220px;
   background: var(--white);
   border: 1px solid var(--rule);
@@ -846,7 +874,6 @@ footer.site {
 /* Menus in the filter rail anchor to the left edge of their control. The
    default right-anchor plus a 220px min-width pushes them off the left of
    the page, because the rail column is narrower than the menu. */
-.directory-rail .pill-menu { left: 0; right: auto; min-width: 100%; }
 
 .year-range { display: flex; align-items: center; gap: 8px; }
 .year-range > div { flex: 1; }
@@ -863,6 +890,11 @@ footer.site {
   display: grid; place-items: center;
 }
 .photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+.photo-preview-lg {
+  width: 96px; height: 96px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+}
 </style>
 </head>
 <body>
@@ -909,6 +941,8 @@ const api = {
   },
   post(path, body) { return api.request("POST", path, body); },
   patch(path, body) { return api.request("PATCH", path, body); },
+  put(path, body) { return api.request("PUT", path, body); },
+  del(path) { return api.request("DELETE", path); },
 
   // Warm a GET without caring about the result. Hovering a directory card
   // fires this, so by the time the click handler renders the profile the
@@ -1041,7 +1075,7 @@ function Select({ value, options, onChange, label }) {
   }, [open]);
 
   return (
-    <div ref={ref} style={{ position: "relative" }}>
+    <div className="pill-wrap" ref={ref}>
       <button className="pill-select" onClick={() => setOpen((o) => !o)}
         aria-haspopup="listbox" aria-expanded={open} aria-label={label}>
         <span>{current ? current.label : ""}</span>
@@ -1071,6 +1105,54 @@ function Select({ value, options, onChange, label }) {
 // Mirror of normalizeLocation in src/lib/place.ts. The server normalizes
 // again on save — this copy exists so you can watch the field settle on
 // "City, ST" as you leave it, instead of finding out after you save.
+/**
+ * A chosen file, as a square JPEG small enough to store.
+ *
+ * Phone photos are three to twelve megabytes and 4000px on the long edge,
+ * and the site shows them at 220px. Sending the original would put twelve
+ * megabytes in a database row to draw a thumbnail. This centre-crops to a
+ * square and re-encodes at 512px, which lands well under 100KB.
+ *
+ * Cropping to the centre is a real decision, not a neutral one: a photo
+ * where the face is off to one side loses part of it. That is the trade
+ * for not building a crop tool, and the preview shows the result before
+ * anyone commits to it.
+ */
+const PHOTO_PX = 512;
+function squareJpeg(file) {
+  return new Promise((resolve, reject) => {
+    if (!/^image\/(jpeg|png|webp)$/i.test(file.type)) {
+      reject(new Error("Choose a JPEG, PNG, or WebP image."));
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      try {
+        const side = Math.min(img.naturalWidth, img.naturalHeight);
+        const sx = (img.naturalWidth - side) / 2;
+        const sy = (img.naturalHeight - side) / 2;
+        const canvas = document.createElement("canvas");
+        canvas.width = PHOTO_PX;
+        canvas.height = PHOTO_PX;
+        const ctx = canvas.getContext("2d");
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(img, sx, sy, side, side, 0, 0, PHOTO_PX, PHOTO_PX);
+        resolve(canvas.toDataURL("image/jpeg", 0.85));
+      } catch {
+        // A canvas tainted by a cross-origin source cannot be read back.
+        reject(new Error("That image could not be read."));
+      }
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("That file is not an image the browser can open."));
+    };
+    img.src = url;
+  });
+}
+
 // Answering "prefer to self-describe" is a request for a box, not an answer.
 const SELF_DESCRIBE = "Prefer to self-describe";
 
@@ -1757,9 +1839,9 @@ const when = (iso) => {
 // well as into the Messages screen. The callbacks live in a ref because
 // they are written inline at both call sites — in the dependency array a
 // fresh function every render would refetch the thread forever.
-function Conversation({ threadId, showHead, onOpenProfile, onRead, onSent }) {
+function Conversation({ threadId, showHead, onOpenProfile, onRead, onSent, initialDraft }) {
   const [thread, setThread] = React.useState(null);
-  const [draft, setDraft] = React.useState("");
+  const [draft, setDraft] = React.useState(initialDraft || "");
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState("");
   const endRef = React.useRef(null);
@@ -1770,6 +1852,9 @@ function Conversation({ threadId, showHead, onOpenProfile, onRead, onSent }) {
     if (!threadId) { setThread(null); return; }
     let dead = false;
     setThread(null);
+    // Arriving from the directory: address it to them. Only on the way in —
+    // a later render must not wipe what has been typed since.
+    if (initialDraft) setDraft(initialDraft);
     api.get("/api/messages/" + encodeURIComponent(threadId))
       .then((t) => {
         if (dead) return;
@@ -1850,7 +1935,7 @@ function Conversation({ threadId, showHead, onOpenProfile, onRead, onSent }) {
   );
 }
 
-function MessagesScreen({ openThreadId, onOpenProfile, onUnreadChange }) {
+function MessagesScreen({ openThreadId, onOpenProfile, draftFor, onUnreadChange }) {
   const [threads, setThreads] = React.useState([]);
   const [active, setActive] = React.useState(openThreadId || null);
   const [error, setError] = React.useState("");
@@ -1914,6 +1999,7 @@ function MessagesScreen({ openThreadId, onOpenProfile, onUnreadChange }) {
             {!active
               ? <p className="meta" style={{ padding: 24 }}>Pick a conversation.</p>
               : <Conversation threadId={active} showHead onOpenProfile={onOpenProfile}
+                  initialDraft={draftFor && draftFor.threadId === active ? draftFor.text : ""}
                   onRead={() => { loadThreads(); onUnreadChange && onUnreadChange(); }}
                   onSent={loadThreads} />}
           </div>
@@ -2270,9 +2356,6 @@ function DirectoryMap({ locations, people, onOpenProfile }) {
 }
 
 // PBHA was founded in 1904; nobody can have a PBHA class year before it.
-// A link to an image file, not to a page that contains one.
-const IMAGE_URL = /\.(jpe?g|png|webp)(\?.*)?$/i;
-
 const YEAR_MIN = 1904;
 const YEAR_MAX = new Date().getFullYear() + 4;
 // Newest first: most people are looking for a recent class, not 1904.
@@ -2287,10 +2370,18 @@ function FilterGroup({ label, children }) {
   );
 }
 
-function PersonCard({ person, onOpen }) {
+function PersonCard({ person, onOpen, onMessage }) {
   const { title, org } = splitCareer(person.career);
+  // The card was a <button>, which cannot hold the Message button — a
+  // button inside a button is invalid, and the browser will not deliver
+  // the inner click. A div that answers Enter and Space the way a button
+  // does keeps the keyboard behaviour without the nesting.
   return (
-    <button className="card person-card" onClick={() => onOpen(person.userId)}
+    <div className="card person-card" role="button" tabIndex={0}
+      onClick={() => onOpen(person.userId)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(person.userId); }
+      }}
       onMouseEnter={() => api.prefetch("/api/users/" + encodeURIComponent(person.userId))}>
       <div className="person-photo">
         <Photo person={person} />
@@ -2317,8 +2408,18 @@ function PersonCard({ person, onOpen }) {
             <Pin /> {person.location}
           </div>
         )}
+        {!person.isSelf && person.openToMessages !== false && (
+          <div className="person-actions">
+            {/* stopPropagation, or the click also opens the profile the
+                card is a link to. */}
+            <button type="button" className="btn btn-ghost btn-sm"
+              onClick={(e) => { e.stopPropagation(); onMessage(person); }}>
+              Message
+            </button>
+          </div>
+        )}
       </div>
-    </button>
+    </div>
   );
 }
 
@@ -2346,7 +2447,7 @@ function PersonRow({ person, onOpen }) {
   );
 }
 
-function DirectoryScreen({ onOpenProfile }) {
+function DirectoryScreen({ onOpenProfile, onMessage }) {
   const [q, setQ] = React.useState("");
   const [who, setWho] = React.useState("all");
   const [programs, setPrograms] = React.useState([]);
@@ -2555,7 +2656,7 @@ function DirectoryScreen({ onOpenProfile }) {
           ) : layout === "grid" ? (
             <div className="grid-people">
               {results.map((p) => (
-                <PersonCard key={p.userId} person={p} onOpen={onOpenProfile} />
+                <PersonCard key={p.userId} person={p} onOpen={onOpenProfile} onMessage={onMessage} />
               ))}
             </div>
           ) : (
@@ -2631,33 +2732,39 @@ function ProfileScreen({ userId, onBack, onUnreadChange }) {
         ← Directory
       </button>
 
-      <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: 48, alignItems: "start" }}
-        className="profile-layout">
-        <div>
-          <div className="person-photo" style={{ borderRadius: 6, border: "1px solid var(--rule)" }}>
-            <Photo person={person} />
-          </div>
-          <div style={{ display: "flex", gap: 6, marginTop: 14, flexWrap: "wrap" }}>
+      {/* A square photo beside a name, with everything that qualifies the
+          person — their year, whether they mentor — up by the name rather
+          than stacked under the picture. Below that the text runs the full
+          width of the page, so a bio is not reading in a 1000px column
+          with 400px of white beside it. */}
+      <div className="profile-head">
+        <div className="profile-photo">
+          <Photo person={person} />
+        </div>
+
+        <div className="profile-id">
+          <h1 className="h-1">{person.first} {person.last}</h1>
+          {person.pronouns && <div className="meta" style={{ marginTop: 6 }}>{person.pronouns}</div>}
+
+          <div className="profile-chips">
             <span className="chip chip-static">
               {person.isCurrentStudent ? "Current student" : "Alum"} · {person.year}
             </span>
             {person.openToMentor && <span className="chip chip-accent">Open to mentoring</span>}
+            {/* Hidden for your own profile, and for anyone who has turned
+                messages off — though the server is what actually refuses. */}
+            {!person.isSelf && person.openToMessages !== false && (
+              <button className="btn btn-primary btn-sm" onClick={write} disabled={opening || !!threadId}>
+                {opening ? "One moment…" : threadId ? "Writing below" : "Message"}
+              </button>
+            )}
           </div>
-          {/* Hidden for your own profile, and for anyone who has turned
-              messages off — though the server is what actually refuses. */}
-          {!person.isSelf && person.openToMessages !== false && (
-            <button className="btn btn-primary btn-sm" style={{ marginTop: 16, width: "100%" }}
-              onClick={write} disabled={opening || !!threadId}>
-              {opening ? "One moment…" : threadId ? "Writing below" : "Message"}
-            </button>
-          )}
         </div>
+      </div>
 
+      <div className="profile-body">
         <div>
-          <h1 className="h-1">{person.first} {person.last}</h1>
-          {person.pronouns && <div className="meta" style={{ marginTop: 6 }}>{person.pronouns}</div>}
-
-          <div style={{ marginTop: 18 }}>
+          <div style={{ marginTop: 0 }}>
             {title && <div className="h-3">{title}</div>}
             {org && <div className="lede" style={{ marginTop: 2 }}>{org}</div>}
             <div className="meta" style={{ marginTop: 10, display: "flex", gap: 18, flexWrap: "wrap" }}>
@@ -2693,7 +2800,7 @@ function ProfileScreen({ userId, onBack, onUnreadChange }) {
             <p className="meta">No programs listed yet.</p>
           )}
           {person.involvement && (
-            <p style={{ margin: "16px 0 0", whiteSpace: "pre-wrap", maxWidth: 640 }}>
+            <p style={{ margin: "16px 0 0", whiteSpace: "pre-wrap" }}>
               {person.involvement}
             </p>
           )}
@@ -2702,7 +2809,7 @@ function ProfileScreen({ userId, onBack, onUnreadChange }) {
             <>
               <hr className="rule" style={{ margin: "28px 0" }} />
               <h2 className="h-2" style={{ marginBottom: 12 }}>About</h2>
-              <p style={{ margin: 0, whiteSpace: "pre-wrap", maxWidth: 640 }}>{person.bio}</p>
+              <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{person.bio}</p>
             </>
           )}
 
@@ -2710,7 +2817,7 @@ function ProfileScreen({ userId, onBack, onUnreadChange }) {
             <>
               <hr className="rule" style={{ margin: "28px 0" }} />
               <h2 className="h-2" style={{ marginBottom: 12 }}>Students should reach out about</h2>
-              <p style={{ margin: 0, whiteSpace: "pre-wrap", maxWidth: 640 }}>{person.reachOut}</p>
+              <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{person.reachOut}</p>
             </>
           )}
 
@@ -2764,6 +2871,9 @@ function MyProfileScreen({ me, onSaved }) {
   const [busy, setBusy] = React.useState(false);
   const [selfRace, setSelfRace] = React.useState("");
   const [selfRaceOpen, setSelfRaceOpen] = React.useState(false);
+  const [photoBusy, setPhotoBusy] = React.useState(false);
+  const [photoError, setPhotoError] = React.useState("");
+  const fileRef = React.useRef(null);
 
   React.useEffect(() => {
     Promise.all([
@@ -2815,6 +2925,37 @@ function MyProfileScreen({ me, onSaved }) {
   const toggleProgram = toggleIn("programs");
   const toggleRace = toggleIn("raceEthnicity");
 
+  // The photo is sent on its own, not with the rest of the form: it is the
+  // one field where you want to see the result before you decide to save.
+  const uploadPhoto = async (file) => {
+    setPhotoError("");
+    setPhotoBusy(true);
+    try {
+      const dataUrl = await squareJpeg(file);
+      const r = await api.put("/api/users/me/photo", { dataUrl });
+      setForm((f) => ({ ...f, photoUrl: r.photoUrl }));
+      onSaved();
+    } catch (err) {
+      setPhotoError(err.message || "That photo could not be read.");
+    } finally {
+      setPhotoBusy(false);
+    }
+  };
+
+  const removePhoto = async () => {
+    setPhotoError("");
+    setPhotoBusy(true);
+    try {
+      await api.del("/api/users/me/photo");
+      setForm((f) => ({ ...f, photoUrl: "" }));
+      onSaved();
+    } catch (err) {
+      setPhotoError(err.message);
+    } finally {
+      setPhotoBusy(false);
+    }
+  };
+
   // The self-describe chip opens a box rather than adding a chip. What gets
   // typed there is one more entry in raceEthnicity, folded in on save.
   const openSelfRace = () => {
@@ -2839,7 +2980,6 @@ function MyProfileScreen({ me, onSaved }) {
         pronouns: blank(form.pronouns),
         year: Number(form.year),
         location: blank(form.location),
-        photoUrl: blank(form.photoUrl),
         career: blank(form.career),
         industry: blank(form.industry),
         concentration: blank(form.concentration),
@@ -2901,7 +3041,7 @@ function MyProfileScreen({ me, onSaved }) {
         <hr className="rule" style={{ margin: "36px 0 28px" }} />
         <h2 className="h-2" style={{ marginBottom: 18 }}>You now</h2>
         <div className="two-up">
-          <Field label="Where you live" hint="Written as City, ST.">
+          <Field label="Where you live">
             <Combo label="Where you live" placeholder="Where you live" options={vocab.cities}
               max={8} value={form.location}
               onChange={(v) => setForm((f) => ({ ...f, location: v }))}
@@ -2916,32 +3056,38 @@ function MyProfileScreen({ me, onSaved }) {
           <input className="input" value={form.career} onChange={set("career")}
             placeholder="What you do" />
         </Field>
-        <Field label="Photo"
-          hint="A link straight to a JPEG or PNG — the image itself, not the page it sits on.">
+        <div className="field">
+          <span className="eyebrow" style={{ display: "block", marginBottom: 7 }}>Photo</span>
           <div className="photo-field">
-            <input className="input" value={form.photoUrl} onChange={set("photoUrl")}
-              placeholder="https://example.com/you.jpg" />
-            {/* The preview is the check that matters: a link to a page rather
-                than to an image simply will not draw. */}
-            {form.photoUrl.trim() && (
-              <span className="photo-preview">
-                <img src={form.photoUrl.trim()} alt=""
-                  onError={(e) => { e.target.style.display = "none"; }}
-                  onLoad={(e) => { e.target.style.display = "block"; }} />
-              </span>
-            )}
-          </div>
-          {form.photoUrl.trim() && !IMAGE_URL.test(form.photoUrl.trim()) && (
-            <span className="meta" style={{ marginTop: 6, display: "block" }}>
-              That does not look like an image file. It should end in .jpg, .jpeg, .png, or .webp.
+            <span className="photo-preview photo-preview-lg">
+              {form.photoUrl
+                ? <img src={form.photoUrl} alt="" />
+                : <span className="initials" style={{ fontSize: 20 }}>{initials(form.first, form.last)}</span>}
             </span>
-          )}
-        </Field>
+            <div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button type="button" className="btn btn-ghost btn-sm"
+                  onClick={() => fileRef.current && fileRef.current.click()} disabled={photoBusy}>
+                  {photoBusy ? "Working…" : form.photoUrl ? "Replace photo" : "Upload a photo"}
+                </button>
+                {form.photoUrl && (
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={removePhoto} disabled={photoBusy}>
+                    Remove
+                  </button>
+                )}
+              </div>
+              {photoError && <span className="meta" style={{ marginTop: 6, display: "block" }}>{photoError}</span>}
+            </div>
+            <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp"
+              style={{ display: "none" }} aria-label="Choose a photo"
+              onChange={(e) => { const f = e.target.files && e.target.files[0]; e.target.value = ""; if (f) uploadPhoto(f); }} />
+          </div>
+        </div>
         <Field label="About you"><textarea className="input" value={form.bio} onChange={set("bio")} placeholder="About you" /></Field>
 
         <hr className="rule" style={{ margin: "36px 0 28px" }} />
         <h2 className="h-2" style={{ marginBottom: 18 }}>You at PBHA</h2>
-        <Field label="Role" hint="The most senior role you held.">
+        <Field label="Role">
           <Select value={form.pbhaRole} label="Role"
             onChange={(v) => setForm((f) => ({ ...f, pbhaRole: v }))}
             options={[{ value: "", label: "Not listed" }].concat(
@@ -3032,6 +3178,7 @@ function App() {
   const [profileId, setProfileId] = React.useState(null);
   const [threadId, setThreadId] = React.useState(null);
   const [unread, setUnread] = React.useState(0);
+  const [draftFor, setDraftFor] = React.useState(null);
 
   const loadMe = React.useCallback(async () => {
     try {
@@ -3067,6 +3214,23 @@ function App() {
 
   const openProfile = (id) => { setProfileId(id); setScreen("profile"); };
 
+  // Message from a directory card: open the conversation with that person
+  // and land on it, with their name already in the box so the message is
+  // addressed rather than starting from a blank line.
+  const messageFromDirectory = async (person) => {
+    try {
+      const { threadId: id } = await api.post("/api/messages/open", { userId: person.userId });
+      setDraftFor({ threadId: id, text: `Hi ${person.first}, ` });
+      setThreadId(id);
+      setProfileId(null);
+      setScreen("messages");
+    } catch {
+      // Refused (they have messages off, or they are gone): their profile
+      // is the honest place to land, and it says so there.
+      openProfile(person.userId);
+    }
+  };
+
   return (
     <>
       <SiteBar />
@@ -3093,10 +3257,12 @@ function App() {
       {screen !== "donate" && me === undefined && <div className="wrap page"><p className="meta">Loading…</p></div>}
       {screen !== "donate" && me === null && <GateScreen onSignedIn={loadMe} />}
       {me && screen === "welcome" && <WelcomeScreen me={me} setScreen={setScreen} />}
-      {me && screen === "directory" && <DirectoryScreen onOpenProfile={openProfile} />}
+      {me && screen === "directory" && (
+        <DirectoryScreen onOpenProfile={openProfile} onMessage={messageFromDirectory} />
+      )}
       {me && screen === "messages" && (
         <MessagesScreen openThreadId={threadId} onOpenProfile={openProfile}
-          onUnreadChange={refreshUnread} />
+          draftFor={draftFor} onUnreadChange={refreshUnread} />
       )}
       {me && screen === "study" && <StudyScreen />}
       {me && screen === "archives" && <ArchivesScreen />}

@@ -126,7 +126,12 @@ const runtime = `
     // server applies.
     out.sort(function (a, b) { return (b.claimedAt ? 1 : 0) - (a.claimedAt ? 1 : 0); });
 
-    return { items: out, meta: { page: 1, pageSize: out.length, total: out.length, totalPages: 1 } };
+    // The server marks these on every card so the frontend knows whether to
+    // draw a Message button; the demo has to say the same thing.
+    var cards = out.map(function (p) {
+      return Object.assign({}, p, { isSelf: p.userId === VIEWER_ID, openToMessages: true });
+    });
+    return { items: cards, meta: { page: 1, pageSize: cards.length, total: cards.length, totalPages: 1 } };
   }
 
   var signedIn = false;
@@ -216,6 +221,21 @@ const runtime = `
     }
     if (url === "/api/users/me" && method === "PATCH") {
       return Promise.reject(new Error("This is a static demo — nothing saves here."));
+    }
+    // The photo is the one thing the demo can honestly do without a server:
+    // the browser has already produced the image, so hand it straight back
+    // as the URL. It lives for as long as the tab does.
+    if (url === "/api/users/me/photo") {
+      if (method === "PUT") {
+        var me = PROFILES.filter(function (p) { return p.userId === VIEWER_ID; })[0];
+        if (me) me.photoUrl = body.dataUrl;
+        return Promise.resolve({ photoUrl: body.dataUrl });
+      }
+      if (method === "DELETE") {
+        var m2 = PROFILES.filter(function (p) { return p.userId === VIEWER_ID; })[0];
+        if (m2) m2.photoUrl = null;
+        return Promise.resolve({ photoUrl: null });
+      }
     }
     if (url.indexOf("/api/users/") === 0) {
       var id = decodeURIComponent(url.slice("/api/users/".length));

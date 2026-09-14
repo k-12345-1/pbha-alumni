@@ -269,6 +269,32 @@ textarea.input { min-height: 100px; resize: vertical; line-height: 1.55; }
   overflow: hidden;
 }
 .person-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+/* A profile: square photo, name and chips beside it, then the text at the
+   full width of the page. */
+.profile-head {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 32px;
+  align-items: center;
+  margin-bottom: 36px;
+}
+.profile-photo {
+  aspect-ratio: 1 / 1;
+  background: var(--wash-2);
+  display: grid; place-items: center;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.profile-photo img { width: 100%; height: 100%; object-fit: cover; }
+.profile-chips { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 16px; }
+.profile-body { max-width: none; }
+
+@media (max-width: 720px) {
+  .profile-head { grid-template-columns: 1fr; gap: 20px; align-items: start; }
+  .profile-photo { max-width: 220px; }
+}
 .initials {
   font-size: 23px; font-weight: 600; color: var(--ink); opacity: .26;
   letter-spacing: 0.01em; text-indent: 0.01em;
@@ -287,6 +313,7 @@ textarea.input { min-height: 100px; resize: vertical; line-height: 1.55; }
   font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
 }
 .person-body { padding: 18px 20px 22px; }
+.person-actions { margin-top: 14px; }
 
 .grid-people { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
 
@@ -381,7 +408,6 @@ footer.site {
 }
 @media (max-width: 860px) {
   .gate-layout { grid-template-columns: 1fr !important; gap: 40px !important; }
-  .profile-layout { grid-template-columns: 1fr !important; gap: 28px !important; }
   .directory-layout { grid-template-columns: 1fr !important; }
   .directory-rail {
     position: static;
@@ -635,10 +661,12 @@ footer.site {
   white-space: nowrap;
 }
 .pill-select:hover { border-color: var(--orange); color: var(--orange); }
+.pill-wrap { position: relative; display: inline-block; }
 .pill-menu {
   position: absolute;
   top: calc(100% + 8px);
-  right: 0;
+  left: 0;
+  right: auto;
   min-width: 220px;
   background: var(--white);
   border: 1px solid var(--rule);
@@ -846,7 +874,6 @@ footer.site {
 /* Menus in the filter rail anchor to the left edge of their control. The
    default right-anchor plus a 220px min-width pushes them off the left of
    the page, because the rail column is narrower than the menu. */
-.directory-rail .pill-menu { left: 0; right: auto; min-width: 100%; }
 
 .year-range { display: flex; align-items: center; gap: 8px; }
 .year-range > div { flex: 1; }
@@ -863,6 +890,11 @@ footer.site {
   display: grid; place-items: center;
 }
 .photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+.photo-preview-lg {
+  width: 96px; height: 96px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+}
 </style>
 </head>
 <body>
@@ -871,7 +903,7 @@ footer.site {
 
 <script>
 (function () {
-  var PROFILES = [{"userId":"amara-okafor-example-com","first":"Amara","last":"Okafor","pronouns":null,"year":2014,"location":"Boston, MA","photoUrl":null,"career":"Pediatrician · Boston Medical Center","industry":"Health & Medicine","concentration":"Human Developmental Biology","house":"Currier","bio":"Two summers at SUP turned into a career in community pediatrics. Happy to talk about medical school, or about running a program while taking orgo.","gender":"Woman","raceEthnicity":["Black or African American"],"showIdentity":true,"programs":["Chinatown Afterschool Program (CHAP)","Summer Urban Program"],"programYears":null,"pbhaRole":"Program Director","involvement":"Ran CHAP my sophomore and junior years, then two summers at SUP as a site director in Mission Hill.","openToMentor":true,"reachOut":"Anything about the pre-med path, or SUP director life.","claimedAt":"2026-09-14T23:11:34.450Z","isCurrentStudent":false,"searchText":"amara okafor boston, ma pediatrician · boston medical center health & medicine human developmental biology program director currier ran chap my sophomore and junior years, then two summers at sup as a site director in mission hill. chinatown afterschool program (chap) summer urban program"},{"userId":"daniel-reyes-example-com","first":"Daniel","last":"Reyes","pronouns":null,"year":2009,"location":"Washington, DC","photoUrl":null,"career":"Policy Counsel · National Housing Law Project","industry":"Law & Policy","concentration":"Social Studies","house":"Adams","bio":"Started in ESOL, ended up writing tenant protection legislation. The through-line is the same work.","gender":"Man","raceEthnicity":["Hispanic or Latino/a/e"],"showIdentity":true,"programs":["Adult ESOL Program","CIVICS"],"programYears":null,"pbhaRole":"Cabinet","involvement":"Taught the Tuesday and Thursday ESOL sections for three years, then chaired the Cabinet committee that rewrote the volunteer training.","openToMentor":true,"reachOut":"Law school, legal aid, housing policy.","claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":false,"searchText":"daniel reyes washington, dc policy counsel · national housing law project law & policy social studies cabinet adams taught the tuesday and thursday esol sections for three years, then chaired the cabinet committee that rewrote the volunteer training. adult esol program civics"},{"userId":"priya-nair-example-com","first":"Priya","last":"Nair","pronouns":null,"year":2018,"location":"New York, NY","photoUrl":null,"career":"Product Manager · Duolingo","industry":"Technology","concentration":"Computer Science","house":"Leverett","bio":"Teaching adult ESL is why I work on language learning now.","gender":"Woman","raceEthnicity":["Asian"],"showIdentity":true,"programs":["Chinatown ESL","BRYE Tutoring"],"programYears":null,"pbhaRole":"Program Coordinator","involvement":"Coordinated Chinatown ESL, and spent a year building the curriculum shared across the adult programs.","openToMentor":true,"reachOut":"Breaking into product, or tech recruiting timelines.","claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":false,"searchText":"priya nair new york, ny product manager · duolingo technology computer science program coordinator leverett coordinated chinatown esl, and spent a year building the curriculum shared across the adult programs. chinatown esl brye tutoring"},{"userId":"marcus-bell-example-com","first":"Marcus","last":"Bell","pronouns":null,"year":1996,"location":"Chicago, IL","photoUrl":null,"career":"Executive Director · Southside Youth Alliance","industry":"Nonprofit","concentration":"Government","house":"Dunster","bio":"Thirty years in youth development. Still use the site-director playbook I learned at PBHA.","gender":"Man","raceEthnicity":["Black or African American"],"showIdentity":true,"programs":["Cambridge After-School Program (CASP)","Summer Urban Program"],"programYears":null,"pbhaRole":"Officer","involvement":"Officer for two years. Before that, CASP and three summers at SUP.","openToMentor":true,"reachOut":"Running a nonprofit, board development, fundraising.","claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":false,"searchText":"marcus bell chicago, il executive director · southside youth alliance nonprofit government officer dunster officer for two years. before that, casp and three summers at sup. cambridge after-school program (casp) summer urban program"},{"userId":"hannah-kim-example-com","first":"Hannah","last":"Kim","pronouns":null,"year":2021,"location":"San Francisco, CA","photoUrl":null,"career":"Software Engineer · Stripe","industry":"Technology","concentration":"Applied Mathematics","house":"Quincy","bio":"Directed Big Sib through the pandemic. Learned more about logistics than any class taught me.","gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Chinatown Big Sibling","Chinatown Teen"],"programYears":null,"pbhaRole":"Program Director","involvement":"Directed Chinatown Big Sibling through the pandemic, including the year everything ran on Zoom.","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":false,"searchText":"hannah kim san francisco, ca software engineer · stripe technology applied mathematics program director quincy directed chinatown big sibling through the pandemic, including the year everything ran on zoom. chinatown big sibling chinatown teen"},{"userId":"tomas-lindqvist-example-com","first":"Tomás","last":"Lindqvist","pronouns":null,"year":2012,"location":"Cambridge, MA","photoUrl":null,"career":"Assistant Professor of Education · Boston College","industry":"Education","concentration":"Psychology","house":"Winthrop","bio":"I study summer learning loss, which is a fancy way of saying I still think about SUP.","gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Summer Urban Program","BRYE Summer"],"programYears":null,"pbhaRole":"Summer Director","involvement":"Summer director at two SUP sites, and on the summer staff hiring committee.","openToMentor":true,"reachOut":"PhD applications in education or psych.","claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":false,"searchText":"tomás lindqvist cambridge, ma assistant professor of education · boston college education psychology summer director winthrop summer director at two sup sites, and on the summer staff hiring committee. summer urban program brye summer"},{"userId":"rachel-adeyemi-example-com","first":"Rachel","last":"Adeyemi","pronouns":null,"year":2006,"location":"Atlanta, GA","photoUrl":null,"career":"VP of Community Impact · Regions Bank","industry":"Finance","concentration":"Economics","house":"Eliot","bio":null,"gender":"Woman","raceEthnicity":["Black or African American"],"showIdentity":true,"programs":["Chinatown Citizenship","Adult ESOL Program"],"programYears":null,"pbhaRole":"Cabinet","involvement":"Cabinet, and the Citizenship program before that.","openToMentor":true,"reachOut":"Corporate social responsibility, finance recruiting.","claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":false,"searchText":"rachel adeyemi atlanta, ga vp of community impact · regions bank finance economics cabinet eliot cabinet, and the citizenship program before that. chinatown citizenship adult esol program"},{"userId":"joseph-hartley-example-com","first":"Joseph","last":"Hartley","pronouns":null,"year":1984,"location":"Portland, ME","photoUrl":null,"career":"Retired · former Superintendent, Portland Public Schools","industry":"Education","concentration":"History","house":"Lowell","bio":"PBHA in the early eighties. I have a filing cabinet of program histories if anyone is writing about that era.","gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Cambridge After-School Program (CASP)"],"programYears":null,"pbhaRole":"Officer","involvement":"Officer in 1983-84, back when the whole association ran out of the Brooks House parlor.","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":false,"searchText":"joseph hartley portland, me retired · former superintendent, portland public schools education history officer lowell officer in 1983-84, back when the whole association ran out of the brooks house parlor. cambridge after-school program (casp)"},{"userId":"wei-zhang-example-com","first":"Wei","last":"Zhang","pronouns":null,"year":2016,"location":"Boston, MA","photoUrl":null,"career":"Immigration Attorney · Greater Boston Legal Services","industry":"Law & Policy","concentration":"East Asian Studies","house":"Mather","bio":"Citizenship program, then law school, then back to the same clients.","gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Chinatown Citizenship","Chinatown ESL","Chinatown Adventure"],"programYears":null,"pbhaRole":"Program Director","involvement":"Four years across the Chinatown programs, ending as director of Citizenship.","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":false,"searchText":"wei zhang boston, ma immigration attorney · greater boston legal services law & policy east asian studies program director mather four years across the chinatown programs, ending as director of citizenship. chinatown citizenship chinatown esl chinatown adventure"},{"userId":"elena-moreau-example-com","first":"Elena","last":"Moreau","pronouns":null,"year":2019,"location":"Brooklyn, NY","photoUrl":null,"career":"Documentary Producer · Field Notes Media","industry":"Media & Arts","concentration":"Visual and Environmental Studies","house":"Cabot","bio":null,"gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Boston Refugee Youth Enrichment (BRYE) Teen","BRYE 1-2-1"],"programYears":null,"pbhaRole":"Program Coordinator","involvement":"Coordinated BRYE Teen and shot the program's first documentary short.","openToMentor":true,"reachOut":"Film, documentary, freelance survival.","claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":false,"searchText":"elena moreau brooklyn, ny documentary producer · field notes media media & arts visual and environmental studies program coordinator cabot coordinated brye teen and shot the program's first documentary short. boston refugee youth enrichment (brye) teen brye 1-2-1"},{"userId":"samuel-osei-example-com","first":"Samuel","last":"Osei","pronouns":null,"year":2011,"location":"Accra, Ghana","photoUrl":null,"career":"Director of Programs · Ashesi Education Collaborative","industry":"Education","concentration":"Social Studies","house":"Pforzheimer","bio":null,"gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Summer Urban Program","Cambridge Youth Enrichment Program"],"programYears":null,"pbhaRole":"Summer Director","involvement":"Summer director at SUP, then stayed on to help with the following year's hiring.","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":false,"searchText":"samuel osei accra, ghana director of programs · ashesi education collaborative education social studies summer director pforzheimer summer director at sup, then stayed on to help with the following year's hiring. summer urban program cambridge youth enrichment program"},{"userId":"nora-feldman-example-com","first":"Nora","last":"Feldman","pronouns":null,"year":2002,"location":"Seattle, WA","photoUrl":null,"career":"Clinical Psychologist · private practice","industry":"Health & Medicine","concentration":"Psychology","house":"Kirkland","bio":"Alzheimer's Buddies is the reason I went into clinical work with older adults.","gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Alzheimer's Buddies","Best Buddies"],"programYears":null,"pbhaRole":"Program Director","involvement":"Directed Alzheimer's Buddies and helped start the Best Buddies chapter's partnership with it.","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":false,"searchText":"nora feldman seattle, wa clinical psychologist · private practice health & medicine psychology program director kirkland directed alzheimer's buddies and helped start the best buddies chapter's partnership with it. alzheimer's buddies best buddies"},{"userId":"andre-thompson-example-com","first":"André","last":"Thompson","pronouns":null,"year":2023,"location":"Cambridge, MA","photoUrl":null,"career":"Research Assistant · Harvard Kennedy School","industry":"Law & Policy","concentration":"Government","house":"Adams","bio":null,"gender":"Man","raceEthnicity":["Black or African American"],"showIdentity":true,"programs":["CIVICS","College High-School Alliance (CHANCE)"],"programYears":null,"pbhaRole":"Cabinet","involvement":"Cabinet, CIVICS classroom lead, and CHANCE tutor.","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":false,"searchText":"andré thompson cambridge, ma research assistant · harvard kennedy school law & policy government cabinet adams cabinet, civics classroom lead, and chance tutor. civics college high-school alliance (chance)"},{"userId":"mei-lin-chen-example-com","first":"Mei Lin","last":"Chen","pronouns":null,"year":2027,"location":"Cambridge, MA","photoUrl":null,"career":"Student","industry":"Student","concentration":"Sociology","house":"Currier","bio":"Current CHAP director. Looking for alumni who ran the program in the 2010s.","gender":"Woman","raceEthnicity":["Asian"],"showIdentity":true,"programs":["Chinatown Afterschool Program (CHAP)","Chinatown Teen"],"programYears":null,"pbhaRole":"Program Director","involvement":"Current CHAP director. Started as a Tuesday tutor first year.","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":true,"searchText":"mei lin chen cambridge, ma student student sociology program director currier current chap director. started as a tuesday tutor first year. chinatown afterschool program (chap) chinatown teen"},{"userId":"jordan-pierre-example-com","first":"Jordan","last":"Pierre","pronouns":null,"year":2028,"location":"Cambridge, MA","photoUrl":null,"career":"Student","industry":"Student","concentration":"Neuroscience","house":"Leverett","bio":null,"gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Boston Refugee Youth Enrichment (BRYE) Extension"],"programYears":null,"pbhaRole":"Program Coordinator","involvement":"BRYE Extension coordinator, second year with the program.","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":true,"searchText":"jordan pierre cambridge, ma student student neuroscience program coordinator leverett brye extension coordinator, second year with the program. boston refugee youth enrichment (brye) extension"},{"userId":"sofia-marchetti-example-com","first":"Sofia","last":"Marchetti","pronouns":null,"year":2026,"location":"Cambridge, MA","photoUrl":null,"career":"Student","industry":"Student","concentration":"History and Literature","house":"Dunster","bio":null,"gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Adult ESOL Program","CIVICS"],"programYears":null,"pbhaRole":"Volunteer","involvement":"Adult ESOL volunteer since first year, and a CIVICS classroom partner.","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":false,"searchText":"sofia marchetti cambridge, ma student student history and literature volunteer dunster adult esol volunteer since first year, and a civics classroom partner. adult esol program civics"},{"userId":"kenji-watanabe-example-com","first":"Kenji","last":"Watanabe","pronouns":null,"year":1999,"location":"Los Angeles, CA","photoUrl":null,"career":"Partner · Westline Ventures","industry":"Finance","concentration":"Economics","house":"Eliot","bio":null,"gender":"Man","raceEthnicity":["Asian"],"showIdentity":true,"programs":["Cambridge After-School Program (CASP)","Summer Urban Program"],"programYears":null,"pbhaRole":"Cabinet","involvement":"Cabinet, CASP, and three summers at SUP.","openToMentor":true,"reachOut":"Venture, startups, or how to fund a nonprofit side project.","claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":false,"searchText":"kenji watanabe los angeles, ca partner · westline ventures finance economics cabinet eliot cabinet, casp, and three summers at sup. cambridge after-school program (casp) summer urban program"},{"userId":"grace-mutua-example-com","first":"Grace","last":"Mutua","pronouns":null,"year":2020,"location":"Nairobi, Kenya","photoUrl":null,"career":"Health Systems Analyst · Ministry of Health","industry":"Health & Medicine","concentration":"Global Health and Health Policy","house":"Quincy","bio":null,"gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Alzheimer's Buddies","Adult ESOL Program"],"programYears":null,"pbhaRole":"Program Coordinator","involvement":"Coordinated Alzheimer's Buddies and volunteered with Adult ESOL.","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":false,"searchText":"grace mutua nairobi, kenya health systems analyst · ministry of health health & medicine global health and health policy program coordinator quincy coordinated alzheimer's buddies and volunteered with adult esol. alzheimer's buddies adult esol program"},{"userId":"patrick-donnelly-example-com","first":"Patrick","last":"Donnelly","pronouns":null,"year":1991,"location":"Dorchester, MA","photoUrl":null,"career":"Principal · Dorchester Collegiate Academy","industry":"Education","concentration":"English","house":"Winthrop","bio":null,"gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Summer Urban Program","BRYE Tutoring"],"programYears":null,"pbhaRole":"Summer Director","involvement":"Summer director at the Dorchester site for two years running.","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":false,"searchText":"patrick donnelly dorchester, ma principal · dorchester collegiate academy education english summer director winthrop summer director at the dorchester site for two years running. summer urban program brye tutoring"},{"userId":"leila-haddad-example-com","first":"Leila","last":"Haddad","pronouns":null,"year":2015,"location":"London, UK","photoUrl":null,"career":"Economist · Institute for Fiscal Studies","industry":"Research","concentration":"Economics","house":"Mather","bio":null,"gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Chinatown ESL","Adult ESOL Program"],"programYears":null,"pbhaRole":"Program Director","involvement":"Directed Chinatown ESL and wrote the placement test the adult programs still use.","openToMentor":true,"reachOut":"Econ PhD, UK moves, research careers.","claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":false,"searchText":"leila haddad london, uk economist · institute for fiscal studies research economics program director mather directed chinatown esl and wrote the placement test the adult programs still use. chinatown esl adult esol program"},{"userId":"c-whitfield-example-com","first":"Charles","last":"Whitfield","pronouns":null,"year":1978,"location":"Portland, ME","photoUrl":null,"career":"Retired · former City Planner, Boston Redevelopment Authority","industry":"Law & Policy","concentration":"Government","house":"Lowell","bio":"CASP in the late seventies, when the program ran out of two rooms. Glad to see it still going.","gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Cambridge After-School Program (CASP)"],"programYears":null,"pbhaRole":"Program Director","involvement":"CASP in the late seventies, when the program ran out of two rooms.","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":false,"searchText":"charles whitfield portland, me retired · former city planner, boston redevelopment authority law & policy government program director lowell casp in the late seventies, when the program ran out of two rooms. cambridge after-school program (casp)"},{"userId":"m-alvarez-example-com","first":"Marisol","last":"Alvarez","pronouns":null,"year":1988,"location":"Boston, MA","photoUrl":null,"career":"Deputy Director · Massachusetts Department of Public Health","industry":"Health & Medicine","concentration":"Biology","house":"Cabot","bio":null,"gender":"Woman","raceEthnicity":["Hispanic or Latino/a/e"],"showIdentity":true,"programs":["Summer Urban Program"],"programYears":null,"pbhaRole":"Summer Director","involvement":"Summer director at SUP, 1987 and 1988.","openToMentor":true,"reachOut":"Public health careers, state government, or running a summer site.","claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":false,"searchText":"marisol alvarez boston, ma deputy director · massachusetts department of public health health & medicine biology summer director cabot summer director at sup, 1987 and 1988. summer urban program"},{"userId":"t-nguyen-example-com","first":"Thao","last":"Nguyen","pronouns":null,"year":2004,"location":"Brooklyn, NY","photoUrl":null,"career":"Architect · Nguyen + Partners","industry":"Media & Arts","concentration":"Visual and Environmental Studies","house":"Kirkland","bio":"Big Sib matched me with a seven-year-old in 2001. We still email.","gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Chinatown Big Sibling"],"programYears":null,"pbhaRole":"Program Coordinator","involvement":"Chinatown Big Sibling for three years.","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":false,"searchText":"thao nguyen brooklyn, ny architect · nguyen + partners media & arts visual and environmental studies program coordinator kirkland chinatown big sibling for three years. chinatown big sibling"},{"userId":"r-okonkwo-example-com","first":"Reuben","last":"Okonkwo","pronouns":null,"year":2010,"location":"Boston, MA","photoUrl":null,"career":"Civics Teacher · Boston Latin Academy","industry":"Education","concentration":"History","house":"Pforzheimer","bio":null,"gender":"Man","raceEthnicity":["Black or African American"],"showIdentity":true,"programs":["CIVICS"],"programYears":null,"pbhaRole":"Program Director","involvement":"CIVICS classroom lead, and a CHANCE tutor before that.","openToMentor":true,"reachOut":"Teaching, licensure, and getting into a classroom after college.","claimedAt":"2026-09-14T23:11:34.456Z","isCurrentStudent":false,"searchText":"reuben okonkwo boston, ma civics teacher · boston latin academy education history program director pforzheimer civics classroom lead, and a chance tutor before that. civics"}];
+  var PROFILES = [{"userId":"amara-okafor-example-com","first":"Amara","last":"Okafor","pronouns":null,"year":2014,"location":"Boston, MA","photoUrl":null,"career":"Pediatrician · Boston Medical Center","industry":"Health & Medicine","concentration":"Human Developmental Biology","house":"Currier","bio":"Two summers at SUP turned into a career in community pediatrics. Happy to talk about medical school, or about running a program while taking orgo.","gender":"Woman","raceEthnicity":["Black or African American"],"showIdentity":true,"programs":["Chinatown Afterschool Program (CHAP)","Summer Urban Program"],"programYears":null,"pbhaRole":"Program Director","involvement":"Ran CHAP my sophomore and junior years, then two summers at SUP as a site director in Mission Hill.","openToMentor":true,"reachOut":"Anything about the pre-med path, or SUP director life.","claimedAt":"2026-09-14T23:26:20.631Z","isCurrentStudent":false,"searchText":"amara okafor boston, ma pediatrician · boston medical center health & medicine human developmental biology program director currier ran chap my sophomore and junior years, then two summers at sup as a site director in mission hill. chinatown afterschool program (chap) summer urban program"},{"userId":"daniel-reyes-example-com","first":"Daniel","last":"Reyes","pronouns":null,"year":2009,"location":"Washington, DC","photoUrl":null,"career":"Policy Counsel · National Housing Law Project","industry":"Law & Policy","concentration":"Social Studies","house":"Adams","bio":"Started in ESOL, ended up writing tenant protection legislation. The through-line is the same work.","gender":"Man","raceEthnicity":["Hispanic or Latino/a/e"],"showIdentity":true,"programs":["Adult ESOL Program","CIVICS"],"programYears":null,"pbhaRole":"Cabinet","involvement":"Taught the Tuesday and Thursday ESOL sections for three years, then chaired the Cabinet committee that rewrote the volunteer training.","openToMentor":true,"reachOut":"Law school, legal aid, housing policy.","claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":false,"searchText":"daniel reyes washington, dc policy counsel · national housing law project law & policy social studies cabinet adams taught the tuesday and thursday esol sections for three years, then chaired the cabinet committee that rewrote the volunteer training. adult esol program civics"},{"userId":"priya-nair-example-com","first":"Priya","last":"Nair","pronouns":null,"year":2018,"location":"New York, NY","photoUrl":null,"career":"Product Manager · Duolingo","industry":"Technology","concentration":"Computer Science","house":"Leverett","bio":"Teaching adult ESL is why I work on language learning now.","gender":"Woman","raceEthnicity":["Asian"],"showIdentity":true,"programs":["Chinatown ESL","BRYE Tutoring"],"programYears":null,"pbhaRole":"Program Coordinator","involvement":"Coordinated Chinatown ESL, and spent a year building the curriculum shared across the adult programs.","openToMentor":true,"reachOut":"Breaking into product, or tech recruiting timelines.","claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":false,"searchText":"priya nair new york, ny product manager · duolingo technology computer science program coordinator leverett coordinated chinatown esl, and spent a year building the curriculum shared across the adult programs. chinatown esl brye tutoring"},{"userId":"marcus-bell-example-com","first":"Marcus","last":"Bell","pronouns":null,"year":1996,"location":"Chicago, IL","photoUrl":null,"career":"Executive Director · Southside Youth Alliance","industry":"Nonprofit","concentration":"Government","house":"Dunster","bio":"Thirty years in youth development. Still use the site-director playbook I learned at PBHA.","gender":"Man","raceEthnicity":["Black or African American"],"showIdentity":true,"programs":["Cambridge After-School Program (CASP)","Summer Urban Program"],"programYears":null,"pbhaRole":"Officer","involvement":"Officer for two years. Before that, CASP and three summers at SUP.","openToMentor":true,"reachOut":"Running a nonprofit, board development, fundraising.","claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":false,"searchText":"marcus bell chicago, il executive director · southside youth alliance nonprofit government officer dunster officer for two years. before that, casp and three summers at sup. cambridge after-school program (casp) summer urban program"},{"userId":"hannah-kim-example-com","first":"Hannah","last":"Kim","pronouns":null,"year":2021,"location":"San Francisco, CA","photoUrl":null,"career":"Software Engineer · Stripe","industry":"Technology","concentration":"Applied Mathematics","house":"Quincy","bio":"Directed Big Sib through the pandemic. Learned more about logistics than any class taught me.","gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Chinatown Big Sibling","Chinatown Teen"],"programYears":null,"pbhaRole":"Program Director","involvement":"Directed Chinatown Big Sibling through the pandemic, including the year everything ran on Zoom.","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":false,"searchText":"hannah kim san francisco, ca software engineer · stripe technology applied mathematics program director quincy directed chinatown big sibling through the pandemic, including the year everything ran on zoom. chinatown big sibling chinatown teen"},{"userId":"tomas-lindqvist-example-com","first":"Tomás","last":"Lindqvist","pronouns":null,"year":2012,"location":"Cambridge, MA","photoUrl":null,"career":"Assistant Professor of Education · Boston College","industry":"Education","concentration":"Psychology","house":"Winthrop","bio":"I study summer learning loss, which is a fancy way of saying I still think about SUP.","gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Summer Urban Program","BRYE Summer"],"programYears":null,"pbhaRole":"Summer Director","involvement":"Summer director at two SUP sites, and on the summer staff hiring committee.","openToMentor":true,"reachOut":"PhD applications in education or psych.","claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":false,"searchText":"tomás lindqvist cambridge, ma assistant professor of education · boston college education psychology summer director winthrop summer director at two sup sites, and on the summer staff hiring committee. summer urban program brye summer"},{"userId":"rachel-adeyemi-example-com","first":"Rachel","last":"Adeyemi","pronouns":null,"year":2006,"location":"Atlanta, GA","photoUrl":null,"career":"VP of Community Impact · Regions Bank","industry":"Finance","concentration":"Economics","house":"Eliot","bio":null,"gender":"Woman","raceEthnicity":["Black or African American"],"showIdentity":true,"programs":["Chinatown Citizenship","Adult ESOL Program"],"programYears":null,"pbhaRole":"Cabinet","involvement":"Cabinet, and the Citizenship program before that.","openToMentor":true,"reachOut":"Corporate social responsibility, finance recruiting.","claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":false,"searchText":"rachel adeyemi atlanta, ga vp of community impact · regions bank finance economics cabinet eliot cabinet, and the citizenship program before that. chinatown citizenship adult esol program"},{"userId":"joseph-hartley-example-com","first":"Joseph","last":"Hartley","pronouns":null,"year":1984,"location":"Portland, ME","photoUrl":null,"career":"Retired · former Superintendent, Portland Public Schools","industry":"Education","concentration":"History","house":"Lowell","bio":"PBHA in the early eighties. I have a filing cabinet of program histories if anyone is writing about that era.","gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Cambridge After-School Program (CASP)"],"programYears":null,"pbhaRole":"Officer","involvement":"Officer in 1983-84, back when the whole association ran out of the Brooks House parlor.","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":false,"searchText":"joseph hartley portland, me retired · former superintendent, portland public schools education history officer lowell officer in 1983-84, back when the whole association ran out of the brooks house parlor. cambridge after-school program (casp)"},{"userId":"wei-zhang-example-com","first":"Wei","last":"Zhang","pronouns":null,"year":2016,"location":"Boston, MA","photoUrl":null,"career":"Immigration Attorney · Greater Boston Legal Services","industry":"Law & Policy","concentration":"East Asian Studies","house":"Mather","bio":"Citizenship program, then law school, then back to the same clients.","gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Chinatown Citizenship","Chinatown ESL","Chinatown Adventure"],"programYears":null,"pbhaRole":"Program Director","involvement":"Four years across the Chinatown programs, ending as director of Citizenship.","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":false,"searchText":"wei zhang boston, ma immigration attorney · greater boston legal services law & policy east asian studies program director mather four years across the chinatown programs, ending as director of citizenship. chinatown citizenship chinatown esl chinatown adventure"},{"userId":"elena-moreau-example-com","first":"Elena","last":"Moreau","pronouns":null,"year":2019,"location":"Brooklyn, NY","photoUrl":null,"career":"Documentary Producer · Field Notes Media","industry":"Media & Arts","concentration":"Visual and Environmental Studies","house":"Cabot","bio":null,"gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Boston Refugee Youth Enrichment (BRYE) Teen","BRYE 1-2-1"],"programYears":null,"pbhaRole":"Program Coordinator","involvement":"Coordinated BRYE Teen and shot the program's first documentary short.","openToMentor":true,"reachOut":"Film, documentary, freelance survival.","claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":false,"searchText":"elena moreau brooklyn, ny documentary producer · field notes media media & arts visual and environmental studies program coordinator cabot coordinated brye teen and shot the program's first documentary short. boston refugee youth enrichment (brye) teen brye 1-2-1"},{"userId":"samuel-osei-example-com","first":"Samuel","last":"Osei","pronouns":null,"year":2011,"location":"Accra, Ghana","photoUrl":null,"career":"Director of Programs · Ashesi Education Collaborative","industry":"Education","concentration":"Social Studies","house":"Pforzheimer","bio":null,"gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Summer Urban Program","Cambridge Youth Enrichment Program"],"programYears":null,"pbhaRole":"Summer Director","involvement":"Summer director at SUP, then stayed on to help with the following year's hiring.","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":false,"searchText":"samuel osei accra, ghana director of programs · ashesi education collaborative education social studies summer director pforzheimer summer director at sup, then stayed on to help with the following year's hiring. summer urban program cambridge youth enrichment program"},{"userId":"nora-feldman-example-com","first":"Nora","last":"Feldman","pronouns":null,"year":2002,"location":"Seattle, WA","photoUrl":null,"career":"Clinical Psychologist · private practice","industry":"Health & Medicine","concentration":"Psychology","house":"Kirkland","bio":"Alzheimer's Buddies is the reason I went into clinical work with older adults.","gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Alzheimer's Buddies","Best Buddies"],"programYears":null,"pbhaRole":"Program Director","involvement":"Directed Alzheimer's Buddies and helped start the Best Buddies chapter's partnership with it.","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":false,"searchText":"nora feldman seattle, wa clinical psychologist · private practice health & medicine psychology program director kirkland directed alzheimer's buddies and helped start the best buddies chapter's partnership with it. alzheimer's buddies best buddies"},{"userId":"andre-thompson-example-com","first":"André","last":"Thompson","pronouns":null,"year":2023,"location":"Cambridge, MA","photoUrl":null,"career":"Research Assistant · Harvard Kennedy School","industry":"Law & Policy","concentration":"Government","house":"Adams","bio":null,"gender":"Man","raceEthnicity":["Black or African American"],"showIdentity":true,"programs":["CIVICS","College High-School Alliance (CHANCE)"],"programYears":null,"pbhaRole":"Cabinet","involvement":"Cabinet, CIVICS classroom lead, and CHANCE tutor.","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":false,"searchText":"andré thompson cambridge, ma research assistant · harvard kennedy school law & policy government cabinet adams cabinet, civics classroom lead, and chance tutor. civics college high-school alliance (chance)"},{"userId":"mei-lin-chen-example-com","first":"Mei Lin","last":"Chen","pronouns":null,"year":2027,"location":"Cambridge, MA","photoUrl":null,"career":"Student","industry":"Student","concentration":"Sociology","house":"Currier","bio":"Current CHAP director. Looking for alumni who ran the program in the 2010s.","gender":"Woman","raceEthnicity":["Asian"],"showIdentity":true,"programs":["Chinatown Afterschool Program (CHAP)","Chinatown Teen"],"programYears":null,"pbhaRole":"Program Director","involvement":"Current CHAP director. Started as a Tuesday tutor first year.","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":true,"searchText":"mei lin chen cambridge, ma student student sociology program director currier current chap director. started as a tuesday tutor first year. chinatown afterschool program (chap) chinatown teen"},{"userId":"jordan-pierre-example-com","first":"Jordan","last":"Pierre","pronouns":null,"year":2028,"location":"Cambridge, MA","photoUrl":null,"career":"Student","industry":"Student","concentration":"Neuroscience","house":"Leverett","bio":null,"gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Boston Refugee Youth Enrichment (BRYE) Extension"],"programYears":null,"pbhaRole":"Program Coordinator","involvement":"BRYE Extension coordinator, second year with the program.","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":true,"searchText":"jordan pierre cambridge, ma student student neuroscience program coordinator leverett brye extension coordinator, second year with the program. boston refugee youth enrichment (brye) extension"},{"userId":"sofia-marchetti-example-com","first":"Sofia","last":"Marchetti","pronouns":null,"year":2026,"location":"Cambridge, MA","photoUrl":null,"career":"Student","industry":"Student","concentration":"History and Literature","house":"Dunster","bio":null,"gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Adult ESOL Program","CIVICS"],"programYears":null,"pbhaRole":"Volunteer","involvement":"Adult ESOL volunteer since first year, and a CIVICS classroom partner.","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":false,"searchText":"sofia marchetti cambridge, ma student student history and literature volunteer dunster adult esol volunteer since first year, and a civics classroom partner. adult esol program civics"},{"userId":"kenji-watanabe-example-com","first":"Kenji","last":"Watanabe","pronouns":null,"year":1999,"location":"Los Angeles, CA","photoUrl":null,"career":"Partner · Westline Ventures","industry":"Finance","concentration":"Economics","house":"Eliot","bio":null,"gender":"Man","raceEthnicity":["Asian"],"showIdentity":true,"programs":["Cambridge After-School Program (CASP)","Summer Urban Program"],"programYears":null,"pbhaRole":"Cabinet","involvement":"Cabinet, CASP, and three summers at SUP.","openToMentor":true,"reachOut":"Venture, startups, or how to fund a nonprofit side project.","claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":false,"searchText":"kenji watanabe los angeles, ca partner · westline ventures finance economics cabinet eliot cabinet, casp, and three summers at sup. cambridge after-school program (casp) summer urban program"},{"userId":"grace-mutua-example-com","first":"Grace","last":"Mutua","pronouns":null,"year":2020,"location":"Nairobi, Kenya","photoUrl":null,"career":"Health Systems Analyst · Ministry of Health","industry":"Health & Medicine","concentration":"Global Health and Health Policy","house":"Quincy","bio":null,"gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Alzheimer's Buddies","Adult ESOL Program"],"programYears":null,"pbhaRole":"Program Coordinator","involvement":"Coordinated Alzheimer's Buddies and volunteered with Adult ESOL.","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":false,"searchText":"grace mutua nairobi, kenya health systems analyst · ministry of health health & medicine global health and health policy program coordinator quincy coordinated alzheimer's buddies and volunteered with adult esol. alzheimer's buddies adult esol program"},{"userId":"patrick-donnelly-example-com","first":"Patrick","last":"Donnelly","pronouns":null,"year":1991,"location":"Dorchester, MA","photoUrl":null,"career":"Principal · Dorchester Collegiate Academy","industry":"Education","concentration":"English","house":"Winthrop","bio":null,"gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Summer Urban Program","BRYE Tutoring"],"programYears":null,"pbhaRole":"Summer Director","involvement":"Summer director at the Dorchester site for two years running.","openToMentor":true,"reachOut":null,"claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":false,"searchText":"patrick donnelly dorchester, ma principal · dorchester collegiate academy education english summer director winthrop summer director at the dorchester site for two years running. summer urban program brye tutoring"},{"userId":"leila-haddad-example-com","first":"Leila","last":"Haddad","pronouns":null,"year":2015,"location":"London, UK","photoUrl":null,"career":"Economist · Institute for Fiscal Studies","industry":"Research","concentration":"Economics","house":"Mather","bio":null,"gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Chinatown ESL","Adult ESOL Program"],"programYears":null,"pbhaRole":"Program Director","involvement":"Directed Chinatown ESL and wrote the placement test the adult programs still use.","openToMentor":true,"reachOut":"Econ PhD, UK moves, research careers.","claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":false,"searchText":"leila haddad london, uk economist · institute for fiscal studies research economics program director mather directed chinatown esl and wrote the placement test the adult programs still use. chinatown esl adult esol program"},{"userId":"c-whitfield-example-com","first":"Charles","last":"Whitfield","pronouns":null,"year":1978,"location":"Portland, ME","photoUrl":null,"career":"Retired · former City Planner, Boston Redevelopment Authority","industry":"Law & Policy","concentration":"Government","house":"Lowell","bio":"CASP in the late seventies, when the program ran out of two rooms. Glad to see it still going.","gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Cambridge After-School Program (CASP)"],"programYears":null,"pbhaRole":"Program Director","involvement":"CASP in the late seventies, when the program ran out of two rooms.","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":false,"searchText":"charles whitfield portland, me retired · former city planner, boston redevelopment authority law & policy government program director lowell casp in the late seventies, when the program ran out of two rooms. cambridge after-school program (casp)"},{"userId":"m-alvarez-example-com","first":"Marisol","last":"Alvarez","pronouns":null,"year":1988,"location":"Boston, MA","photoUrl":null,"career":"Deputy Director · Massachusetts Department of Public Health","industry":"Health & Medicine","concentration":"Biology","house":"Cabot","bio":null,"gender":"Woman","raceEthnicity":["Hispanic or Latino/a/e"],"showIdentity":true,"programs":["Summer Urban Program"],"programYears":null,"pbhaRole":"Summer Director","involvement":"Summer director at SUP, 1987 and 1988.","openToMentor":true,"reachOut":"Public health careers, state government, or running a summer site.","claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":false,"searchText":"marisol alvarez boston, ma deputy director · massachusetts department of public health health & medicine biology summer director cabot summer director at sup, 1987 and 1988. summer urban program"},{"userId":"t-nguyen-example-com","first":"Thao","last":"Nguyen","pronouns":null,"year":2004,"location":"Brooklyn, NY","photoUrl":null,"career":"Architect · Nguyen + Partners","industry":"Media & Arts","concentration":"Visual and Environmental Studies","house":"Kirkland","bio":"Big Sib matched me with a seven-year-old in 2001. We still email.","gender":null,"raceEthnicity":[],"showIdentity":false,"programs":["Chinatown Big Sibling"],"programYears":null,"pbhaRole":"Program Coordinator","involvement":"Chinatown Big Sibling for three years.","openToMentor":false,"reachOut":null,"claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":false,"searchText":"thao nguyen brooklyn, ny architect · nguyen + partners media & arts visual and environmental studies program coordinator kirkland chinatown big sibling for three years. chinatown big sibling"},{"userId":"r-okonkwo-example-com","first":"Reuben","last":"Okonkwo","pronouns":null,"year":2010,"location":"Boston, MA","photoUrl":null,"career":"Civics Teacher · Boston Latin Academy","industry":"Education","concentration":"History","house":"Pforzheimer","bio":null,"gender":"Man","raceEthnicity":["Black or African American"],"showIdentity":true,"programs":["CIVICS"],"programYears":null,"pbhaRole":"Program Director","involvement":"CIVICS classroom lead, and a CHANCE tutor before that.","openToMentor":true,"reachOut":"Teaching, licensure, and getting into a classroom after college.","claimedAt":"2026-09-14T23:26:20.633Z","isCurrentStudent":false,"searchText":"reuben okonkwo boston, ma civics teacher · boston latin academy education history program director pforzheimer civics classroom lead, and a chance tutor before that. civics"}];
   var VOCAB = {"programs":["Adult ESOL Program","Alzheimer's Buddies","Best Buddies","Boston Refugee Youth Enrichment (BRYE) Extension","Boston Refugee Youth Enrichment (BRYE) Teen","BRYE 1-2-1","BRYE Summer","BRYE Tutoring","Cambridge After-School Program (CASP)","Cambridge Youth Enrichment Program","Chinatown Adventure","Chinatown Afterschool Program (CHAP)","Chinatown Big Sibling","Chinatown Citizenship","Chinatown ESL","Chinatown Teen","CIVICS","College High-School Alliance (CHANCE)","Summer Urban Program"],"roles":["Volunteer","Program Coordinator","Program Director","Summer Director","Cabinet","Officer"],"houses":["Adams","Cabot","Currier","Dudley","Dunster","Eliot","Kirkland","Leverett","Lowell","Mather","Pforzheimer","Quincy","Winthrop","First-year (Yard)","Non-resident"],"genders":["Woman","Man","Non-binary","Prefer to self-describe","Prefer not to say"],"races":["American Indian or Alaska Native","Asian","Black or African American","Hispanic or Latino/a/e","Middle Eastern or North African","Native Hawaiian or Pacific Islander","White","Prefer to self-describe","Prefer not to say"],"industries":["Education","Healthcare","Business","Legal","Government","Social Services","Sciences","Technology","Arts & Media","Community Organizing","Finance","Health & Medicine","Housing","Journalism","Law & Policy","Nonprofit","Philanthropy","Public Health","Research","Student","Other"],"cities":["Boston, MA","Cambridge, MA","Somerville, MA","Dorchester, MA","Brookline, MA","Worcester, MA","Newton, MA","Medford, MA","Quincy, MA","Springfield, MA","New York, NY","Brooklyn, NY","Queens, NY","Bronx, NY","Buffalo, NY","Rochester, NY","Albany, NY","Yonkers, NY","White Plains, NY","Ithaca, NY","Washington, DC","Arlington, VA","Alexandria, VA","Richmond, VA","Charlottesville, VA","Norfolk, VA","Baltimore, MD","Bethesda, MD","Silver Spring, MD","Annapolis, MD","Philadelphia, PA","Pittsburgh, PA","Newark, NJ","Jersey City, NJ","Princeton, NJ","Hoboken, NJ","Providence, RI","New Haven, CT","Hartford, CT","Stamford, CT","Bridgeport, CT","Portland, ME","Burlington, VT","Manchester, NH","Portsmouth, NH","Chicago, IL","Evanston, IL","Urbana, IL","Detroit, MI","Ann Arbor, MI","Grand Rapids, MI","Minneapolis, MN","Saint Paul, MN","Madison, WI","Milwaukee, WI","Cleveland, OH","Columbus, OH","Cincinnati, OH","Indianapolis, IN","Bloomington, IN","Saint Louis, MO","Kansas City, MO","Des Moines, IA","Iowa City, IA","Omaha, NE","Atlanta, GA","Savannah, GA","Athens, GA","Charlotte, NC","Raleigh, NC","Durham, NC","Chapel Hill, NC","Charleston, SC","Columbia, SC","Nashville, TN","Memphis, TN","Knoxville, TN","Louisville, KY","Lexington, KY","Birmingham, AL","Jackson, MS","New Orleans, LA","Baton Rouge, LA","Little Rock, AR","Miami, FL","Orlando, FL","Tampa, FL","Jacksonville, FL","Gainesville, FL","Tallahassee, FL","Houston, TX","Austin, TX","Dallas, TX","San Antonio, TX","Fort Worth, TX","El Paso, TX","Oklahoma City, OK","Tulsa, OK","Denver, CO","Boulder, CO","Colorado Springs, CO","Salt Lake City, UT","Albuquerque, NM","Santa Fe, NM","Phoenix, AZ","Tucson, AZ","Tempe, AZ","Las Vegas, NV","Reno, NV","Boise, ID","Missoula, MT","Bozeman, MT","Cheyenne, WY","Sioux Falls, SD","Fargo, ND","Wichita, KS","Lawrence, KS","San Francisco, CA","Oakland, CA","Berkeley, CA","San Jose, CA","Palo Alto, CA","Mountain View, CA","Sacramento, CA","Los Angeles, CA","Pasadena, CA","Long Beach, CA","Santa Monica, CA","San Diego, CA","Irvine, CA","Santa Barbara, CA","Fresno, CA","Santa Cruz, CA","Davis, CA","Portland, OR","Eugene, OR","Seattle, WA","Tacoma, WA","Spokane, WA","Bellevue, WA","Anchorage, AK","Honolulu, HI","San Juan, PR","Charleston, WV","London, UK","Oxford, UK","Cambridge, UK","Edinburgh, UK","Dublin, Ireland","Paris, France","Berlin, Germany","Madrid, Spain","Rome, Italy","Amsterdam, Netherlands","Geneva, Switzerland","Stockholm, Sweden","Toronto, Canada","Montreal, Canada","Vancouver, Canada","Mexico City, Mexico","Sao Paulo, Brazil","Buenos Aires, Argentina","Bogota, Colombia","Lima, Peru","Accra, Ghana","Nairobi, Kenya","Lagos, Nigeria","Johannesburg, South Africa","Cairo, Egypt","Kampala, Uganda","Dakar, Senegal","Tel Aviv, Israel","Amman, Jordan","Dubai, UAE","Mumbai, India","New Delhi, India","Bangalore, India","Beijing, China","Shanghai, China","Hong Kong, China","Taipei, Taiwan","Seoul, South Korea","Tokyo, Japan","Singapore, Singapore","Bangkok, Thailand","Manila, Philippines","Jakarta, Indonesia","Sydney, Australia","Melbourne, Australia","Auckland, New Zealand"]};
   var VIEWER_ID = "amara-okafor-example-com";
   var STUDENT_BOUNDARY = 2027;
@@ -933,7 +965,12 @@ footer.site {
     // server applies.
     out.sort(function (a, b) { return (b.claimedAt ? 1 : 0) - (a.claimedAt ? 1 : 0); });
 
-    return { items: out, meta: { page: 1, pageSize: out.length, total: out.length, totalPages: 1 } };
+    // The server marks these on every card so the frontend knows whether to
+    // draw a Message button; the demo has to say the same thing.
+    var cards = out.map(function (p) {
+      return Object.assign({}, p, { isSelf: p.userId === VIEWER_ID, openToMessages: true });
+    });
+    return { items: cards, meta: { page: 1, pageSize: cards.length, total: cards.length, totalPages: 1 } };
   }
 
   var signedIn = false;
@@ -1024,6 +1061,21 @@ footer.site {
     if (url === "/api/users/me" && method === "PATCH") {
       return Promise.reject(new Error("This is a static demo — nothing saves here."));
     }
+    // The photo is the one thing the demo can honestly do without a server:
+    // the browser has already produced the image, so hand it straight back
+    // as the URL. It lives for as long as the tab does.
+    if (url === "/api/users/me/photo") {
+      if (method === "PUT") {
+        var me = PROFILES.filter(function (p) { return p.userId === VIEWER_ID; })[0];
+        if (me) me.photoUrl = body.dataUrl;
+        return Promise.resolve({ photoUrl: body.dataUrl });
+      }
+      if (method === "DELETE") {
+        var m2 = PROFILES.filter(function (p) { return p.userId === VIEWER_ID; })[0];
+        if (m2) m2.photoUrl = null;
+        return Promise.resolve({ photoUrl: null });
+      }
+    }
     if (url.indexOf("/api/users/") === 0) {
       var id = decodeURIComponent(url.slice("/api/users/".length));
       var found = PROFILES.filter(function (p) { return p.userId === id; })[0];
@@ -1075,6 +1127,8 @@ const api = {
   },
   post(path, body) { return api.request("POST", path, body); },
   patch(path, body) { return api.request("PATCH", path, body); },
+  put(path, body) { return api.request("PUT", path, body); },
+  del(path) { return api.request("DELETE", path); },
 
   // Warm a GET without caring about the result. Hovering a directory card
   // fires this, so by the time the click handler renders the profile the
@@ -1207,7 +1261,7 @@ function Select({ value, options, onChange, label }) {
   }, [open]);
 
   return (
-    <div ref={ref} style={{ position: "relative" }}>
+    <div className="pill-wrap" ref={ref}>
       <button className="pill-select" onClick={() => setOpen((o) => !o)}
         aria-haspopup="listbox" aria-expanded={open} aria-label={label}>
         <span>{current ? current.label : ""}</span>
@@ -1237,6 +1291,54 @@ function Select({ value, options, onChange, label }) {
 // Mirror of normalizeLocation in src/lib/place.ts. The server normalizes
 // again on save — this copy exists so you can watch the field settle on
 // "City, ST" as you leave it, instead of finding out after you save.
+/**
+ * A chosen file, as a square JPEG small enough to store.
+ *
+ * Phone photos are three to twelve megabytes and 4000px on the long edge,
+ * and the site shows them at 220px. Sending the original would put twelve
+ * megabytes in a database row to draw a thumbnail. This centre-crops to a
+ * square and re-encodes at 512px, which lands well under 100KB.
+ *
+ * Cropping to the centre is a real decision, not a neutral one: a photo
+ * where the face is off to one side loses part of it. That is the trade
+ * for not building a crop tool, and the preview shows the result before
+ * anyone commits to it.
+ */
+const PHOTO_PX = 512;
+function squareJpeg(file) {
+  return new Promise((resolve, reject) => {
+    if (!/^image\/(jpeg|png|webp)$/i.test(file.type)) {
+      reject(new Error("Choose a JPEG, PNG, or WebP image."));
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      try {
+        const side = Math.min(img.naturalWidth, img.naturalHeight);
+        const sx = (img.naturalWidth - side) / 2;
+        const sy = (img.naturalHeight - side) / 2;
+        const canvas = document.createElement("canvas");
+        canvas.width = PHOTO_PX;
+        canvas.height = PHOTO_PX;
+        const ctx = canvas.getContext("2d");
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(img, sx, sy, side, side, 0, 0, PHOTO_PX, PHOTO_PX);
+        resolve(canvas.toDataURL("image/jpeg", 0.85));
+      } catch {
+        // A canvas tainted by a cross-origin source cannot be read back.
+        reject(new Error("That image could not be read."));
+      }
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("That file is not an image the browser can open."));
+    };
+    img.src = url;
+  });
+}
+
 // Answering "prefer to self-describe" is a request for a box, not an answer.
 const SELF_DESCRIBE = "Prefer to self-describe";
 
@@ -1923,9 +2025,9 @@ const when = (iso) => {
 // well as into the Messages screen. The callbacks live in a ref because
 // they are written inline at both call sites — in the dependency array a
 // fresh function every render would refetch the thread forever.
-function Conversation({ threadId, showHead, onOpenProfile, onRead, onSent }) {
+function Conversation({ threadId, showHead, onOpenProfile, onRead, onSent, initialDraft }) {
   const [thread, setThread] = React.useState(null);
-  const [draft, setDraft] = React.useState("");
+  const [draft, setDraft] = React.useState(initialDraft || "");
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState("");
   const endRef = React.useRef(null);
@@ -1936,6 +2038,9 @@ function Conversation({ threadId, showHead, onOpenProfile, onRead, onSent }) {
     if (!threadId) { setThread(null); return; }
     let dead = false;
     setThread(null);
+    // Arriving from the directory: address it to them. Only on the way in —
+    // a later render must not wipe what has been typed since.
+    if (initialDraft) setDraft(initialDraft);
     api.get("/api/messages/" + encodeURIComponent(threadId))
       .then((t) => {
         if (dead) return;
@@ -2016,7 +2121,7 @@ function Conversation({ threadId, showHead, onOpenProfile, onRead, onSent }) {
   );
 }
 
-function MessagesScreen({ openThreadId, onOpenProfile, onUnreadChange }) {
+function MessagesScreen({ openThreadId, onOpenProfile, draftFor, onUnreadChange }) {
   const [threads, setThreads] = React.useState([]);
   const [active, setActive] = React.useState(openThreadId || null);
   const [error, setError] = React.useState("");
@@ -2080,6 +2185,7 @@ function MessagesScreen({ openThreadId, onOpenProfile, onUnreadChange }) {
             {!active
               ? <p className="meta" style={{ padding: 24 }}>Pick a conversation.</p>
               : <Conversation threadId={active} showHead onOpenProfile={onOpenProfile}
+                  initialDraft={draftFor && draftFor.threadId === active ? draftFor.text : ""}
                   onRead={() => { loadThreads(); onUnreadChange && onUnreadChange(); }}
                   onSent={loadThreads} />}
           </div>
@@ -2436,9 +2542,6 @@ function DirectoryMap({ locations, people, onOpenProfile }) {
 }
 
 // PBHA was founded in 1904; nobody can have a PBHA class year before it.
-// A link to an image file, not to a page that contains one.
-const IMAGE_URL = /\.(jpe?g|png|webp)(\?.*)?$/i;
-
 const YEAR_MIN = 1904;
 const YEAR_MAX = new Date().getFullYear() + 4;
 // Newest first: most people are looking for a recent class, not 1904.
@@ -2453,10 +2556,18 @@ function FilterGroup({ label, children }) {
   );
 }
 
-function PersonCard({ person, onOpen }) {
+function PersonCard({ person, onOpen, onMessage }) {
   const { title, org } = splitCareer(person.career);
+  // The card was a <button>, which cannot hold the Message button — a
+  // button inside a button is invalid, and the browser will not deliver
+  // the inner click. A div that answers Enter and Space the way a button
+  // does keeps the keyboard behaviour without the nesting.
   return (
-    <button className="card person-card" onClick={() => onOpen(person.userId)}
+    <div className="card person-card" role="button" tabIndex={0}
+      onClick={() => onOpen(person.userId)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(person.userId); }
+      }}
       onMouseEnter={() => api.prefetch("/api/users/" + encodeURIComponent(person.userId))}>
       <div className="person-photo">
         <Photo person={person} />
@@ -2483,8 +2594,18 @@ function PersonCard({ person, onOpen }) {
             <Pin /> {person.location}
           </div>
         )}
+        {!person.isSelf && person.openToMessages !== false && (
+          <div className="person-actions">
+            {/* stopPropagation, or the click also opens the profile the
+                card is a link to. */}
+            <button type="button" className="btn btn-ghost btn-sm"
+              onClick={(e) => { e.stopPropagation(); onMessage(person); }}>
+              Message
+            </button>
+          </div>
+        )}
       </div>
-    </button>
+    </div>
   );
 }
 
@@ -2512,7 +2633,7 @@ function PersonRow({ person, onOpen }) {
   );
 }
 
-function DirectoryScreen({ onOpenProfile }) {
+function DirectoryScreen({ onOpenProfile, onMessage }) {
   const [q, setQ] = React.useState("");
   const [who, setWho] = React.useState("all");
   const [programs, setPrograms] = React.useState([]);
@@ -2721,7 +2842,7 @@ function DirectoryScreen({ onOpenProfile }) {
           ) : layout === "grid" ? (
             <div className="grid-people">
               {results.map((p) => (
-                <PersonCard key={p.userId} person={p} onOpen={onOpenProfile} />
+                <PersonCard key={p.userId} person={p} onOpen={onOpenProfile} onMessage={onMessage} />
               ))}
             </div>
           ) : (
@@ -2797,33 +2918,39 @@ function ProfileScreen({ userId, onBack, onUnreadChange }) {
         ← Directory
       </button>
 
-      <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: 48, alignItems: "start" }}
-        className="profile-layout">
-        <div>
-          <div className="person-photo" style={{ borderRadius: 6, border: "1px solid var(--rule)" }}>
-            <Photo person={person} />
-          </div>
-          <div style={{ display: "flex", gap: 6, marginTop: 14, flexWrap: "wrap" }}>
+      {/* A square photo beside a name, with everything that qualifies the
+          person — their year, whether they mentor — up by the name rather
+          than stacked under the picture. Below that the text runs the full
+          width of the page, so a bio is not reading in a 1000px column
+          with 400px of white beside it. */}
+      <div className="profile-head">
+        <div className="profile-photo">
+          <Photo person={person} />
+        </div>
+
+        <div className="profile-id">
+          <h1 className="h-1">{person.first} {person.last}</h1>
+          {person.pronouns && <div className="meta" style={{ marginTop: 6 }}>{person.pronouns}</div>}
+
+          <div className="profile-chips">
             <span className="chip chip-static">
               {person.isCurrentStudent ? "Current student" : "Alum"} · {person.year}
             </span>
             {person.openToMentor && <span className="chip chip-accent">Open to mentoring</span>}
+            {/* Hidden for your own profile, and for anyone who has turned
+                messages off — though the server is what actually refuses. */}
+            {!person.isSelf && person.openToMessages !== false && (
+              <button className="btn btn-primary btn-sm" onClick={write} disabled={opening || !!threadId}>
+                {opening ? "One moment…" : threadId ? "Writing below" : "Message"}
+              </button>
+            )}
           </div>
-          {/* Hidden for your own profile, and for anyone who has turned
-              messages off — though the server is what actually refuses. */}
-          {!person.isSelf && person.openToMessages !== false && (
-            <button className="btn btn-primary btn-sm" style={{ marginTop: 16, width: "100%" }}
-              onClick={write} disabled={opening || !!threadId}>
-              {opening ? "One moment…" : threadId ? "Writing below" : "Message"}
-            </button>
-          )}
         </div>
+      </div>
 
+      <div className="profile-body">
         <div>
-          <h1 className="h-1">{person.first} {person.last}</h1>
-          {person.pronouns && <div className="meta" style={{ marginTop: 6 }}>{person.pronouns}</div>}
-
-          <div style={{ marginTop: 18 }}>
+          <div style={{ marginTop: 0 }}>
             {title && <div className="h-3">{title}</div>}
             {org && <div className="lede" style={{ marginTop: 2 }}>{org}</div>}
             <div className="meta" style={{ marginTop: 10, display: "flex", gap: 18, flexWrap: "wrap" }}>
@@ -2859,7 +2986,7 @@ function ProfileScreen({ userId, onBack, onUnreadChange }) {
             <p className="meta">No programs listed yet.</p>
           )}
           {person.involvement && (
-            <p style={{ margin: "16px 0 0", whiteSpace: "pre-wrap", maxWidth: 640 }}>
+            <p style={{ margin: "16px 0 0", whiteSpace: "pre-wrap" }}>
               {person.involvement}
             </p>
           )}
@@ -2868,7 +2995,7 @@ function ProfileScreen({ userId, onBack, onUnreadChange }) {
             <>
               <hr className="rule" style={{ margin: "28px 0" }} />
               <h2 className="h-2" style={{ marginBottom: 12 }}>About</h2>
-              <p style={{ margin: 0, whiteSpace: "pre-wrap", maxWidth: 640 }}>{person.bio}</p>
+              <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{person.bio}</p>
             </>
           )}
 
@@ -2876,7 +3003,7 @@ function ProfileScreen({ userId, onBack, onUnreadChange }) {
             <>
               <hr className="rule" style={{ margin: "28px 0" }} />
               <h2 className="h-2" style={{ marginBottom: 12 }}>Students should reach out about</h2>
-              <p style={{ margin: 0, whiteSpace: "pre-wrap", maxWidth: 640 }}>{person.reachOut}</p>
+              <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{person.reachOut}</p>
             </>
           )}
 
@@ -2930,6 +3057,9 @@ function MyProfileScreen({ me, onSaved }) {
   const [busy, setBusy] = React.useState(false);
   const [selfRace, setSelfRace] = React.useState("");
   const [selfRaceOpen, setSelfRaceOpen] = React.useState(false);
+  const [photoBusy, setPhotoBusy] = React.useState(false);
+  const [photoError, setPhotoError] = React.useState("");
+  const fileRef = React.useRef(null);
 
   React.useEffect(() => {
     Promise.all([
@@ -2981,6 +3111,37 @@ function MyProfileScreen({ me, onSaved }) {
   const toggleProgram = toggleIn("programs");
   const toggleRace = toggleIn("raceEthnicity");
 
+  // The photo is sent on its own, not with the rest of the form: it is the
+  // one field where you want to see the result before you decide to save.
+  const uploadPhoto = async (file) => {
+    setPhotoError("");
+    setPhotoBusy(true);
+    try {
+      const dataUrl = await squareJpeg(file);
+      const r = await api.put("/api/users/me/photo", { dataUrl });
+      setForm((f) => ({ ...f, photoUrl: r.photoUrl }));
+      onSaved();
+    } catch (err) {
+      setPhotoError(err.message || "That photo could not be read.");
+    } finally {
+      setPhotoBusy(false);
+    }
+  };
+
+  const removePhoto = async () => {
+    setPhotoError("");
+    setPhotoBusy(true);
+    try {
+      await api.del("/api/users/me/photo");
+      setForm((f) => ({ ...f, photoUrl: "" }));
+      onSaved();
+    } catch (err) {
+      setPhotoError(err.message);
+    } finally {
+      setPhotoBusy(false);
+    }
+  };
+
   // The self-describe chip opens a box rather than adding a chip. What gets
   // typed there is one more entry in raceEthnicity, folded in on save.
   const openSelfRace = () => {
@@ -3005,7 +3166,6 @@ function MyProfileScreen({ me, onSaved }) {
         pronouns: blank(form.pronouns),
         year: Number(form.year),
         location: blank(form.location),
-        photoUrl: blank(form.photoUrl),
         career: blank(form.career),
         industry: blank(form.industry),
         concentration: blank(form.concentration),
@@ -3067,7 +3227,7 @@ function MyProfileScreen({ me, onSaved }) {
         <hr className="rule" style={{ margin: "36px 0 28px" }} />
         <h2 className="h-2" style={{ marginBottom: 18 }}>You now</h2>
         <div className="two-up">
-          <Field label="Where you live" hint="Written as City, ST.">
+          <Field label="Where you live">
             <Combo label="Where you live" placeholder="Where you live" options={vocab.cities}
               max={8} value={form.location}
               onChange={(v) => setForm((f) => ({ ...f, location: v }))}
@@ -3082,32 +3242,38 @@ function MyProfileScreen({ me, onSaved }) {
           <input className="input" value={form.career} onChange={set("career")}
             placeholder="What you do" />
         </Field>
-        <Field label="Photo"
-          hint="A link straight to a JPEG or PNG — the image itself, not the page it sits on.">
+        <div className="field">
+          <span className="eyebrow" style={{ display: "block", marginBottom: 7 }}>Photo</span>
           <div className="photo-field">
-            <input className="input" value={form.photoUrl} onChange={set("photoUrl")}
-              placeholder="https://example.com/you.jpg" />
-            {/* The preview is the check that matters: a link to a page rather
-                than to an image simply will not draw. */}
-            {form.photoUrl.trim() && (
-              <span className="photo-preview">
-                <img src={form.photoUrl.trim()} alt=""
-                  onError={(e) => { e.target.style.display = "none"; }}
-                  onLoad={(e) => { e.target.style.display = "block"; }} />
-              </span>
-            )}
-          </div>
-          {form.photoUrl.trim() && !IMAGE_URL.test(form.photoUrl.trim()) && (
-            <span className="meta" style={{ marginTop: 6, display: "block" }}>
-              That does not look like an image file. It should end in .jpg, .jpeg, .png, or .webp.
+            <span className="photo-preview photo-preview-lg">
+              {form.photoUrl
+                ? <img src={form.photoUrl} alt="" />
+                : <span className="initials" style={{ fontSize: 20 }}>{initials(form.first, form.last)}</span>}
             </span>
-          )}
-        </Field>
+            <div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button type="button" className="btn btn-ghost btn-sm"
+                  onClick={() => fileRef.current && fileRef.current.click()} disabled={photoBusy}>
+                  {photoBusy ? "Working…" : form.photoUrl ? "Replace photo" : "Upload a photo"}
+                </button>
+                {form.photoUrl && (
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={removePhoto} disabled={photoBusy}>
+                    Remove
+                  </button>
+                )}
+              </div>
+              {photoError && <span className="meta" style={{ marginTop: 6, display: "block" }}>{photoError}</span>}
+            </div>
+            <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp"
+              style={{ display: "none" }} aria-label="Choose a photo"
+              onChange={(e) => { const f = e.target.files && e.target.files[0]; e.target.value = ""; if (f) uploadPhoto(f); }} />
+          </div>
+        </div>
         <Field label="About you"><textarea className="input" value={form.bio} onChange={set("bio")} placeholder="About you" /></Field>
 
         <hr className="rule" style={{ margin: "36px 0 28px" }} />
         <h2 className="h-2" style={{ marginBottom: 18 }}>You at PBHA</h2>
-        <Field label="Role" hint="The most senior role you held.">
+        <Field label="Role">
           <Select value={form.pbhaRole} label="Role"
             onChange={(v) => setForm((f) => ({ ...f, pbhaRole: v }))}
             options={[{ value: "", label: "Not listed" }].concat(
@@ -3198,6 +3364,7 @@ function App() {
   const [profileId, setProfileId] = React.useState(null);
   const [threadId, setThreadId] = React.useState(null);
   const [unread, setUnread] = React.useState(0);
+  const [draftFor, setDraftFor] = React.useState(null);
 
   const loadMe = React.useCallback(async () => {
     try {
@@ -3233,6 +3400,23 @@ function App() {
 
   const openProfile = (id) => { setProfileId(id); setScreen("profile"); };
 
+  // Message from a directory card: open the conversation with that person
+  // and land on it, with their name already in the box so the message is
+  // addressed rather than starting from a blank line.
+  const messageFromDirectory = async (person) => {
+    try {
+      const { threadId: id } = await api.post("/api/messages/open", { userId: person.userId });
+      setDraftFor({ threadId: id, text: `Hi ${person.first}, ` });
+      setThreadId(id);
+      setProfileId(null);
+      setScreen("messages");
+    } catch {
+      // Refused (they have messages off, or they are gone): their profile
+      // is the honest place to land, and it says so there.
+      openProfile(person.userId);
+    }
+  };
+
   return (
     <>
       <SiteBar />
@@ -3259,10 +3443,12 @@ function App() {
       {screen !== "donate" && me === undefined && <div className="wrap page"><p className="meta">Loading…</p></div>}
       {screen !== "donate" && me === null && <GateScreen onSignedIn={loadMe} />}
       {me && screen === "welcome" && <WelcomeScreen me={me} setScreen={setScreen} />}
-      {me && screen === "directory" && <DirectoryScreen onOpenProfile={openProfile} />}
+      {me && screen === "directory" && (
+        <DirectoryScreen onOpenProfile={openProfile} onMessage={messageFromDirectory} />
+      )}
       {me && screen === "messages" && (
         <MessagesScreen openThreadId={threadId} onOpenProfile={openProfile}
-          onUnreadChange={refreshUnread} />
+          draftFor={draftFor} onUnreadChange={refreshUnread} />
       )}
       {me && screen === "study" && <StudyScreen />}
       {me && screen === "archives" && <ArchivesScreen />}

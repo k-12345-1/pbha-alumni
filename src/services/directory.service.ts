@@ -130,8 +130,26 @@ export const searchDirectory = async (q: DirectoryQuery, viewerId: string) => {
   // DB-side ordering survives within each group.
   items.sort((a, b) => Number(!!b.claimedAt) - Number(!!a.claimedAt));
 
+  // Who on this page can be written to. One query for the whole page rather
+  // than one per card, and the answer is only ever used to decide whether to
+  // draw a Message button — openThread on the server is what actually
+  // refuses a member who has messages off.
+  const closed = new Set(
+    (
+      await prisma.privacySettings.findMany({
+        where: { userId: { in: items.map((it) => it.userId) }, openToMessages: false },
+        select: { userId: true },
+      })
+    ).map((r) => r.userId),
+  );
+
   return {
-    items: items.map((it) => ({ ...it, isCurrentStudent: isCurrentStudent(it.year) })),
+    items: items.map((it) => ({
+      ...it,
+      isCurrentStudent: isCurrentStudent(it.year),
+      isSelf: it.userId === viewerId,
+      openToMessages: !closed.has(it.userId),
+    })),
     meta: buildPageMeta(q, total),
   };
 };

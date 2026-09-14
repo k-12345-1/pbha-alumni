@@ -2,7 +2,7 @@ import { Router } from "express";
 import { asyncHandler } from "../lib/async-handler";
 import { requireAuth } from "../middleware/requireAuth";
 import { validate } from "../middleware/validate";
-import { privacyUpdateSchema, profileUpdateSchema } from "../schemas/user.schema";
+import { photoUploadSchema, privacyUpdateSchema, profileUpdateSchema } from "../schemas/user.schema";
 import * as userService from "../services/user.service";
 
 export const usersRouter = Router();
@@ -30,6 +30,27 @@ usersRouter.patch(
   validate(profileUpdateSchema),
   asyncHandler(async (req, res) => {
     res.json(await userService.updateMyProfile(req.auth!.sub, req.body));
+  }),
+);
+
+// A photo arrives as a base64 data URL in JSON rather than as multipart,
+// so the request goes through the same body parser, validation and auth as
+// every other write. The client downscales first; see the size cap in the
+// service for what actually gets enforced.
+usersRouter.put(
+  "/me/photo",
+  requireAuth,
+  validate(photoUploadSchema),
+  asyncHandler(async (req, res) => {
+    res.json(await userService.setMyPhoto(req.auth!.sub, req.body.dataUrl));
+  }),
+);
+
+usersRouter.delete(
+  "/me/photo",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    res.json(await userService.clearMyPhoto(req.auth!.sub));
   }),
 );
 
