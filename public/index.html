@@ -457,7 +457,7 @@ footer.site {
    contact details — stays selectable. */
 .chip, .stamp, .stamp-year, .scope-btn, .btn, .check, .eyebrow,
 .person-card, .row-person, nav.site-nav button, .map-btn, .account-btn, .account-menu button,
-.pill-select, .pill-menu button, .site-bar-here, .combo-toggle {
+.pill-select, .pill-menu button, .site-bar-here, .combo-toggle, .amount {
   -webkit-user-select: none;
   user-select: none;
 }
@@ -725,6 +725,50 @@ footer.site {
 }
 .combo-toggle:hover { color: var(--orange); }
 .combo-menu { left: 0; right: auto; min-width: 100%; max-height: 260px; overflow-y: auto; }
+
+/* ---------- donate ---------- */
+
+.give-layout { display: grid; grid-template-columns: 1fr 340px; gap: 56px; align-items: start; }
+
+.amount-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; max-width: 620px; }
+.amount {
+  padding: 16px 12px;
+  border: 1px solid var(--rule);
+  background: var(--white);
+  border-radius: 2px;
+  font-size: 16px; font-weight: 600; color: var(--ink);
+  cursor: pointer;
+  transition: border-color .12s, background .12s, color .12s;
+}
+.amount:hover { border-color: var(--ink); }
+.amount.is-on { background: var(--orange); border-color: var(--orange); color: var(--white); }
+
+.pill-row { display: flex; flex-wrap: wrap; gap: 8px; max-width: 700px; }
+
+.give-summary {
+  position: sticky;
+  top: 90px;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 24px;
+}
+.give-total { font-size: 40px; font-weight: 700; line-height: 1.1; color: var(--orange); }
+.give-lines { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 0; font-size: 13.5px; }
+.give-lines dt { color: var(--ink-mute); }
+.give-lines dd { margin: 0; font-weight: 500; }
+
+.society-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.society { border-top: 2px solid var(--orange); padding-top: 14px; }
+.society-level { font-size: 13px; font-weight: 700; color: var(--orange); margin-bottom: 6px; }
+
+@media (max-width: 1000px) {
+  .give-layout { grid-template-columns: 1fr; gap: 32px; }
+  .give-summary { position: static; }
+  .society-row { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 620px) {
+  .society-row { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -844,7 +888,7 @@ const Social = {
   ),
 };
 
-function SiteBar() {
+function SiteBar({ onDonate }) {
   return (
     <div className="site-bar">
       <div className="site-bar-inner">
@@ -866,8 +910,7 @@ function SiteBar() {
           <a href="https://www.linkedin.com/company/phillips-brooks-house-association-inc-" target="_blank" rel="noopener noreferrer" aria-label="PBHA on LinkedIn"><Social.linkedin /></a>
           <a href="https://www.instagram.com/pbha" target="_blank" rel="noopener noreferrer" aria-label="PBHA on Instagram"><Social.instagram /></a>
           <a href="mailto:pbha@pbha.org" aria-label="Email PBHA"><Social.mail /></a>
-          <a className="btn btn-primary btn-sm" href="https://donatenow.networkforgood.org/1439676"
-            target="_blank" rel="noopener noreferrer">Donate</a>
+          <button className="btn btn-primary btn-sm" onClick={onDonate}>Donate</button>
         </div>
       </div>
     </div>
@@ -1311,6 +1354,228 @@ function ArchivesScreen() {
     <div className="wrap page">
       <h1 className="h-1 accent">Archives</h1>
       <hr className="rule" style={{ margin: "22px 0 32px" }} />
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Donate
+ *
+ * PBHA takes gifts through two hosted forms that disagree with each
+ * other: Network for Good (amounts $25-$5,000; One Time / Monthly /
+ * Quarterly / Annual; a designation dropdown) and Click & Pledge for
+ * Road to the 125th (amounts $25-$25,000; One time / Yearly; a
+ * multiyear pledge question; no designation). Both ask the Harvard
+ * class-credit question and both offer anonymous giving.
+ *
+ * This page is the front of that, in PBHA's own layout: it gathers the
+ * choices in one place and hands off to whichever processor can take
+ * the gift. It deliberately collects NO payment details — card entry
+ * stays on the processor's secured page, which is also the only place
+ * it belongs.
+ * ------------------------------------------------------------------ */
+
+const GIFT_AMOUNTS = [25, 50, 100, 250, 500, 1000, 2500, 5000];
+
+const FREQUENCIES = [
+  { key: "once", label: "One time" },
+  { key: "monthly", label: "Monthly" },
+  { key: "quarterly", label: "Quarterly" },
+  { key: "annual", label: "Annual" },
+];
+
+// Network for Good's designation list, verbatim.
+const DESIGNATIONS = [
+  "General Program Support",
+  "Summer Urban Program (SUP)",
+  "Harvard Square Homeless Shelter",
+  "Y2Y Harvard Square",
+  "Road to the 125th",
+];
+
+const SOCIETIES = [
+  ["125th Leadership Committee", "$25,000+ a year"],
+  ["Road to the 125th Champion", "$5,000+ a year"],
+  ["125th Road Builder", "$500+ a year"],
+  ["Sustaining Donor", "$20 to $100 a month"],
+];
+
+const NFG_URL = "https://donatenow.networkforgood.org/1439676";
+const CP_URL = "https://connect.clickandpledge.com/Organization/pbha/campaign/125Donation";
+
+function DonateScreen({ me }) {
+  const [amount, setAmount] = React.useState(100);
+  const [other, setOther] = React.useState("");
+  const [frequency, setFrequency] = React.useState("once");
+  const [designation, setDesignation] = React.useState(DESIGNATIONS[0]);
+  const [classCredit, setClassCredit] = React.useState(false);
+  const [anonymous, setAnonymous] = React.useState(false);
+
+  const value = amount === "other" ? Number(other) || 0 : amount;
+  const fmt = (n) => "$" + n.toLocaleString("en-US");
+
+  // Road to the 125th is run through Click & Pledge, everything else
+  // through Network for Good — and Click & Pledge only takes one-time and
+  // yearly gifts, so a monthly pledge to the campaign has to go the other
+  // way. Sending someone to a processor that cannot take their gift is
+  // worse than sending them one click further.
+  const campaign = designation === "Road to the 125th";
+  const cpCanTake = frequency === "once" || frequency === "annual";
+  const processor = campaign && cpCanTake ? "clickandpledge" : "networkforgood";
+  const href = processor === "clickandpledge" ? CP_URL : NFG_URL;
+
+  return (
+    <div className="wrap page">
+      <h1 className="h-1 accent">Donate</h1>
+      <hr className="rule" style={{ margin: "22px 0 32px" }} />
+
+      <p className="lede" style={{ maxWidth: 720, marginBottom: 36 }}>
+        Students raise nearly half of PBHA's budget every year. Gifts from alumni are what
+        keep <span className="em-u">80+ programs</span> running for the
+        <span className="em-n"> 1,500</span> students and
+        <span className="em-n"> 10,000</span> neighbours they serve.
+      </p>
+
+      <div className="give-layout">
+        <div>
+          <h2 className="h-2" style={{ marginBottom: 16 }}>Choose your gift</h2>
+          <div className="amount-grid">
+            {GIFT_AMOUNTS.map((a) => (
+              <button key={a} className={`amount ${amount === a ? "is-on" : ""}`}
+                onClick={() => setAmount(a)}>{fmt(a)}</button>
+            ))}
+            <button className={`amount ${amount === "other" ? "is-on" : ""}`}
+              onClick={() => setAmount("other")}>Other</button>
+          </div>
+          {amount === "other" && (
+            <div style={{ marginTop: 14, maxWidth: 240 }}>
+              <input className="input" inputMode="decimal" value={other} placeholder="Amount"
+                aria-label="Other amount"
+                onChange={(e) => setOther(e.target.value.replace(/[^0-9.]/g, ""))} />
+            </div>
+          )}
+
+          <h2 className="h-2" style={{ margin: "36px 0 16px" }}>How often</h2>
+          <div className="pill-row">
+            {FREQUENCIES.map((f) => (
+              <button key={f.key} className={`chip ${frequency === f.key ? "is-on" : ""}`}
+                onClick={() => setFrequency(f.key)}>{f.label}</button>
+            ))}
+          </div>
+          <p className="meta" style={{ marginTop: 10 }}>
+            A recurring gift is the steadiest support PBHA can plan around.
+          </p>
+
+          <h2 className="h-2" style={{ margin: "36px 0 16px" }}>Where it goes</h2>
+          <div className="pill-row">
+            {DESIGNATIONS.map((d) => (
+              <button key={d} className={`chip ${designation === d ? "is-on" : ""}`}
+                onClick={() => setDesignation(d)}>{d}</button>
+            ))}
+          </div>
+
+          <h2 className="h-2" style={{ margin: "36px 0 16px" }}>A few options</h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14, maxWidth: 640 }}>
+            <label className={`check ${classCredit ? "is-on" : ""}`}
+              onClick={(e) => { e.preventDefault(); setClassCredit(!classCredit); }}>
+              <span className="box" />
+              <span>
+                Count this toward my Harvard College class credit.
+                <span className="meta"> Harvard keeps 15% of a gift made this way, for administration.</span>
+              </span>
+            </label>
+            <label className={`check ${anonymous ? "is-on" : ""}`}
+              onClick={(e) => { e.preventDefault(); setAnonymous(!anonymous); }}>
+              <span className="box" />
+              <span>Make my donation anonymously.</span>
+            </label>
+          </div>
+        </div>
+
+        <aside className="give-summary">
+          <div className="eyebrow" style={{ marginBottom: 14 }}>Your gift</div>
+          <div className="give-total">{value > 0 ? fmt(value) : "—"}</div>
+          <div className="meta" style={{ marginTop: 4 }}>
+            {FREQUENCIES.find((f) => f.key === frequency).label.toLowerCase()}
+            {frequency !== "once" && ", until you stop it"}
+          </div>
+
+          <hr className="rule" style={{ margin: "20px 0" }} />
+
+          <dl className="give-lines">
+            <dt>Going to</dt><dd>{designation}</dd>
+            {me && me.profile && me.profile.year && (
+              <><dt>Class year</dt><dd>{me.profile.year}</dd></>
+            )}
+            {classCredit && (<><dt>Class credit</dt><dd>Yes — Harvard keeps 15%</dd></>)}
+            {anonymous && (<><dt>Anonymous</dt><dd>Yes</dd></>)}
+          </dl>
+
+          <a className="btn btn-primary" style={{ width: "100%", marginTop: 20 }}
+            href={href} target="_blank" rel="noopener noreferrer">Continue to payment</a>
+
+          {/* Said plainly rather than buried: this page takes no card
+              details, and the choices above do not travel with the link. */}
+          <p className="meta" style={{ marginTop: 14, fontSize: 12.5 }}>
+            Payment is completed on PBHA's secured page
+            {processor === "clickandpledge" ? " at Click & Pledge" : " at Network for Good"}.
+            Nothing is charged here, and you will re-enter your amount there.
+          </p>
+          {campaign && !cpCanTake && (
+            <p className="meta" style={{ marginTop: 10, fontSize: 12.5 }}>
+              The 125th campaign form takes one-time and yearly gifts only, so a
+              {" " + frequency} gift goes through PBHA's main donation page instead.
+            </p>
+          )}
+        </aside>
+      </div>
+
+      <hr className="rule" style={{ margin: "56px 0 32px" }} />
+
+      <h2 className="h-2" style={{ marginBottom: 8 }}>Giving societies</h2>
+      <p className="meta" style={{ marginBottom: 24, maxWidth: 680 }}>
+        Road to the 125th is a five-year campaign toward PBHA's anniversary in 2029, aiming to
+        raise annual giving by $1.3 million and take alumni participation from one in ten to
+        one in four.
+      </p>
+      <div className="society-row">
+        {SOCIETIES.map(([name, level]) => (
+          <div key={name} className="society">
+            <div className="society-level">{level}</div>
+            <div className="h-3">{name}</div>
+          </div>
+        ))}
+      </div>
+
+      <hr className="rule" style={{ margin: "48px 0 32px" }} />
+
+      <h2 className="h-2" style={{ marginBottom: 20 }}>Other ways to give</h2>
+      <div className="link-grid">
+        <div className="link-card" style={{ cursor: "default" }}>
+          <div className="h-3">By check</div>
+          <p className="meta">
+            Phillips Brooks House Association, 1 Harvard Yard, Cambridge, MA 02138. Write your
+            designation on the memo line.
+          </p>
+        </div>
+        <a className="link-card" href="https://community.alumni.harvard.edu/give/16040771"
+          target="_blank" rel="noopener noreferrer">
+          <div className="h-3">Through Harvard, for class credit</div>
+          <p className="meta">
+            Fund &ldquo;General Support of the PBHA Fund&rdquo;, allocation code 310-330584RG.
+            Harvard keeps 15%.
+          </p>
+          <span className="tile-cta">Harvard giving →</span>
+        </a>
+        <a className="link-card" href="https://forms.gle/dH8MTUAXPabQmqXp7"
+          target="_blank" rel="noopener noreferrer">
+          <div className="h-3">Pledge over several years</div>
+          <p className="meta">
+            Tell PBHA what you intend to give between now and 2029 so they can plan against it.
+          </p>
+          <span className="tile-cta">Pledge form →</span>
+        </a>
+      </div>
     </div>
   );
 }
@@ -2377,7 +2642,7 @@ function App() {
 
   return (
     <>
-      <SiteBar />
+      <SiteBar onDonate={() => { setScreen("donate"); setProfileId(null); }} />
 
       {me && (
         <div className="wrap section-tabs">
@@ -2392,8 +2657,9 @@ function App() {
         </div>
       )}
 
-      {me === undefined && <div className="wrap page"><p className="meta">Loading…</p></div>}
-      {me === null && <GateScreen onSignedIn={loadMe} />}
+      {screen === "donate" && <DonateScreen me={me} />}
+      {screen !== "donate" && me === undefined && <div className="wrap page"><p className="meta">Loading…</p></div>}
+      {screen !== "donate" && me === null && <GateScreen onSignedIn={loadMe} />}
       {me && screen === "welcome" && <WelcomeScreen me={me} setScreen={setScreen} />}
       {me && screen === "directory" && <DirectoryScreen onOpenProfile={openProfile} />}
       {me && screen === "study" && <StudyScreen />}
