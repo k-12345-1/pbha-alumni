@@ -73,11 +73,12 @@ button, input, select, textarea { font-family: inherit; }
 
 h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: 0.01em; }
 
+/* Page title: black, 53px, 30px of air beneath it, no rule. */
 .h-display { font-size: clamp(40px, 5.2vw, 67px); line-height: 1.4; }
-.h-1 { font-size: clamp(34px, 3.9vw, 53px); line-height: 1.19; }
-/* Their section heads are orange by default — that is the single strongest
-   signature of the site, so it is the default here too. */
-.h-2 { font-size: clamp(26px, 2.4vw, 32px); line-height: 1.25; color: var(--orange); }
+.h-1 { font-size: clamp(34px, 3.9vw, 53px); line-height: 1.19; margin-bottom: 30px; }
+/* Subheads carry the orange. This is their whole system: black title,
+   orange heads beneath it. */
+.h-2 { font-size: clamp(26px, 2.4vw, 32px); line-height: 1.25; color: var(--orange); margin-bottom: 20px; }
 .h-3 { font-size: 20px; line-height: 1.3; }
 .accent { color: var(--orange); }
 /* Orange inline emphasis on numbers and key phrases, the way their body copy
@@ -85,7 +86,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: 0.01em; }
 .em-n { color: var(--orange); font-weight: 700; }
 .em-u { text-decoration: underline; text-underline-offset: 3px; }
 
-.lede { font-size: 18.5px; line-height: 1.6; font-weight: 500; color: var(--ink); }
+.lede { font-size: 18.5px; line-height: 1.6; font-weight: 500; color: var(--ink); max-width: 1060px; }
 
 .eyebrow {
   font-size: 11px;
@@ -102,7 +103,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: 0.01em; }
 /* Vertical only — a padding shorthand here would reset the horizontal
    gutter .wrap sets, which is what had been pinning body content to the
    left edge while the header sat correctly inset. */
-.page { padding-top: 26px; padding-bottom: 110px; }
+.page { padding-top: 64px; padding-bottom: 120px; }
 .rule { height: 1px; background: var(--rule); border: 0; }
 
 
@@ -113,7 +114,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: 0.01em; }
 /* Vertical only. A padding shorthand here resets the horizontal gutter
    .wrap sets, which pins the tabs to the window edge — the same trap that
    caught .page. */
-.section-tabs { padding-top: 30px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.section-tabs { padding-top: 26px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 
 /* Sentence case, 15px/500, black — not uppercase. */
 nav.site-nav { display: flex; align-items: center; gap: 24px; }
@@ -174,11 +175,12 @@ textarea.input { min-height: 100px; resize: vertical; line-height: 1.55; }
 
 .search {
   display: flex; align-items: center; gap: 10px;
-  border: 1px solid var(--ink);
-  border-radius: 300px;
-  padding: 12px 20px;
+  border: 1px solid var(--rule);
+  padding: 12px 14px;
   background: var(--white);
+  color: var(--ink-mute);
 }
+.search:focus-within { border-color: var(--ink); }
 .search input { border: 0; outline: 0; flex: 1; font-size: 14px; font-weight: 500; background: transparent; }
 
 .chip {
@@ -202,18 +204,17 @@ textarea.input { min-height: 100px; resize: vertical; line-height: 1.55; }
 .scope-btn {
   text-align: left;
   width: 100%;
-  padding: 11px 18px;
-  border-radius: 300px;
-  border: 1px solid var(--rule);
-  background: transparent;
+  padding: 7px 0;
+  border: 0;
+  background: none;
   color: var(--ink-soft);
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: all .12s;
+  transition: color .12s;
 }
-.scope-btn:hover { border-color: var(--ink); }
-.scope-btn.is-on { background: var(--orange); border-color: var(--orange); color: var(--white); }
+.scope-btn:hover { color: var(--orange); }
+.scope-btn.is-on { color: var(--orange); font-weight: 600; }
 
 .check {
   display: flex; align-items: flex-start; gap: 10px;
@@ -242,15 +243,17 @@ textarea.input { min-height: 100px; resize: vertical; line-height: 1.55; }
   display: flex; flex-direction: column;
   text-align: left; padding: 0; overflow: hidden;
   cursor: pointer;
-  transition: border-color .15s;
+  border: 0;
+  border-radius: 0;
+  background: none;
 }
-.person-card:hover { border-color: var(--orange); }
+.person-card .h-3 { transition: color .15s; }
+.person-card:hover .h-3 { color: var(--orange); }
 .person-photo {
   aspect-ratio: 5 / 4;
   background: var(--wash-2);
   display: grid; place-items: center;
   position: relative;
-  border-bottom: 1px solid var(--rule);
   overflow: hidden;
 }
 .person-photo img { width: 100%; height: 100%; object-fit: cover; }
@@ -271,9 +274,9 @@ textarea.input { min-height: 100px; resize: vertical; line-height: 1.55; }
   border-radius: 300px; padding: 5px 12px;
   font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
 }
-.person-body { padding: 18px 20px 22px; }
+.person-body { padding: 16px 0 0; }
 
-.grid-people { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.grid-people { display: grid; grid-template-columns: repeat(3, 1fr); gap: 44px 32px; }
 
 .row-person {
   display: grid;
@@ -303,7 +306,7 @@ textarea.input { min-height: 100px; resize: vertical; line-height: 1.55; }
 .fact-list li { font-size: 15px; font-weight: 500; line-height: 1.6; margin-bottom: 8px; }
 .fact-list li::before { content: "·"; color: var(--orange); font-weight: 700; margin-right: 10px; }
 
-.empty { padding: 72px 24px; text-align: center; color: var(--ink-mute); }
+.empty { padding: 72px 0; color: var(--ink-mute); border: 0; }
 
 .banner {
   border-left: 3px solid var(--orange);
@@ -507,27 +510,30 @@ footer.site {
 
 /* ---------- welcome ---------- */
 
+/* No boxes: their pages are headings, text, and space. */
 .link-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+  gap: 44px 48px;
 }
 .link-card {
   display: block;
   text-align: left;
-  background: var(--white);
-  border: 1px solid var(--rule);
-  border-radius: 2px;
-  padding: 24px;
+  background: none;
+  border: 0;
+  padding: 0;
   cursor: pointer;
   text-decoration: none;
   color: inherit;
   font: inherit;
-  transition: border-color .15s;
 }
-.link-card:hover { border-color: var(--orange); }
-.link-card p { margin: 10px 0 16px; }
-.tile-cta { font-size: 13px; font-weight: 600; color: var(--orange); }
+.link-card .h-3 { transition: color .15s; }
+.link-card:hover .h-3 { color: var(--orange); }
+.link-card p { margin: 8px 0 12px; }
+.tile-cta {
+  font-size: 15px; font-weight: 500; color: var(--orange);
+  text-decoration: underline; text-underline-offset: 3px;
+}
 
 /* ---------- study ---------- */
 
@@ -750,9 +756,8 @@ footer.site {
 .give-summary {
   position: sticky;
   top: 90px;
-  border: 1px solid var(--rule);
-  border-radius: 2px;
-  padding: 24px;
+  border-top: 2px solid var(--orange);
+  padding-top: 22px;
 }
 .give-total { font-size: 40px; font-weight: 700; line-height: 1.1; color: var(--orange); }
 .give-lines { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 0; font-size: 13.5px; }
@@ -1166,7 +1171,7 @@ function GateScreen({ onSignedIn }) {
     <div className="wrap page">
       <div className="gate">
         <div className="eyebrow" style={{ marginBottom: 20 }}>Phillips Brooks House Association</div>
-        <h1 className="h-1 accent">Alumni Network</h1>
+        <h1 className="h-1">Alumni Network</h1>
 
         <div className="gate-tabs">
           <button className={`btn ${mode === "signin" ? "btn-primary" : "btn-ghost"}`}
@@ -1271,8 +1276,7 @@ function WelcomeScreen({ me, setScreen }) {
   const first = (me.profile && me.profile.first) || "";
   return (
     <div className="wrap page">
-      <h1 className="h-1 accent">{first ? `Hi, ${first}.` : "Hi."}</h1>
-      <hr className="rule" style={{ margin: "22px 0 32px" }} />
+      <h1 className="h-1">{first ? `Hi, ${first}.` : "Hi."}</h1>
 
       <h2 className="h-2" style={{ marginBottom: 8 }}>Ways to stay involved</h2>
       <p className="meta" style={{ marginBottom: 24, maxWidth: 640 }}>
@@ -1309,8 +1313,7 @@ function WelcomeScreen({ me, setScreen }) {
 function StudyScreen() {
   return (
     <div className="wrap page">
-      <h1 className="h-1 accent">Alumni Study</h1>
-      <hr className="rule" style={{ margin: "22px 0 32px" }} />
+      <h1 className="h-1">Alumni Study</h1>
     </div>
   );
 }
@@ -1325,8 +1328,7 @@ function StudyScreen() {
 function ArchivesScreen() {
   return (
     <div className="wrap page">
-      <h1 className="h-1 accent">Archives</h1>
-      <hr className="rule" style={{ margin: "22px 0 32px" }} />
+      <h1 className="h-1">Archives</h1>
     </div>
   );
 }
@@ -1399,8 +1401,7 @@ function DonateScreen({ me }) {
 
   return (
     <div className="wrap page">
-      <h1 className="h-1 accent">Donate</h1>
-      <hr className="rule" style={{ margin: "22px 0 32px" }} />
+      <h1 className="h-1">Donate</h1>
 
       <p className="lede" style={{ maxWidth: 720, marginBottom: 36 }}>
         Students raise nearly half of PBHA's budget every year. Gifts from alumni are what
@@ -2054,8 +2055,7 @@ function DirectoryScreen({ onOpenProfile }) {
 
   return (
     <div className="wrap page">
-      <h1 className="h-1 accent">Directory</h1>
-      <hr className="rule" style={{ margin: "22px 0 32px" }} />
+      <h1 className="h-1">Directory</h1>
 
       <div className="directory-layout" style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: 44 }}>
         <aside className="directory-rail">
@@ -2471,7 +2471,7 @@ function MyProfileScreen({ me, onSaved }) {
 
   return (
     <div className="wrap page" style={{ maxWidth: 880 }}>
-      <h1 className="h-1 accent">Your profile</h1>
+      <h1 className="h-1">Your profile</h1>
       <p className="lede" style={{ marginTop: 12 }}>
         This is what other PBHA members see in the directory.
       </p>
