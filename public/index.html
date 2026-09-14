@@ -87,9 +87,11 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: 0.01em; }
    through the middle and flicks up at its end, the way a marker does.
    text-decoration cannot curve, so this is an SVG behind the text.
    box-decoration-break: clone gives each line its own stroke when the
-   phrase wraps, instead of one stroke stretched across both. */
+   phrase wraps, instead of one stroke stretched across both — and since
+   the path is stretched to each fragment's width, its vertical travel is
+   kept shallow so a short fragment does not squash into a steep hook. */
 .em-u {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 14' preserveAspectRatio='none'%3E%3Cpath d='M3 6.2C58 10.4 152 11.6 236 8.2c22-.9 40-2.6 58-5.4' fill='none' stroke='%23f98715' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 14' preserveAspectRatio='none'%3E%3Cpath d='M3 7C58 9.6 152 10.1 236 8.5c22-.4 40-1.2 58-2.6' fill='none' stroke='%23f98715' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: left calc(100% - 0.02em);
   background-size: 100% 0.30em;
