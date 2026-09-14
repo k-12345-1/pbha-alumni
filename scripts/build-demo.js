@@ -159,9 +159,14 @@ const runtime = `
 
     if (url === "/api/auth/me") {
       if (!signedIn) return Promise.reject(Object.assign(new Error("Sign in required"), { status: 401 }));
+      // The name stays fixed, but the photo is read from the live record so
+      // an upload reaches the header avatar the way it does against a real
+      // server.
+      var self = PROFILES.filter(function (p) { return p.userId === VIEWER_ID; })[0] || {};
       return Promise.resolve({
         id: VIEWER_ID, email: "demo@pbha.example", role: "ALUM", status: "ACTIVE",
-        profile: { first: "Demo", last: "Viewer" }, privacy: null,
+        profile: { first: "Demo", last: "Viewer", photoUrl: self.photoUrl || null },
+        privacy: null,
       });
     }
     if (url === "/api/auth/signin" || url === "/api/auth/signup") { signedIn = true; return Promise.resolve({ userId: VIEWER_ID }); }
