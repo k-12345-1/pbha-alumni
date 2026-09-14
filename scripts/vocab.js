@@ -31,7 +31,7 @@ const INDUSTRIES = [
   "Education", "Healthcare", "Business", "Legal", "Government", "Social Services",
   "Sciences", "Technology", "Arts & Media", "Community Organizing", "Finance",
   "Health & Medicine", "Housing", "Journalism", "Law & Policy", "Nonprofit",
-  "Philanthropy", "Public Health", "Research", "Student",
+  "Philanthropy", "Public Health", "Research", "Student", "Other",
 ];
 
 const PBHA_ROLES = [

@@ -83,7 +83,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: 0.01em; }
 /* Orange inline emphasis on numbers and key phrases, the way their body copy
    highlights "1,200 student volunteers" and "50 programs". */
 .em-n { color: var(--orange); font-weight: 700; }
-.em-u { text-decoration: underline; text-underline-offset: 3px; }
+.em-u { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--orange); text-decoration-thickness: 2px; }
 
 .lede { font-size: 18.5px; line-height: 1.6; font-weight: 500; color: var(--ink); }
 /* The treatment their homepage gives "Each year, 1,200 student volunteers
@@ -456,6 +456,22 @@ footer.site {
 .account-btn:hover { background: var(--orange-dark); }
 .account-btn img { width: 100%; height: 100%; object-fit: cover; }
 
+/* The avatar clips its overflow for the photo, so the unread dot cannot
+   ride outside it. It sits just inside the top-right edge instead, with a
+   white ring so it reads against both the orange and a photo. */
+.account-wrap { position: relative; display: inline-flex; }
+.account-dot {
+  position: absolute; top: 0; right: 0;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--ink);
+  box-shadow: 0 0 0 2px var(--white);
+  pointer-events: none;
+}
+
+/* The menu row is a block button; the count has to sit on its right. */
+.account-menu button .tab-count { float: right; margin-left: 0; }
+
 .account-menu {
   position: absolute;
   top: calc(100% + 10px);
@@ -813,6 +829,10 @@ footer.site {
 
 .msg-compose { display: flex; gap: 10px; align-items: flex-end; padding: 14px 20px; border-top: 1px solid var(--rule); }
 .msg-compose textarea { min-height: 44px; resize: none; }
+/* On a profile the conversation is a panel under the person, not the whole
+   screen, so it does not hold open 520px of empty space. */
+.msg-pane-inline { min-height: 0; max-height: 420px; }
+.msg-pane-inline .msg-body { padding: 18px 20px; }
 
 @media (max-width: 860px) {
   .msg-layout { grid-template-columns: 1fr; }
@@ -990,7 +1010,6 @@ function SiteBar() {
 const SECTIONS = [
   { key: "welcome", label: "Home" },
   { key: "directory", label: "Directory" },
-  { key: "messages", label: "Messages" },
   { key: "study", label: "Alumni Study" },
   { key: "archives", label: "Archives" },
 ];
@@ -1093,7 +1112,7 @@ function Combo({ value, onChange, options, placeholder, label }) {
   );
 }
 
-function AccountMenu({ me, onProfile, onSignOut }) {
+function AccountMenu({ me, unread, onProfile, onMessages, onSignOut }) {
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef(null);
 
@@ -1115,7 +1134,7 @@ function AccountMenu({ me, onProfile, onSignOut }) {
   const last = me.profile?.last || "";
 
   return (
-    <div ref={ref} style={{ position: "relative" }}>
+    <div className="account-wrap" ref={ref}>
       <button className="account-btn" onClick={() => setOpen((o) => !o)}
         aria-haspopup="menu" aria-expanded={open}
         aria-label={`Account menu for ${first} ${last}`.trim()}>
@@ -1123,6 +1142,11 @@ function AccountMenu({ me, onProfile, onSignOut }) {
           ? <img src={me.profile.photoUrl} alt="" />
           : <span className="account-initials">{initials(first, last)}</span>}
       </button>
+      {/* Messages live in this menu now, so the avatar has to carry the
+          badge — otherwise unread mail is behind a closed door. Outside the
+          button, because .account-btn clips its overflow to keep a photo
+          round and would clip the dot with it. */}
+      {unread > 0 && <span className="account-dot" aria-label={`${unread} unread messages`} />}
       {open && (
         <div className="account-menu" role="menu">
           {(first || last) && (
@@ -1132,6 +1156,10 @@ function AccountMenu({ me, onProfile, onSignOut }) {
             </div>
           )}
           <button role="menuitem" onClick={() => { setOpen(false); onProfile(); }}>Your profile</button>
+          <button role="menuitem" onClick={() => { setOpen(false); onMessages(); }}>
+            Messages
+            {unread > 0 && <span className="tab-count">{unread}</span>}
+          </button>
           <button role="menuitem" onClick={() => { setOpen(false); onSignOut(); }}>Sign out</button>
         </div>
       )}
@@ -1340,14 +1368,15 @@ function WelcomeScreen({ me, setScreen }) {
   const first = (me.profile && me.profile.first) || "";
   return (
     <div className="wrap page">
-      <h1 className="h-1 accent">{first ? `Hi, ${first}.` : "Hi."}</h1>
+      <h1 className="h-1 accent">{first ? `Hi, ${first}!` : "Hi!"}</h1>
       <hr className="rule" style={{ margin: "22px 0 36px" }} />
 
       <p className="statement">
         More than <span className="em-n">30,000</span> alumni have run
         <span className="em-u"> the Phillips Brooks House Association</span>&rsquo;s programs
         since <span className="em-n">1904</span>. The Alumni Network is where they find each
-        other again &mdash; by program, class year, House, city, and the work they do now.
+        other again. Current students are here too, so the people running a program this
+        year can reach the people who ran it before them.
       </p>
 
       <hr className="rule" style={{ margin: "40px 0 32px" }} />
@@ -1643,14 +1672,108 @@ const when = (iso) => {
     : { month: "short", day: "numeric", year: "numeric" });
 };
 
-function MessagesScreen({ openThreadId, onOpenProfile, onUnreadChange }) {
-  const [threads, setThreads] = React.useState([]);
-  const [active, setActive] = React.useState(openThreadId || null);
+// One conversation: what has been said, and the box to add to it. It owns
+// its own fetch so it can be dropped straight onto a member's profile as
+// well as into the Messages screen. The callbacks live in a ref because
+// they are written inline at both call sites — in the dependency array a
+// fresh function every render would refetch the thread forever.
+function Conversation({ threadId, showHead, onOpenProfile, onRead, onSent }) {
   const [thread, setThread] = React.useState(null);
   const [draft, setDraft] = React.useState("");
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState("");
   const endRef = React.useRef(null);
+  const cb = React.useRef({});
+  cb.current = { onRead, onSent };
+
+  React.useEffect(() => {
+    if (!threadId) { setThread(null); return; }
+    let dead = false;
+    setThread(null);
+    api.get("/api/messages/" + encodeURIComponent(threadId))
+      .then((t) => {
+        if (dead) return;
+        setThread(t);
+        // Opening a conversation reads it.
+        return api.post("/api/messages/" + encodeURIComponent(threadId) + "/read");
+      })
+      .then(() => { if (!dead && cb.current.onRead) cb.current.onRead(); })
+      .catch((err) => { if (!dead) setError(err.message); });
+    return () => { dead = true; };
+  }, [threadId]);
+
+  React.useEffect(() => {
+    if (endRef.current) endRef.current.scrollIntoView({ block: "end" });
+  }, [thread && thread.messages.length]);
+
+  const send = async (e) => {
+    e.preventDefault();
+    const body = draft.trim();
+    if (!body || !threadId) return;
+    setBusy(true);
+    setError("");
+    try {
+      const sent = await api.post("/api/messages/" + encodeURIComponent(threadId), { body });
+      setThread((t) => (t ? { ...t, messages: [...t.messages, sent] } : t));
+      setDraft("");
+      if (cb.current.onSent) cb.current.onSent();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (!thread) {
+    return <p className="meta" style={{ padding: 24 }}>{error || "Loading…"}</p>;
+  }
+
+  return (
+    <>
+      {showHead && (
+        <div className="msg-head">
+          {thread.with ? (
+            <button className="msg-head-name" onClick={() => onOpenProfile(thread.with.userId)}>
+              {thread.with.first} {thread.with.last}
+              {thread.with.year && <span className="meta"> · {shortYear(thread.with.year)}</span>}
+            </button>
+          ) : <span className="msg-head-name">Former member</span>}
+        </div>
+      )}
+
+      <div className="msg-body">
+        {thread.messages.length === 0 && <p className="meta">Nothing here yet. Say hello.</p>}
+        {thread.messages.map((m) => (
+          <div key={m.id} className={`bubble-row ${m.fromMe ? "mine" : ""}`}>
+            <div className="bubble">
+              {m.body}
+              <span className="bubble-time">{when(m.createdAt)}</span>
+            </div>
+          </div>
+        ))}
+        <div ref={endRef} />
+      </div>
+
+      {error && <div className="banner banner-error" style={{ margin: "0 16px 12px" }}>{error}</div>}
+
+      <form className="msg-compose" onSubmit={send}>
+        <textarea className="input" value={draft} rows={2}
+          placeholder="Write a message" aria-label="Write a message"
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            // Enter sends; Shift+Enter breaks the line.
+            if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(e); }
+          }} />
+        <button className="btn btn-primary" disabled={busy || !draft.trim()}>Send</button>
+      </form>
+    </>
+  );
+}
+
+function MessagesScreen({ openThreadId, onOpenProfile, onUnreadChange }) {
+  const [threads, setThreads] = React.useState([]);
+  const [active, setActive] = React.useState(openThreadId || null);
+  const [error, setError] = React.useState("");
 
   const loadThreads = React.useCallback(() => {
     api.get("/api/messages")
@@ -1666,43 +1789,8 @@ function MessagesScreen({ openThreadId, onOpenProfile, onUnreadChange }) {
   React.useEffect(() => { loadThreads(); }, [loadThreads]);
   React.useEffect(() => { if (openThreadId) setActive(openThreadId); }, [openThreadId]);
 
-  React.useEffect(() => {
-    if (!active) { setThread(null); return; }
-    let dead = false;
-    api.get("/api/messages/" + encodeURIComponent(active))
-      .then((t) => {
-        if (dead) return;
-        setThread(t);
-        // Opening a conversation reads it.
-        return api.post("/api/messages/" + encodeURIComponent(active) + "/read");
-      })
-      .then(() => { if (!dead) { loadThreads(); onUnreadChange && onUnreadChange(); } })
-      .catch((err) => { if (!dead) setError(err.message); });
-    return () => { dead = true; };
-  }, [active, loadThreads, onUnreadChange]);
-
-  React.useEffect(() => {
-    if (endRef.current) endRef.current.scrollIntoView({ block: "end" });
-  }, [thread && thread.messages.length]);
-
-  const send = async (e) => {
-    e.preventDefault();
-    const body = draft.trim();
-    if (!body || !active) return;
-    setBusy(true);
-    setError("");
-    try {
-      const sent = await api.post("/api/messages/" + encodeURIComponent(active), { body });
-      setThread((t) => (t ? { ...t, messages: [...t.messages, sent] } : t));
-      setDraft("");
-      loadThreads();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setBusy(false);
-    }
-  };
-
+  const [active, setActive] = React.useState(openThreadId || null);
+  const [error, setError] = React.useState("");
   return (
     <div className="wrap page">
       <h1 className="h-1 accent">Messages</h1>
@@ -1745,47 +1833,11 @@ function MessagesScreen({ openThreadId, onOpenProfile, onUnreadChange }) {
           </div>
 
           <div className="msg-pane card">
-            {!thread ? (
-              <p className="meta" style={{ padding: 24 }}>Pick a conversation.</p>
-            ) : (
-              <>
-                <div className="msg-head">
-                  {thread.with ? (
-                    <button className="msg-head-name"
-                      onClick={() => onOpenProfile(thread.with.userId)}>
-                      {thread.with.first} {thread.with.last}
-                      {thread.with.year && <span className="meta"> · {shortYear(thread.with.year)}</span>}
-                    </button>
-                  ) : <span className="msg-head-name">Former member</span>}
-                </div>
-
-                <div className="msg-body">
-                  {thread.messages.length === 0 && (
-                    <p className="meta">Nothing here yet. Say hello.</p>
-                  )}
-                  {thread.messages.map((m) => (
-                    <div key={m.id} className={`bubble-row ${m.fromMe ? "mine" : ""}`}>
-                      <div className="bubble">
-                        {m.body}
-                        <span className="bubble-time">{when(m.createdAt)}</span>
-                      </div>
-                    </div>
-                  ))}
-                  <div ref={endRef} />
-                </div>
-
-                <form className="msg-compose" onSubmit={send}>
-                  <textarea className="input" value={draft} rows={2}
-                    placeholder="Write a message" aria-label="Write a message"
-                    onChange={(e) => setDraft(e.target.value)}
-                    onKeyDown={(e) => {
-                      // Enter sends; Shift+Enter breaks the line.
-                      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(e); }
-                    }} />
-                  <button className="btn btn-primary" disabled={busy || !draft.trim()}>Send</button>
-                </form>
-              </>
-            )}
+            {!active
+              ? <p className="meta" style={{ padding: 24 }}>Pick a conversation.</p>
+              : <Conversation threadId={active} showHead onOpenProfile={onOpenProfile}
+                  onRead={() => { loadThreads(); onUnreadChange && onUnreadChange(); }}
+                  onSent={loadThreads} />}
           </div>
         </div>
       )}
@@ -2371,13 +2423,11 @@ function DirectoryScreen({ onOpenProfile }) {
           </FilterGroup>
 
           <FilterGroup label="House">
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {facets.houses.map((h) => (
-                <button key={h.name} className={`chip ${houses.includes(h.name) ? "is-on" : ""}`}
-                  onClick={() => toggle(houses, h.name, setHouses)}>{h.name}</button>
-              ))}
-              {facets.houses.length === 0 && <span className="meta">—</span>}
-            </div>
+            <Select value={houses[0] || ""} label="House"
+              onChange={(v) => setHouses(v ? [v] : [])}
+              options={[{ value: "", label: "All Houses" }].concat(
+                facets.houses.map((h) => ({ value: h.name, label: `${h.name} · ${h.count}` })),
+              )} />
           </FilterGroup>
 
           <FilterGroup label="Field of work">
@@ -2461,16 +2511,25 @@ function DirectoryScreen({ onOpenProfile }) {
  * Profile
  * ------------------------------------------------------------------ */
 
-function ProfileScreen({ userId, onBack, onMessage }) {
+function ProfileScreen({ userId, onBack, onUnreadChange }) {
   const [person, setPerson] = React.useState(null);
   const [error, setError] = React.useState("");
   const [opening, setOpening] = React.useState(false);
+  const [threadId, setThreadId] = React.useState(null);
+  const threadRef = React.useRef(null);
 
+  // Writing to someone happens on their profile. Sending people off to a
+  // separate screen to answer a profile they were just reading loses the
+  // reason they were writing in the first place.
   const write = async () => {
     setOpening(true);
     try {
-      const { threadId } = await api.post("/api/messages/open", { userId });
-      onMessage(threadId);
+      const r = await api.post("/api/messages/open", { userId });
+      setThreadId(r.threadId);
+      // Let the panel mount before scrolling to it.
+      requestAnimationFrame(() => {
+        if (threadRef.current) threadRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -2481,6 +2540,7 @@ function ProfileScreen({ userId, onBack, onMessage }) {
   React.useEffect(() => {
     setPerson(null);
     setError("");
+    setThreadId(null);
     api.get("/api/users/" + encodeURIComponent(userId))
       .then(setPerson)
       .catch((err) => setError(err.message));
@@ -2521,8 +2581,8 @@ function ProfileScreen({ userId, onBack, onMessage }) {
               messages off — though the server is what actually refuses. */}
           {!person.isSelf && person.openToMessages !== false && (
             <button className="btn btn-primary btn-sm" style={{ marginTop: 16, width: "100%" }}
-              onClick={write} disabled={opening}>
-              {opening ? "One moment…" : "Message"}
+              onClick={write} disabled={opening || !!threadId}>
+              {opening ? "One moment…" : threadId ? "Writing below" : "Message"}
             </button>
           )}
         </div>
@@ -2601,17 +2661,26 @@ function ProfileScreen({ userId, onBack, onMessage }) {
                   <span key={r} className="chip chip-static">{r}</span>
                 ))}
               </div>
-              {person.isSelf && (
+              {person.isSelf && !person.showIdentity && (
                 <p className="meta" style={{ marginTop: 10 }}>
-                  {person.showIdentity
-                    ? "Visible to other signed-in members."
-                    : "Only you can see this. Turn it on in your profile to share it."}
+                  Only you can see this. Turn it on in your profile to share it.
                 </p>
               )}
             </>
           )}
         </div>
       </div>
+
+      {threadId && (
+        <div ref={threadRef} style={{ marginTop: 40 }}>
+          <h2 className="h-2" style={{ marginBottom: 14 }}>
+            Your conversation with {person.first}
+          </h2>
+          <div className="msg-pane msg-pane-inline card">
+            <Conversation threadId={threadId} onRead={onUnreadChange} onSent={onUnreadChange} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -2882,7 +2951,7 @@ function App() {
 
   React.useEffect(() => { loadMe(); }, [loadMe]);
 
-  // The unread badge on the Messages tab. Refreshed on sign-in, whenever a
+  // The unread badge on the account avatar. Refreshed on sign-in, whenever a
   // conversation is read, and on a slow poll so a message that arrives while
   // someone is reading the directory still shows up.
   const refreshUnread = React.useCallback(() => {
@@ -2916,13 +2985,15 @@ function App() {
             {SECTIONS.map((t) => (
               <button key={t.key}
                 className={t.key === screen || (t.key === "directory" && screen === "profile") ? "is-active" : ""}
-                onClick={() => { setScreen(t.key); setProfileId(null); if (t.key === "messages") setThreadId(null); }}>
+                onClick={() => { setScreen(t.key); setProfileId(null); }}>
                 {t.label}
-                {t.key === "messages" && unread > 0 && <span className="tab-count">{unread}</span>}
               </button>
             ))}
           </nav>
-          <AccountMenu me={me} onProfile={() => setScreen("me")} onSignOut={signOut} />
+          <AccountMenu me={me} unread={unread}
+            onProfile={() => { setScreen("me"); setProfileId(null); }}
+            onMessages={() => { setScreen("messages"); setProfileId(null); setThreadId(null); }}
+            onSignOut={signOut} />
         </div>
       )}
 
@@ -2940,7 +3011,7 @@ function App() {
       {me && screen === "profile" && profileId && (
         <ProfileScreen userId={profileId}
           onBack={() => { setScreen("directory"); setProfileId(null); }}
-          onMessage={(id) => { setThreadId(id); setScreen("messages"); }} />
+          onUnreadChange={refreshUnread} />
       )}
       {me && screen === "me" && <MyProfileScreen me={me} onSaved={loadMe} />}
 

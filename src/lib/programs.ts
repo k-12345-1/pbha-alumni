@@ -106,4 +106,7 @@ export const INDUSTRIES = [
   "Public Health",
   "Research",
   "Student",
+  // Last on purpose: a catch-all belongs at the bottom of the list, not
+  // alphabetised into the middle of it.
+  "Other",
 ] as const;
