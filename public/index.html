@@ -558,7 +558,10 @@ footer.site {
 .involve-list li:first-child { border-top: 1px solid var(--rule); }
 .involve-row {
   display: grid;
-  grid-template-columns: 56px minmax(200px, 1fr) minmax(0, 1.6fr) auto;
+  /* Every track here is content-independent on purpose. Each row is its
+     own grid, so an `auto` or a bare `fr` track sizes to that row's own
+     text and the columns stop lining up down the list. */
+  grid-template-columns: 56px 26% minmax(0, 1fr) 190px;
   gap: 24px;
   align-items: baseline;
   width: 100%;
