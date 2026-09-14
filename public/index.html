@@ -83,15 +83,17 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: 0.01em; }
 /* Orange inline emphasis on numbers and key phrases, the way their body copy
    highlights "1,200 student volunteers" and "50 programs". */
 .em-n { color: var(--orange); font-weight: 700; }
-/* A drawn underline, not a typographic one: a single stroke that dips
-   through the middle and flicks up at its end, the way a marker does.
+/* A drawn underline, not a typographic one: a single stroke with a lift
+   through the middle, the way a marker does. The path is rotated 180°
+   about the centre of its own viewBox rather than redrawn mirrored, so
+   there is one set of coordinates to change if the shape is revisited.
    text-decoration cannot curve, so this is an SVG behind the text.
    box-decoration-break: clone gives each line its own stroke when the
    phrase wraps, instead of one stroke stretched across both — and since
    the path is stretched to each fragment's width, its vertical travel is
    kept shallow so a short fragment does not squash into a steep hook. */
 .em-u {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 14' preserveAspectRatio='none'%3E%3Cpath d='M3 7C58 9.6 152 10.1 236 8.5c22-.4 40-1.2 58-2.6' fill='none' stroke='%23f98715' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 14' preserveAspectRatio='none'%3E%3Cpath d='M3 7C58 9.6 152 10.1 236 8.5c22-.4 40-1.2 58-2.6' fill='none' stroke='%23f98715' stroke-width='3.2' stroke-linecap='round' transform='rotate(180 150 7)'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: left calc(100% - 0.02em);
   background-size: 100% 0.30em;
@@ -2756,25 +2758,18 @@ function DirectoryScreen({ onOpenProfile, onMessage }) {
  * Profile
  * ------------------------------------------------------------------ */
 
-function ProfileScreen({ userId, onBack, onUnreadChange }) {
+function ProfileScreen({ userId, onBack, onMessage }) {
   const [person, setPerson] = React.useState(null);
   const [error, setError] = React.useState("");
   const [opening, setOpening] = React.useState(false);
-  const [threadId, setThreadId] = React.useState(null);
-  const threadRef = React.useRef(null);
 
-  // Writing to someone happens on their profile. Sending people off to a
-  // separate screen to answer a profile they were just reading loses the
-  // reason they were writing in the first place.
+  // Same destination as the Message button on a directory card: the
+  // Messages section, on a conversation with this person, addressed to
+  // them. One button, one place messages live.
   const write = async () => {
     setOpening(true);
     try {
-      const r = await api.post("/api/messages/open", { userId });
-      setThreadId(r.threadId);
-      // Let the panel mount before scrolling to it.
-      requestAnimationFrame(() => {
-        if (threadRef.current) threadRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-      });
+      await onMessage(person);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -2785,7 +2780,6 @@ function ProfileScreen({ userId, onBack, onUnreadChange }) {
   React.useEffect(() => {
     setPerson(null);
     setError("");
-    setThreadId(null);
     api.get("/api/users/" + encodeURIComponent(userId))
       .then(setPerson)
       .catch((err) => setError(err.message));
@@ -2836,8 +2830,8 @@ function ProfileScreen({ userId, onBack, onUnreadChange }) {
                   Not accepting messages
                 </span>
               ) : (
-                <button className="btn btn-primary btn-sm" onClick={write} disabled={opening || !!threadId}>
-                  {opening ? "One moment…" : threadId ? "Writing below" : "Message"}
+                <button className="btn btn-primary btn-sm" onClick={write} disabled={opening}>
+                  {opening ? "One moment…" : "Send a message"}
                 </button>
               )
             )}
@@ -2927,16 +2921,6 @@ function ProfileScreen({ userId, onBack, onUnreadChange }) {
         </div>
       </div>
 
-      {threadId && (
-        <div ref={threadRef} style={{ marginTop: 40 }}>
-          <h2 className="h-2" style={{ marginBottom: 14 }}>
-            Your conversation with {person.first}
-          </h2>
-          <div className="msg-pane msg-pane-inline card">
-            <Conversation threadId={threadId} onRead={onUnreadChange} onSent={onUnreadChange} />
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -3297,22 +3281,22 @@ function App() {
 
   const openProfile = (id) => { setProfileId(id); setScreen("profile"); };
 
-  // Message from a directory card: open the conversation with that person
-  // and land on it, with their name already in the box so the message is
-  // addressed rather than starting from a blank line.
-  const messageFromDirectory = async (person) => {
-    try {
-      const { threadId: id } = await api.post("/api/messages/open", { userId: person.userId });
-      setDraftFor({ threadId: id, text: `Hi ${person.first}, ` });
-      setThreadId(id);
-      setProfileId(null);
-      setScreen("messages");
-    } catch {
-      // Refused (they have messages off, or they are gone): their profile
-      // is the honest place to land, and it says so there.
-      openProfile(person.userId);
-    }
+  // Writing to someone, from a directory card or from their profile: open
+  // the conversation and land on it in Messages, with their name already
+  // in the box so the message is addressed rather than starting blank.
+  const startMessage = async (person) => {
+    const { threadId: id } = await api.post("/api/messages/open", { userId: person.userId });
+    setDraftFor({ threadId: id, text: `Hi ${person.first}, ` });
+    setThreadId(id);
+    setProfileId(null);
+    setScreen("messages");
   };
+
+  // From a card there is nowhere useful to show a failure, so a refusal
+  // (messages off, or the member is gone) lands on their profile, which
+  // says so in place of the button.
+  const messageFromDirectory = (person) =>
+    startMessage(person).catch(() => openProfile(person.userId));
 
   return (
     <>
@@ -3352,7 +3336,7 @@ function App() {
       {me && screen === "profile" && profileId && (
         <ProfileScreen userId={profileId}
           onBack={() => { setScreen("directory"); setProfileId(null); }}
-          onUnreadChange={refreshUnread} />
+          onMessage={startMessage} />
       )}
       {me && screen === "me" && <MyProfileScreen me={me} onSaved={loadMe} />}
 
