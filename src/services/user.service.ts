@@ -1,4 +1,5 @@
 import type { Prisma } from "@prisma/client";
+import { normalizeLocation } from "../lib/place";
 import { prisma } from "../db";
 import { isCurrentStudent } from "../lib/class-year";
 import { NotFound } from "../lib/errors";
@@ -99,11 +100,16 @@ export const updateMyProfile = async (userId: string, input: ProfileUpdateInput)
   const existing = await prisma.profile.findUnique({ where: { userId } });
   if (!existing) throw NotFound("Profile not found");
 
-  const merged = { ...existing, ...input };
+  // One spelling per city, whatever the caller sent. The client normalizes
+  // as you type, but the client is not the only thing that can post here.
+  const normalized = "location" in input
+    ? { ...input, location: normalizeLocation(input.location) }
+    : input;
+  const merged = { ...existing, ...normalized };
   const profile = await prisma.profile.update({
     where: { userId },
     data: {
-      ...input,
+      ...normalized,
       programYears: input.programYears as Prisma.InputJsonValue | undefined,
       searchText: buildSearchText({
         first: merged.first,

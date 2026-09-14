@@ -97,6 +97,10 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: 0.01em; }
   margin: 0;
   max-width: 940px;
 }
+/* Centred needs the box centred too, not just the text: at 940px in a
+   1498px column, text-align alone would centre it inside a block still
+   sitting against the left gutter. */
+.statement-mid { margin-left: auto; margin-right: auto; text-align: center; }
 
 .eyebrow {
   font-size: 11px;
@@ -170,7 +174,7 @@ nav.site-nav button.is-active { color: var(--orange); border-bottom-color: var(-
 
 .field { display: block; margin-bottom: 18px; }
 .field > span { display: block; margin-bottom: 7px; }
-.input, .select, textarea.input {
+.input, textarea.input {
   width: 100%;
   padding: 13px 15px;
   border: 1px solid var(--rule);
@@ -180,7 +184,7 @@ nav.site-nav button.is-active { color: var(--orange); border-bottom-color: var(-
   background: var(--white);
   color: var(--ink);
 }
-.input:focus, .select:focus { outline: 2px solid var(--orange); outline-offset: -1px; border-color: transparent; }
+.input:focus { outline: 2px solid var(--orange); outline-offset: -1px; border-color: transparent; }
 textarea.input { min-height: 100px; resize: vertical; line-height: 1.55; }
 
 .search {
@@ -1064,7 +1068,73 @@ function Select({ value, options, onChange, label }) {
 // operating system to draw — the dark panel — and no CSS reaches it. This
 // keeps the free-text input (House and gender are free-text columns for a
 // reason) and puts the suggestions in a menu the site owns.
-function Combo({ value, onChange, options, placeholder, label }) {
+// Mirror of normalizeLocation in src/lib/place.ts. The server normalizes
+// again on save — this copy exists so you can watch the field settle on
+// "City, ST" as you leave it, instead of finding out after you save.
+// Answering "prefer to self-describe" is a request for a box, not an answer.
+const SELF_DESCRIBE = "Prefer to self-describe";
+
+const US_STATES = {
+  alabama: "AL", alaska: "AK", arizona: "AZ", arkansas: "AR", california: "CA",
+  colorado: "CO", connecticut: "CT", delaware: "DE", florida: "FL", georgia: "GA",
+  hawaii: "HI", idaho: "ID", illinois: "IL", indiana: "IN", iowa: "IA",
+  kansas: "KS", kentucky: "KY", louisiana: "LA", maine: "ME", maryland: "MD",
+  massachusetts: "MA", michigan: "MI", minnesota: "MN", mississippi: "MS",
+  missouri: "MO", montana: "MT", nebraska: "NE", nevada: "NV",
+  "new hampshire": "NH", "new jersey": "NJ", "new mexico": "NM", "new york": "NY",
+  "north carolina": "NC", "north dakota": "ND", ohio: "OH", oklahoma: "OK",
+  oregon: "OR", pennsylvania: "PA", "rhode island": "RI", "south carolina": "SC",
+  "south dakota": "SD", tennessee: "TN", texas: "TX", utah: "UT", vermont: "VT",
+  virginia: "VA", washington: "WA", "west virginia": "WV", wisconsin: "WI",
+  wyoming: "WY", "district of columbia": "DC", "puerto rico": "PR",
+  mass: "MA", "mass.": "MA", calif: "CA", "calif.": "CA", penn: "PA", "penn.": "PA",
+  conn: "CT", "conn.": "CT", wash: "WA", "wash.": "WA", ill: "IL", "ill.": "IL",
+  fla: "FL", "fla.": "FL", tex: "TX", "tex.": "TX", "d.c.": "DC", dc: "DC",
+};
+const STATE_ABBREVS = new Set(Object.keys(US_STATES).map((k) => US_STATES[k]));
+
+const titleCase = (str) =>
+  str.toLowerCase().split(/(\s|-|')/)
+    .map((part) => (/^(of|the|de|la|los|las|upon|on|and)$/.test(part)
+      ? part : part.charAt(0).toUpperCase() + part.slice(1)))
+    .join("")
+    .replace(/\b(Dc|Nyc|Usa|Uk)\b/g, (m) => m.toUpperCase());
+
+function normalizeLocation(raw) {
+  const input = (raw || "").trim().replace(/\s+/g, " ");
+  if (!input) return "";
+
+  const parts = input.split(",").map((x) => x.trim()).filter(Boolean);
+  let city = parts[0] || "";
+  let region = parts.length > 1 ? parts[parts.length - 1] : "";
+
+  if (!region) {
+    const words = city.split(" ");
+    const tail = words[words.length - 1];
+    if (words.length > 1 && STATE_ABBREVS.has(tail.toUpperCase())) {
+      region = tail; city = words.slice(0, -1).join(" ");
+    } else {
+      const twoWord = words.slice(-2).join(" ").toLowerCase();
+      if (words.length > 2 && US_STATES[twoWord]) {
+        region = twoWord; city = words.slice(0, -2).join(" ");
+      } else if (words.length > 1 && US_STATES[tail.toLowerCase()]) {
+        region = tail; city = words.slice(0, -1).join(" ");
+      }
+    }
+  }
+
+  if (!city) return "";
+  if (!region) return titleCase(city);
+
+  const key = region.toLowerCase().replace(/\.$/, "");
+  const state = US_STATES[key] || (STATE_ABBREVS.has(region.toUpperCase()) ? region.toUpperCase() : null);
+  if (state) return titleCase(city) + ", " + state;
+
+  const tidied = region.length <= 3 ? region.toUpperCase() : titleCase(region);
+  return titleCase(city) + ", " + tidied;
+}
+
+function Combo({ value, onChange, options, placeholder, label, onBlur, max }) {
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef(null);
 
@@ -1084,13 +1154,23 @@ function Combo({ value, onChange, options, placeholder, label }) {
   // Once the value exactly matches a suggestion, show the whole list again —
   // otherwise picking one collapses the menu to that single entry.
   const exact = options.some((o) => o.toLowerCase() === typed);
-  const shown = !typed || exact ? options : options.filter((o) => o.toLowerCase().includes(typed));
+  const all = !typed || exact ? options : options.filter((o) => o.toLowerCase().includes(typed));
+  // A list of 190 cities is a scroll, not a suggestion. Where `max` is set,
+  // show the nearest few — prefixes first, since that is what typing means.
+  const shown = max
+    ? all.slice().sort((a, b) => {
+        const ap = a.toLowerCase().startsWith(typed) ? 0 : 1;
+        const bp = b.toLowerCase().startsWith(typed) ? 0 : 1;
+        return ap - bp;
+      }).slice(0, max)
+    : all;
 
   return (
     <div className="combo" ref={ref}>
       <input className="input" value={value} placeholder={placeholder} aria-label={label}
         onChange={(e) => { onChange(e.target.value); setOpen(true); }}
-        onFocus={() => setOpen(true)} />
+        onFocus={() => setOpen(true)}
+        onBlur={onBlur ? (e) => onBlur(e.target.value) : undefined} />
       {/* type="button" matters: this sits inside the profile form, and a
           bare <button> there would submit it. */}
       <button type="button" className="combo-toggle" onClick={() => setOpen((o) => !o)}
@@ -1104,7 +1184,7 @@ function Combo({ value, onChange, options, placeholder, label }) {
           {shown.map((o) => (
             <button type="button" key={o} role="option" aria-selected={o === value}
               className={o === value ? "is-on" : ""}
-              onClick={() => { onChange(o); setOpen(false); }}>{o}</button>
+              onClick={() => { onChange(o); setOpen(false); if (onBlur) onBlur(o); }}>{o}</button>
           ))}
         </div>
       )}
@@ -1371,7 +1451,7 @@ function WelcomeScreen({ me, setScreen }) {
       <h1 className="h-1 accent">{first ? `Hi, ${first}!` : "Hi!"}</h1>
       <hr className="rule" style={{ margin: "22px 0 36px" }} />
 
-      <p className="statement">
+      <p className="statement statement-mid">
         More than <span className="em-n">30,000</span> alumni have run
         <span className="em-u"> the Phillips Brooks House Association</span>&rsquo;s programs
         since <span className="em-n">1904</span>. The Alumni Network is where they find each
@@ -1381,7 +1461,7 @@ function WelcomeScreen({ me, setScreen }) {
 
       <hr className="rule" style={{ margin: "40px 0 32px" }} />
 
-      <h2 className="h-2" style={{ marginBottom: 20 }}>Ways to stay involved</h2>
+      <h2 className="h-2" style={{ marginBottom: 20 }}>Get involved</h2>
       <div className="link-grid">
         {GET_INVOLVED.map((g) => {
           const inner = (
@@ -2393,31 +2473,19 @@ function DirectoryScreen({ onOpenProfile }) {
           </FilterGroup>
 
           <FilterGroup label="PBHA role">
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {facets.roles.map((r) => (
-                <label key={r.name}
-                  className={`check ${roles.includes(r.name) ? "is-on" : ""}`}
-                  onClick={(e) => { e.preventDefault(); toggle(roles, r.name, setRoles); }}>
-                  <span className="box" />
-                  <span>{r.name} <span className="meta">· {r.count}</span></span>
-                </label>
-              ))}
-              {facets.roles.length === 0 && <span className="meta">—</span>}
-            </div>
+            <Select value={roles[0] || ""} label="PBHA role"
+              onChange={(v) => setRoles(v ? [v] : [])}
+              options={[{ value: "", label: "All roles" }].concat(
+                facets.roles.map((r) => ({ value: r.name, label: `${r.name} · ${r.count}` })),
+              )} />
           </FilterGroup>
 
           <FilterGroup label="Program">
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {facets.programs.map((p) => (
-                <label key={p.name}
-                  className={`check ${programs.includes(p.name) ? "is-on" : ""}`}
-                  onClick={(e) => { e.preventDefault(); toggle(programs, p.name, setPrograms); }}>
-                  <span className="box" />
-                  <span>{p.name} <span className="meta">· {p.count}</span></span>
-                </label>
-              ))}
-              {facets.programs.length === 0 && <span className="meta">—</span>}
-            </div>
+            <Select value={programs[0] || ""} label="Program"
+              onChange={(v) => setPrograms(v ? [v] : [])}
+              options={[{ value: "", label: "All programs" }].concat(
+                facets.programs.map((p) => ({ value: p.name, label: `${p.name} · ${p.count}` })),
+              )} />
           </FilterGroup>
 
           <FilterGroup label="House">
@@ -2690,10 +2758,12 @@ function ProfileScreen({ userId, onBack, onUnreadChange }) {
 function MyProfileScreen({ me, onSaved }) {
   const [form, setForm] = React.useState(null);
   const [privacy, setPrivacy] = React.useState(null);
-  const [vocab, setVocab] = React.useState({ programs: [], roles: [], houses: [], genders: [], races: [], industries: [] });
+  const [vocab, setVocab] = React.useState({ programs: [], roles: [], houses: [], genders: [], races: [], industries: [], cities: [] });
   const [status, setStatus] = React.useState("");
   const [error, setError] = React.useState("");
   const [busy, setBusy] = React.useState(false);
+  const [selfRace, setSelfRace] = React.useState("");
+  const [selfRaceOpen, setSelfRaceOpen] = React.useState(false);
 
   React.useEffect(() => {
     Promise.all([
@@ -2718,10 +2788,12 @@ function MyProfileScreen({ me, onSaved }) {
           pbhaRole: profile.pbhaRole || "",
           involvement: profile.involvement || "",
           gender: profile.gender || "",
-          raceEthnicity: profile.raceEthnicity || [],
+          raceEthnicity: (profile.raceEthnicity || []).filter((r) => (v.races || []).includes(r)),
           openToMentor: !!profile.openToMentor,
           reachOut: profile.reachOut || "",
         });
+        const own = (profile.raceEthnicity || []).filter((r) => !(v.races || []).includes(r));
+        if (own.length > 0) { setSelfRace(own.join(", ")); setSelfRaceOpen(true); }
         setPrivacy(priv);
         setVocab(v);
       })
@@ -2742,6 +2814,17 @@ function MyProfileScreen({ me, onSaved }) {
     }));
   const toggleProgram = toggleIn("programs");
   const toggleRace = toggleIn("raceEthnicity");
+
+  // The self-describe chip opens a box rather than adding a chip. What gets
+  // typed there is one more entry in raceEthnicity, folded in on save.
+  const openSelfRace = () => {
+    if (selfRaceOpen) {
+      setSelfRaceOpen(false);
+      setSelfRace("");
+    } else {
+      setSelfRaceOpen(true);
+    }
+  };
 
   const save = async (e) => {
     e.preventDefault();
@@ -2766,7 +2849,9 @@ function MyProfileScreen({ me, onSaved }) {
         pbhaRole: blank(form.pbhaRole),
         involvement: blank(form.involvement),
         gender: blank(form.gender),
-        raceEthnicity: form.raceEthnicity,
+        raceEthnicity: selfRaceOpen && selfRace.trim()
+          ? [...form.raceEthnicity, selfRace.trim()]
+          : form.raceEthnicity,
         openToMentor: form.openToMentor,
         reachOut: blank(form.reachOut),
       });
@@ -2816,13 +2901,18 @@ function MyProfileScreen({ me, onSaved }) {
         <hr className="rule" style={{ margin: "36px 0 28px" }} />
         <h2 className="h-2" style={{ marginBottom: 18 }}>You now</h2>
         <div className="two-up">
-          <Field label="Where you live"><input className="input" value={form.location} onChange={set("location")} placeholder="Where you live" /></Field>
-          <Field label="Field of work" hint="Used as a directory filter.">
+          <Field label="Where you live" hint="Written as City, ST.">
+            <Combo label="Where you live" placeholder="Where you live" options={vocab.cities}
+              max={8} value={form.location}
+              onChange={(v) => setForm((f) => ({ ...f, location: v }))}
+              onBlur={(v) => setForm((f) => ({ ...f, location: normalizeLocation(v) }))} />
+          </Field>
+          <Field label="Field of work">
             <Combo label="Field of work" placeholder="Field of work" options={vocab.industries}
               value={form.industry} onChange={(v) => setForm((f) => ({ ...f, industry: v }))} />
           </Field>
         </div>
-        <Field label="What you do" hint='Written as "Title · Organization" so the directory can show both.'>
+        <Field label="What you do">
           <input className="input" value={form.career} onChange={set("career")}
             placeholder="What you do" />
         </Field>
@@ -2852,10 +2942,11 @@ function MyProfileScreen({ me, onSaved }) {
         <hr className="rule" style={{ margin: "36px 0 28px" }} />
         <h2 className="h-2" style={{ marginBottom: 18 }}>You at PBHA</h2>
         <Field label="Role" hint="The most senior role you held.">
-          <select className="select" value={form.pbhaRole} onChange={set("pbhaRole")}>
-            <option value="">Not listed</option>
-            {vocab.roles.map((r) => <option key={r} value={r}>{r}</option>)}
-          </select>
+          <Select value={form.pbhaRole} label="Role"
+            onChange={(v) => setForm((f) => ({ ...f, pbhaRole: v }))}
+            options={[{ value: "", label: "Not listed" }].concat(
+              vocab.roles.map((r) => ({ value: r, label: r })),
+            )} />
         </Field>
         <div className="field">
           <span className="eyebrow" style={{ display: "block", marginBottom: 10 }}>Programs</span>
@@ -2867,8 +2958,7 @@ function MyProfileScreen({ me, onSaved }) {
             ))}
           </div>
         </div>
-        <Field label="Your involvement"
-          hint="Anything the list above misses — a committee, a summer, how you got started.">
+        <Field label="Your involvement">
           <textarea className="input" value={form.involvement} onChange={set("involvement")} placeholder="Your involvement" />
         </Field>
 
@@ -2882,8 +2972,7 @@ function MyProfileScreen({ me, onSaved }) {
           </label>
         </div>
         {form.openToMentor && (
-          <Field label="Students should reach out to me about:"
-            hint="Be specific. This is what a student sees before they write to you.">
+          <Field label="Students should reach out to me about:">
             <textarea className="input" value={form.reachOut} onChange={set("reachOut")}
               placeholder="Students should reach out to me about" />
           </Field>
@@ -2891,24 +2980,29 @@ function MyProfileScreen({ me, onSaved }) {
 
         <hr className="rule" style={{ margin: "36px 0 28px" }} />
         <h2 className="h-2" style={{ marginBottom: 12 }}>Identity</h2>
-        <p className="meta" style={{ marginBottom: 20, maxWidth: 620 }}>
-          Optional, and hidden from everyone unless you turn it on below. PBHA asks so it can
-          see who its alumni body actually is, and so members who want to can find people who
-          share their background. You can leave all of it blank.
-        </p>
         <Field label="Gender">
+          {/* Picking "Prefer to self-describe" is a request for a blank box,
+              not an answer. Saving the phrase itself would put it on the
+              profile as though it were the person's gender. */}
           <Combo label="Gender" placeholder="Gender" options={vocab.genders}
-            value={form.gender} onChange={(v) => setForm((f) => ({ ...f, gender: v }))} />
+            value={form.gender}
+            onChange={(v) => setForm((f) => ({ ...f, gender: v === SELF_DESCRIBE ? "" : v }))} />
         </Field>
         <div className="field">
           <span className="eyebrow" style={{ display: "block", marginBottom: 10 }}>Race and ethnicity</span>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
             {vocab.races.map((r) => (
               <button type="button" key={r}
-                className={`chip ${form.raceEthnicity.includes(r) ? "is-on" : ""}`}
-                onClick={() => toggleRace(r)}>{r}</button>
+                className={`chip ${r === SELF_DESCRIBE ? (selfRaceOpen ? "is-on" : "") : (form.raceEthnicity.includes(r) ? "is-on" : "")}`}
+                onClick={() => (r === SELF_DESCRIBE ? openSelfRace() : toggleRace(r))}>{r}</button>
             ))}
           </div>
+          {selfRaceOpen && (
+            <input className="input" style={{ marginTop: 10, maxWidth: 420 }}
+              autoFocus value={selfRace} aria-label="Describe your race or ethnicity"
+              placeholder="Race and ethnicity"
+              onChange={(e) => setSelfRace(e.target.value)} />
+          )}
         </div>
         <div className="field">
           <label className={`check ${privacy?.showIdentity ? "is-on" : ""}`}

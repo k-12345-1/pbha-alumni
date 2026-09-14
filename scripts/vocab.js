@@ -60,6 +60,15 @@ const RACE_OPTIONS = [
   "Prefer to self-describe", "Prefer not to say",
 ];
 
+// The city list is long and changes rarely, so rather than keep a second
+// copy in sync by hand it is read straight out of the TypeScript source.
+// There is nothing to drift.
+const CITIES = (() => {
+  const src = fs.readFileSync(path.resolve(__dirname, "../src/lib/place.ts"), "utf8");
+  const block = src.slice(src.indexOf("export const CITIES = ["));
+  return block.slice(block.indexOf("[") + 1, block.indexOf("]")).match(/"([^"]+)"/g).map((q) => q.slice(1, -1));
+})();
+
 // Drift guard: every name here must appear in the TypeScript source.
 const ts = fs.readFileSync(path.resolve(__dirname, "../src/lib/programs.ts"), "utf8");
 for (const name of [...PROGRAMS, ...PBHA_ROLES, ...HOUSES, ...GENDER_OPTIONS, ...RACE_OPTIONS, ...INDUSTRIES]) {
@@ -68,4 +77,4 @@ for (const name of [...PROGRAMS, ...PBHA_ROLES, ...HOUSES, ...GENDER_OPTIONS, ..
   }
 }
 
-module.exports = { PROGRAMS, PBHA_ROLES, HOUSES, GENDER_OPTIONS, RACE_OPTIONS, INDUSTRIES };
+module.exports = { PROGRAMS, PBHA_ROLES, HOUSES, GENDER_OPTIONS, RACE_OPTIONS, INDUSTRIES, CITIES };

@@ -3,6 +3,7 @@ import { authRouter } from "./auth.routes";
 import { directoryRouter } from "./directory.routes";
 import { messagesRouter } from "./messages.routes";
 import { usersRouter } from "./users.routes";
+import { CITIES } from "../lib/place";
 import { GENDER_OPTIONS, HOUSES, INDUSTRIES, PBHA_ROLES, PROGRAMS, RACE_OPTIONS } from "../lib/programs";
 
 export const apiRouter = Router();
@@ -20,6 +21,7 @@ apiRouter.get("/vocab", (_req, res) =>
     industries: INDUSTRIES,
     genders: GENDER_OPTIONS,
     races: RACE_OPTIONS,
+    cities: CITIES,
   }),
 );
 
