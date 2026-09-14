@@ -1136,16 +1136,16 @@ function WelcomeScreen({ me, setScreen }) {
   const first = (me.profile && me.profile.first) || "";
   return (
     <div className="wrap page">
-      <div className="eyebrow" style={{ marginBottom: 16 }}>Welcome</div>
       <h1 className="h-1 accent">{first ? `Welcome back, ${first}.` : "Welcome to the network."}</h1>
-      <p className="lede" style={{ marginTop: 18, maxWidth: 720 }}>
+      <hr className="rule" style={{ margin: "22px 0 32px" }} />
+      <p className="lede" style={{ maxWidth: 720 }}>
         You are a member of the Phillips Brooks House Alumni Association because you were
         involved in a PBHA program. There is nothing to join and no dues:
         <span className="em-u"> everyone who served is already in</span>, whether or not they
         graduated from Harvard.
       </p>
 
-      <hr className="rule" style={{ margin: "40px 0 32px" }} />
+      <hr className="rule" style={{ margin: "36px 0 32px" }} />
 
       <h2 className="h-2" style={{ marginBottom: 20 }}>Start here</h2>
       <div className="tile-row">
@@ -1260,9 +1260,9 @@ function StudyScreen() {
   const max = STUDY_FIELDS[0][1];
   return (
     <div className="wrap page">
-      <div className="eyebrow" style={{ marginBottom: 16 }}>Alumni Study</div>
-      <h1 className="h-1 accent">What PBHA does to a life</h1>
-      <p className="lede" style={{ marginTop: 18, maxWidth: 720 }}>
+      <h1 className="h-1 accent">Alumni Study</h1>
+      <hr className="rule" style={{ margin: "22px 0 32px" }} />
+      <p className="lede" style={{ maxWidth: 720 }}>
         The PBHA Alumni Association surveyed alumni about where their service years took them.
         <span className="em-n"> 1,078</span> people answered. These are their findings, as PBHA
         published them.
@@ -2431,22 +2431,12 @@ function App() {
     <>
       <SiteBar />
 
-      <header className="site">
-        <div className="site-inner">
-          <a className="brand" href="#" onClick={(e) => { e.preventDefault(); setScreen("welcome"); }}>
-            <span>
-              <span className="brand-name">Alumni Network</span><br/>
-              <span className="brand-sub">Phillips Brooks House Association</span>
-            </span>
-          </a>
-
-          {/* Only the alumni section's own nav. Dropping this app under
-              pbha.org means adding one Alumni item to their nav and pointing
-              it here — see "Integrating with pbha.org" in the README — so
-              there is nothing to be gained by restating their menu. */}
-          {/* Editing your own profile lives in the account menu, not here,
-              so it is not offered in two places at once. */}
-          {me && (
+      {/* Only rendered signed in, when it has tabs to carry. Editing your
+          own profile lives in the account menu rather than here, so it is
+          not offered in two places at once. */}
+      {me && (
+        <header className="site">
+          <div className="site-inner">
             <nav className="site-nav">
               {SECTIONS.map((t) => (
                 <button key={t.key}
@@ -2454,19 +2444,12 @@ function App() {
                   onClick={() => { setScreen(t.key); setProfileId(null); }}>{t.label}</button>
               ))}
             </nav>
-          )}
-
-          <div className="header-actions">
-            {me && (
-              <AccountMenu
-                me={me}
-                onProfile={() => setScreen("me")}
-                onSignOut={signOut}
-              />
-            )}
+            <div className="header-actions">
+              <AccountMenu me={me} onProfile={() => setScreen("me")} onSignOut={signOut} />
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       {me === undefined && <div className="wrap page"><p className="meta">Loading…</p></div>}
       {me === null && <GateScreen onSignedIn={loadMe} />}
