@@ -2805,12 +2805,21 @@ function ProfileScreen({ userId, onBack, onUnreadChange }) {
               {person.isCurrentStudent ? "Current student" : "Alum"} · {person.year}
             </span>
             {person.openToMentor && <span className="chip chip-accent">Open to mentoring</span>}
-            {/* Hidden for your own profile, and for anyone who has turned
-                messages off — though the server is what actually refuses. */}
-            {!person.isSelf && person.openToMessages !== false && (
-              <button className="btn btn-primary btn-sm" onClick={write} disabled={opening || !!threadId}>
-                {opening ? "One moment…" : threadId ? "Writing below" : "Message"}
-              </button>
+            {/* On everyone's profile but your own. Someone who has turned
+                messages off still gets the button, disabled and saying so,
+                rather than a profile that silently offers no way to write:
+                the absence of a button reads as a bug, not as a choice.
+                The server is what actually refuses either way. */}
+            {!person.isSelf && (
+              person.openToMessages === false ? (
+                <span className="chip chip-static" title="This member has messages turned off">
+                  Not accepting messages
+                </span>
+              ) : (
+                <button className="btn btn-primary btn-sm" onClick={write} disabled={opening || !!threadId}>
+                  {opening ? "One moment…" : threadId ? "Writing below" : "Message"}
+                </button>
+              )
             )}
           </div>
         </div>
