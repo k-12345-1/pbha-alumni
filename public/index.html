@@ -291,9 +291,15 @@ textarea.input { min-height: 100px; resize: vertical; line-height: 1.55; }
   display: grid;
   grid-template-columns: 220px 1fr;
   gap: 32px;
-  align-items: center;
+  align-items: start;
   margin-bottom: 36px;
 }
+/* align-items: start lines up the box, not the letters: the name's line
+   box carries leading above its cap height, so the name would sit a few
+   pixels below the photo's top edge. At line-height 1.19 that leading is
+   (1.19 - 1) / 2 = .095 of the font size — in em, which resolves against
+   the heading's own clamped size, so the correction holds at every width. */
+.profile-id .h-1 { margin-top: -0.095em; }
 .profile-photo {
   aspect-ratio: 1 / 1;
   background: var(--wash-2);
