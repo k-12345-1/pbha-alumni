@@ -391,40 +391,6 @@ footer.site {
   nav.site-nav { gap: 16px; }
 }
 
-/* Dual-range class-year slider — two overlaid range inputs with the selected
-   span painted between them. pointer-events is off on the track so the two
-   thumbs stay independently grabbable where they overlap. */
-.dual-range {
-  -webkit-appearance: none;
-  appearance: none;
-  background: transparent;
-  pointer-events: none;
-  margin: 0;
-  height: 24px;
-}
-.dual-range::-webkit-slider-runnable-track { background: transparent; height: 2px; }
-.dual-range::-moz-range-track { background: transparent; height: 2px; }
-.dual-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  pointer-events: auto;
-  width: 16px; height: 16px;
-  border-radius: 50%;
-  background: var(--orange);
-  border: 2px solid var(--white);
-  box-shadow: 0 0 0 1px var(--orange);
-  cursor: pointer;
-  margin-top: -7px;
-}
-.dual-range::-moz-range-thumb {
-  pointer-events: auto;
-  width: 16px; height: 16px;
-  border-radius: 50%;
-  background: var(--orange);
-  border: 2px solid var(--white);
-  box-shadow: 0 0 0 1px var(--orange);
-  cursor: pointer;
-}
 
 .map-btn {
   width: 30px; height: 30px; padding: 0;
@@ -852,6 +818,27 @@ footer.site {
   .msg-layout { grid-template-columns: 1fr; }
   .msg-list { max-height: 260px; }
 }
+
+/* Menus in the filter rail anchor to the left edge of their control. The
+   default right-anchor plus a 220px min-width pushes them off the left of
+   the page, because the rail column is narrower than the menu. */
+.directory-rail .pill-menu { left: 0; right: auto; min-width: 100%; }
+
+.year-range { display: flex; align-items: center; gap: 8px; }
+.year-range > div { flex: 1; }
+.year-range .pill-select { width: 100%; justify-content: space-between; padding: 8px 12px; }
+/* Year lists run to 126 entries, so the menu has to scroll. */
+.pill-menu { max-height: 280px; overflow-y: auto; }
+
+.photo-field { display: flex; align-items: center; gap: 12px; }
+.photo-field .input { flex: 1; }
+.photo-preview {
+  width: 44px; height: 44px; flex: none;
+  background: var(--wash-2);
+  overflow: hidden;
+  display: grid; place-items: center;
+}
+.photo-preview img { width: 100%; height: 100%; object-fit: cover; }
 </style>
 </head>
 <body>
@@ -2153,9 +2140,13 @@ function DirectoryMap({ locations, people, onOpenProfile }) {
 }
 
 // PBHA was founded in 1904; nobody can have a PBHA class year before it.
+// A link to an image file, not to a page that contains one.
+const IMAGE_URL = /\.(jpe?g|png|webp)(\?.*)?$/i;
+
 const YEAR_MIN = 1904;
 const YEAR_MAX = new Date().getFullYear() + 4;
-const YEAR_SPAN = YEAR_MAX - YEAR_MIN;
+// Newest first: most people are looking for a recent class, not 1904.
+const YEARS = Array.from({ length: YEAR_MAX - YEAR_MIN + 1 }, (_, i) => YEAR_MAX - i);
 
 function FilterGroup({ label, children }) {
   return (
@@ -2340,26 +2331,14 @@ function DirectoryScreen({ onOpenProfile }) {
           </FilterGroup>
 
           <FilterGroup label="Class year">
-            <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, fontWeight: 500 }}>
-              <span>{yearFrom}</span>
-              <div style={{ flex: 1, position: "relative", height: 24 }}>
-                <div style={{ position: "absolute", left: 0, right: 0, top: 11, height: 2, background: "var(--rule)" }} />
-                <div style={{ position: "absolute", top: 11, height: 2, background: "var(--orange)",
-                              left: `${((yearFrom - YEAR_MIN) / YEAR_SPAN) * 100}%`,
-                              right: `${100 - ((yearTo - YEAR_MIN) / YEAR_SPAN) * 100}%` }} />
-                {/* Two overlaid inputs. The upper one is the max handle; when
-                    both sit at the top of the range the min handle is raised
-                    above it so it stays grabbable. */}
-                <input type="range" className="dual-range" min={YEAR_MIN} max={YEAR_MAX} value={yearFrom}
-                  aria-label="Earliest class year"
-                  onChange={(e) => setYearFrom(Math.min(Number(e.target.value), yearTo))}
-                  style={{ position: "absolute", inset: 0, width: "100%", zIndex: yearFrom > YEAR_MAX - 4 ? 3 : 2 }} />
-                <input type="range" className="dual-range" min={YEAR_MIN} max={YEAR_MAX} value={yearTo}
-                  aria-label="Latest class year"
-                  onChange={(e) => setYearTo(Math.max(Number(e.target.value), yearFrom))}
-                  style={{ position: "absolute", inset: 0, width: "100%", zIndex: 2 }} />
-              </div>
-              <span>{yearTo}</span>
+            <div className="year-range">
+              <Select value={yearFrom} label="Earliest class year"
+                onChange={(v) => { setYearFrom(v); if (v > yearTo) setYearTo(v); }}
+                options={YEARS.map((y) => ({ value: y, label: String(y) }))} />
+              <span className="meta">to</span>
+              <Select value={yearTo} label="Latest class year"
+                onChange={(v) => { setYearTo(v); if (v < yearFrom) setYearFrom(v); }}
+                options={YEARS.map((y) => ({ value: y, label: String(y) }))} />
             </div>
           </FilterGroup>
 
@@ -2402,17 +2381,11 @@ function DirectoryScreen({ onOpenProfile }) {
           </FilterGroup>
 
           <FilterGroup label="Field of work">
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {facets.industries.map((i) => (
-                <label key={i.name}
-                  className={`check ${industries.includes(i.name) ? "is-on" : ""}`}
-                  onClick={(e) => { e.preventDefault(); toggle(industries, i.name, setIndustries); }}>
-                  <span className="box" />
-                  <span>{i.name} <span className="meta">· {i.count}</span></span>
-                </label>
-              ))}
-              {facets.industries.length === 0 && <span className="meta">—</span>}
-            </div>
+            <Select value={industries[0] || ""} label="Field of work"
+              onChange={(v) => setIndustries(v ? [v] : [])}
+              options={[{ value: "", label: "All fields" }].concat(
+                facets.industries.map((i) => ({ value: i.name, label: `${i.name} · ${i.count}` })),
+              )} />
           </FilterGroup>
 
           <FilterGroup label="Mentorship">
@@ -2786,7 +2759,27 @@ function MyProfileScreen({ me, onSaved }) {
           <input className="input" value={form.career} onChange={set("career")}
             placeholder="What you do" />
         </Field>
-        <Field label="Photo URL"><input className="input" value={form.photoUrl} onChange={set("photoUrl")} placeholder="Photo URL" /></Field>
+        <Field label="Photo"
+          hint="A link straight to a JPEG or PNG — the image itself, not the page it sits on.">
+          <div className="photo-field">
+            <input className="input" value={form.photoUrl} onChange={set("photoUrl")}
+              placeholder="https://example.com/you.jpg" />
+            {/* The preview is the check that matters: a link to a page rather
+                than to an image simply will not draw. */}
+            {form.photoUrl.trim() && (
+              <span className="photo-preview">
+                <img src={form.photoUrl.trim()} alt=""
+                  onError={(e) => { e.target.style.display = "none"; }}
+                  onLoad={(e) => { e.target.style.display = "block"; }} />
+              </span>
+            )}
+          </div>
+          {form.photoUrl.trim() && !IMAGE_URL.test(form.photoUrl.trim()) && (
+            <span className="meta" style={{ marginTop: 6, display: "block" }}>
+              That does not look like an image file. It should end in .jpg, .jpeg, .png, or .webp.
+            </span>
+          )}
+        </Field>
         <Field label="About you"><textarea className="input" value={form.bio} onChange={set("bio")} placeholder="About you" /></Field>
 
         <hr className="rule" style={{ margin: "36px 0 28px" }} />
