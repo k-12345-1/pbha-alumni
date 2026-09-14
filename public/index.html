@@ -431,7 +431,7 @@ footer.site {
    contact details — stays selectable. */
 .chip, .stamp, .stamp-year, .scope-btn, .btn, .check, .eyebrow,
 .person-card, .row-person, nav.site-nav button, .map-btn, .account-btn, .account-menu button,
-.pill-select, .pill-menu button, .site-bar-here {
+.pill-select, .pill-menu button, .site-bar-here, .combo-toggle {
   -webkit-user-select: none;
   user-select: none;
 }
@@ -674,6 +674,20 @@ header.site { background: var(--wash); }
   .site-bar-nav { gap: 14px; }
   .site-bar-nav a, .site-bar-here { font-size: 14px; }
 }
+
+.combo { position: relative; }
+.combo .input { padding-right: 40px; }
+.combo-toggle {
+  position: absolute;
+  right: 1px; top: 1px; bottom: 1px;
+  width: 36px;
+  display: grid; place-items: center;
+  background: none; border: 0;
+  color: var(--ink-mute);
+  cursor: pointer;
+}
+.combo-toggle:hover { color: var(--orange); }
+.combo-menu { left: 0; right: auto; min-width: 100%; max-height: 260px; overflow-y: auto; }
 </style>
 </head>
 <body>
@@ -868,6 +882,58 @@ function Select({ value, options, onChange, label }) {
               onClick={() => { onChange(o.value); setOpen(false); }}>
               {o.label}
             </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Type-or-pick. A native <datalist> hands its suggestion list to the
+// operating system to draw — the dark panel — and no CSS reaches it. This
+// keeps the free-text input (House and gender are free-text columns for a
+// reason) and puts the suggestions in a menu the site owns.
+function Combo({ value, onChange, options, placeholder, label }) {
+  const [open, setOpen] = React.useState(false);
+  const ref = React.useRef(null);
+
+  React.useEffect(() => {
+    if (!open) return;
+    const onDocClick = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const onKey = (e) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  const typed = (value || "").trim().toLowerCase();
+  // Once the value exactly matches a suggestion, show the whole list again —
+  // otherwise picking one collapses the menu to that single entry.
+  const exact = options.some((o) => o.toLowerCase() === typed);
+  const shown = !typed || exact ? options : options.filter((o) => o.toLowerCase().includes(typed));
+
+  return (
+    <div className="combo" ref={ref}>
+      <input className="input" value={value} placeholder={placeholder} aria-label={label}
+        onChange={(e) => { onChange(e.target.value); setOpen(true); }}
+        onFocus={() => setOpen(true)} />
+      {/* type="button" matters: this sits inside the profile form, and a
+          bare <button> there would submit it. */}
+      <button type="button" className="combo-toggle" onClick={() => setOpen((o) => !o)}
+        aria-label={`Show ${label} options`} aria-expanded={open}>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+          <path d="M5 8.5l7 7 7-7" />
+        </svg>
+      </button>
+      {open && shown.length > 0 && (
+        <div className="pill-menu combo-menu" role="listbox">
+          {shown.map((o) => (
+            <button type="button" key={o} role="option" aria-selected={o === value}
+              className={o === value ? "is-on" : ""}
+              onClick={() => { onChange(o); setOpen(false); }}>{o}</button>
           ))}
         </div>
       )}
@@ -2134,12 +2200,12 @@ function MyProfileScreen({ me, onSaved }) {
           <Field label="Last name"><input className="input" value={form.last} onChange={set("last")} required /></Field>
           <Field label="Pronouns"><input className="input" value={form.pronouns} onChange={set("pronouns")} placeholder="she/her" /></Field>
           <Field label="Class year"><input className="input" type="number" min="1904" max="2050" value={form.year} onChange={set("year")} required /></Field>
-          <Field label="Concentration"><input className="input" value={form.concentration} onChange={set("concentration")} placeholder="Social Studies" /></Field>
+          <Field label="Concentration">
+            <input className="input" value={form.concentration} onChange={set("concentration")} placeholder="Concentration" />
+          </Field>
           <Field label="House">
-            <input className="input" list="house-options" value={form.house} onChange={set("house")} placeholder="Currier" />
-            <datalist id="house-options">
-              {vocab.houses.map((h) => <option key={h} value={h} />)}
-            </datalist>
+            <Combo label="House" placeholder="House" options={vocab.houses}
+              value={form.house} onChange={(v) => setForm((f) => ({ ...f, house: v }))} />
           </Field>
         </div>
 
@@ -2204,10 +2270,8 @@ function MyProfileScreen({ me, onSaved }) {
           share their background. You can leave all of it blank.
         </p>
         <Field label="Gender">
-          <input className="input" list="gender-options" value={form.gender} onChange={set("gender")} placeholder="Optional" />
-          <datalist id="gender-options">
-            {vocab.genders.map((g) => <option key={g} value={g} />)}
-          </datalist>
+          <Combo label="Gender" placeholder="Gender" options={vocab.genders}
+            value={form.gender} onChange={(v) => setForm((f) => ({ ...f, gender: v }))} />
         </Field>
         <div className="field">
           <span className="eyebrow" style={{ display: "block", marginBottom: 10 }}>Race and ethnicity</span>
@@ -2233,23 +2297,6 @@ function MyProfileScreen({ me, onSaved }) {
         <button className="btn btn-primary" disabled={busy}>{busy ? "Saving…" : "Save profile"}</button>
       </form>
 
-      <hr className="rule" style={{ margin: "44px 0 28px" }} />
-      <h2 className="h-2">Privacy</h2>
-      <div style={{ display: "flex", flexDirection: "column", gap: 14, marginTop: 18 }}>
-        <label className={`check ${privacy?.showInDirectory ? "is-on" : ""}`}
-          onClick={(e) => { e.preventDefault(); savePrivacy({ showInDirectory: !privacy.showInDirectory }); }}>
-          <span className="box" />
-          <span>List me in the directory</span>
-        </label>
-        <label className={`check ${privacy?.profileVisibility === "ALUMNI" ? "is-on" : ""}`}
-          onClick={(e) => {
-            e.preventDefault();
-            savePrivacy({ profileVisibility: privacy.profileVisibility === "ALUMNI" ? "PRIVATE" : "ALUMNI" });
-          }}>
-          <span className="box" />
-          <span>Let signed-in PBHA members open my full profile</span>
-        </label>
-      </div>
     </div>
   );
 }
