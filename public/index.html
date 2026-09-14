@@ -102,29 +102,18 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: 0.01em; }
 /* Vertical only — a padding shorthand here would reset the horizontal
    gutter .wrap sets, which is what had been pinning body content to the
    left edge while the header sat correctly inset. */
-.page { padding-top: 56px; padding-bottom: 110px; }
+.page { padding-top: 26px; padding-bottom: 110px; }
 .rule { height: 1px; background: var(--rule); border: 0; }
 
 
 
-header.site {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  background: var(--white);
-  border-bottom: 1px solid var(--rule);
-}
-.site-inner {
-  display: flex;
-  align-items: center;
-  gap: 26px;
-  /* Their header row runs 65px tall and holds the 35x51 mark with 7px above
-     and below it, on the same gutter as the body content. */
-  min-height: 65px;
-  padding: 0 var(--pad);
-  max-width: var(--max);
-  margin: 0 auto;
-}
+/* The alumni section's tabs, sitting inside the page rather than in a band
+   of their own — a second full-width bar under pbha.org's read as two
+   competing headers. */
+/* Vertical only. A padding shorthand here resets the horizontal gutter
+   .wrap sets, which pins the tabs to the window edge — the same trap that
+   caught .page. */
+.section-tabs { padding-top: 30px; }
 
 /* Sentence case, 15px/500, black — not uppercase. */
 nav.site-nav { display: flex; align-items: center; gap: 24px; }
@@ -370,7 +359,6 @@ footer.site {
   .row-person { grid-template-columns: 46px 1fr; }
   .row-person > :nth-child(n+3) { grid-column: 2; }
   nav.site-nav { gap: 16px; }
-  .site-inner { flex-wrap: wrap; gap: 16px; min-height: 0; }
 }
 
 /* Dual-range class-year slider — two overlaid range inputs with the selected
@@ -424,9 +412,9 @@ footer.site {
    from carrying on into the page behind it. */
 .directory-rail {
   position: sticky;
-  top: 92px;
+  top: 90px;
   align-self: start;
-  max-height: calc(100vh - 116px);
+  max-height: calc(100vh - 114px);
   overflow-y: auto;
   overscroll-behavior: contain;
   padding-right: 10px;
@@ -457,8 +445,6 @@ footer.site {
   -webkit-user-select: none;
   user-select: none;
 }
-
-.header-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
 
 .account-btn {
   width: 38px; height: 38px; padding: 0;
@@ -660,7 +646,13 @@ footer.site {
 
 /* ---------- pbha.org's own bar, above the alumni section ---------- */
 
-.site-bar { background: var(--white); border-bottom: 1px solid var(--rule); }
+.site-bar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--white);
+  border-bottom: 1px solid var(--rule);
+}
 .site-bar-inner {
   display: flex;
   align-items: center;
@@ -686,7 +678,6 @@ footer.site {
 .site-bar-actions .btn:hover { color: var(--white); }
 
 /* The alumni row underneath reads as a subsection of the bar above it. */
-header.site { background: var(--wash); }
 
 @media (max-width: 1180px) {
   .site-bar-actions a:not(.btn) { display: none; }
@@ -829,7 +820,7 @@ const Social = {
   ),
 };
 
-function SiteBar() {
+function SiteBar({ me, onProfile, onSignOut }) {
   return (
     <div className="site-bar">
       <div className="site-bar-inner">
@@ -853,6 +844,7 @@ function SiteBar() {
           <a href="mailto:pbha@pbha.org" aria-label="Email PBHA"><Social.mail /></a>
           <a className="btn btn-primary btn-sm" href="https://donatenow.networkforgood.org/1439676"
             target="_blank" rel="noopener noreferrer">Donate</a>
+          {me && <AccountMenu me={me} onProfile={onProfile} onSignOut={onSignOut} />}
         </div>
       </div>
     </div>
@@ -2370,26 +2362,18 @@ function App() {
 
   return (
     <>
-      <SiteBar />
+      <SiteBar me={me} onProfile={() => setScreen("me")} onSignOut={signOut} />
 
-      {/* Only rendered signed in, when it has tabs to carry. Editing your
-          own profile lives in the account menu rather than here, so it is
-          not offered in two places at once. */}
       {me && (
-        <header className="site">
-          <div className="site-inner">
-            <nav className="site-nav">
-              {SECTIONS.map((t) => (
-                <button key={t.key}
-                  className={t.key === screen || (t.key === "directory" && screen === "profile") ? "is-active" : ""}
-                  onClick={() => { setScreen(t.key); setProfileId(null); }}>{t.label}</button>
-              ))}
-            </nav>
-            <div className="header-actions">
-              <AccountMenu me={me} onProfile={() => setScreen("me")} onSignOut={signOut} />
-            </div>
-          </div>
-        </header>
+        <div className="wrap section-tabs">
+          <nav className="site-nav">
+            {SECTIONS.map((t) => (
+              <button key={t.key}
+                className={t.key === screen || (t.key === "directory" && screen === "profile") ? "is-active" : ""}
+                onClick={() => { setScreen(t.key); setProfileId(null); }}>{t.label}</button>
+            ))}
+          </nav>
+        </div>
       )}
 
       {me === undefined && <div className="wrap page"><p className="meta">Loading…</p></div>}
