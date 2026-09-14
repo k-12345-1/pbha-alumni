@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PBHA Alumni Network</title>
+<!-- The mark is taller than it is wide, so the favicon is a squared,
+     white-padded copy — a browser would otherwise squash it. -->
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
 <meta name="description" content="The alumni directory of the Phillips Brooks House Association.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -136,7 +140,7 @@ nav.site-nav button {
   border-bottom: 2px solid transparent;
 }
 nav.site-nav button:hover { color: var(--orange); }
-nav.site-nav button.is-active { border-bottom-color: var(--orange); }
+nav.site-nav button.is-active { color: var(--orange); border-bottom-color: var(--orange); }
 
 /* ---------- controls ---------- */
 
@@ -656,7 +660,7 @@ footer.site {
   padding: 4px 0; border-bottom: 2px solid transparent;
 }
 .site-bar-nav a:hover { color: var(--orange); }
-.site-bar-here { border-bottom-color: var(--orange); }
+.site-bar-here { color: var(--orange); border-bottom-color: var(--orange); }
 .site-bar-actions { margin-left: auto; display: flex; align-items: center; gap: 18px; }
 .site-bar-actions a { color: var(--ink); display: flex; text-decoration: none; }
 .site-bar-actions a:hover { color: var(--orange); }
@@ -823,10 +827,9 @@ function SiteBar() {
 }
 
 const SECTIONS = [
-  { key: "welcome", label: "Welcome" },
+  { key: "welcome", label: "Home" },
   { key: "directory", label: "Directory" },
   { key: "study", label: "Alumni Study" },
-  { key: "archives", label: "Archives" },
 ];
 
 // The account control in the header: an orange avatar that opens the two
@@ -1337,171 +1340,6 @@ function StudyScreen() {
           target="_blank" rel="noopener noreferrer">Read the full report</a>
         <a className="btn btn-ghost" href="https://www.pbha.org/alumni-impact"
           target="_blank" rel="noopener noreferrer">PBHA's impact pages</a>
-      </div>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- * Archives
- *
- * PBHA has no archive. There is a prose institutional history at
- * /our-history, and 120 Stories, a numbered series of written accounts.
- * This section puts both in one place and gives alumni somewhere to add
- * to it — which is the whole point, since the people who remember the
- * 1970s collapse or the 1995 rally are the ones reading this.
- * ------------------------------------------------------------------ */
-
-const ERAS = [
-  {
-    era: "Origins",
-    years: "1893–1904",
-    items: [
-      "Phillips Brooks House is built in memory of Reverend Phillips Brooks, a Trinity Church preacher, Harvard graduate, and advocate for social service. Plans are completed on his death in 1893.",
-      "The House is dedicated on 23 January 1900, to serve “the ideal of piety, charity, and hospitality.”",
-      "In 1904, six organizations formally organize as the Phillips Brooks House Association.",
-    ],
-  },
-  {
-    era: "The first half-century",
-    years: "1900s–1940s",
-    items: ["By the 1920s every religious group has withdrawn, leaving PBHA a secular service association."],
-  },
-  {
-    era: "Opening up",
-    years: "1950s–1960s",
-    items: [
-      "1954: Radcliffe students are admitted to full participation.",
-      "A Mental Health Committee forms; students organize with the Roosevelt Towers tenants' council.",
-      "1969: PBHA commits the house to being a common meeting ground during the protests, and produces a twelve-page report, The Critique of Harvard Expansion.",
-    ],
-  },
-  {
-    era: "Collapse and rebuilding",
-    years: "1970s",
-    items: [
-      "Membership falls from over 1,000 students to fewer than 200.",
-      "PBHA incorporates in 1973 and hires its first full-time graduate secretary — now the executive director — in 1974.",
-      "The Environmental Action Committee, the Committee on Women's Issues, and Harvard's first women's center are founded, the last on the second floor of Phillips Brooks House.",
-      "Michael Robinson '74: “The approach quickly evolved from arms-length charity to an involved attack on basic social and political problems.”",
-    ],
-  },
-  {
-    era: "Shelter and scale",
-    years: "1980s",
-    items: [
-      "The Harvard Square Homeless Shelter opens at University Lutheran Church.",
-      "A $1 million capital campaign runs in 1986.",
-      "The Summer Urban Program grows into a twelve-camp network serving more than 700 children.",
-    ],
-  },
-  {
-    era: "Independence",
-    years: "1990s–2000s",
-    items: [
-      "1992: the cabinet votes to create a student board of directors.",
-      "November 1995: a cabinet resolution urges “a more rational, autonomous structure.” On 7 December, more than 2,000 people join a rally.",
-      "By-laws are rewritten in spring 1996, a one-year trial agreement follows that summer, and a final agreement is signed in September 1997.",
-      "A $7.25 million Centennial Campaign follows. The Living Wage Campaign runs through PSLM, later SLAM, including a Massachusetts Hall sit-in and a plane over commencement.",
-    ],
-  },
-  {
-    era: "Present day",
-    years: "2004–",
-    items: [
-      "More than 85 programs and over 1,400 volunteers.",
-      "2024: PBHA marks 120 years and begins 120 Stories.",
-      "The Road to the 125th runs toward the anniversary in 2029.",
-    ],
-  },
-];
-
-// Named subjects from PBHA's published 120 Stories series. Numbers are
-// theirs; the series counts down.
-const STORIES = [
-  ["120", "Remi Cruz", "Founder of Keylatch, on Jorge Palmarin's legacy"],
-  ["119", "Meherina Khan & Farah Afify", "Leading through the pandemic"],
-  ["118", "Ian Simmons", "The Harvard Living Wage Campaign"],
-  ["117", "Van Le", "Vietnamese refugee to Cambridge Youth Enrichment Program"],
-  ["116", "Darin McKeever", "Co-founder of Heads Up"],
-  ["115", "Arnold Hiatt", "The Stride Rite sponsorship"],
-  ["114", "Priscilla Chan", "FASE, and the Chan Zuckerberg Initiative"],
-  ["113", "Richard Buery", "Founded the Mission Hill Summer Program; CEO of Robin Hood"],
-  ["112", "Roger Baldwin", "Co-founder of the ACLU"],
-  ["110", "Sara Lockridge-Steckel", "The Collective Blueprint"],
-  ["109", "Eric Dawson", "Peace Games"],
-  ["108", "Lindsay Hyde", "Strong Women, Strong Girls"],
-];
-
-function ArchivesScreen() {
-  const [open, setOpen] = React.useState(ERAS[0].era);
-  return (
-    <div className="wrap page">
-      <div className="eyebrow" style={{ marginBottom: 16 }}>Archives</div>
-      <h1 className="h-1 accent">A hundred and twenty years of it</h1>
-      <p className="lede" style={{ marginTop: 18, maxWidth: 720 }}>
-        PBHA has been running since <span className="em-n">1904</span>, and almost none of it is
-        written down anywhere a member can find. What follows is PBHA's published history and
-        its 120 Stories series, in one place.
-      </p>
-
-      <hr className="rule" style={{ margin: "40px 0 32px" }} />
-
-      <h2 className="h-2" style={{ marginBottom: 20 }}>The record so far</h2>
-      <div className="card">
-        {ERAS.map((e) => {
-          const isOpen = open === e.era;
-          return (
-            <div key={e.era} className="era">
-              <button className="era-head" onClick={() => setOpen(isOpen ? null : e.era)}
-                aria-expanded={isOpen}>
-                <span className="era-years">{e.years}</span>
-                <span className="era-title">{e.era}</span>
-                <span className="era-mark">{isOpen ? "−" : "+"}</span>
-              </button>
-              {isOpen && (
-                <ul className="era-body">
-                  {e.items.map((it, i) => <li key={i}>{it}</li>)}
-                </ul>
-              )}
-            </div>
-          );
-        })}
-      </div>
-      <p className="meta" style={{ marginTop: 12 }}>
-        Drawn from <a className="link-orange" href="https://www.pbha.org/our-history" target="_blank" rel="noopener noreferrer">PBHA's history page</a>.
-      </p>
-
-      <hr className="rule" style={{ margin: "44px 0 32px" }} />
-
-      <h2 className="h-2" style={{ marginBottom: 8 }}>120 Stories</h2>
-      <p className="meta" style={{ marginBottom: 24, maxWidth: 700 }}>
-        For its 120th anniversary PBHA began collecting accounts from alumni, participants,
-        volunteers, and directors. A selection of what is published so far.
-      </p>
-      <div className="story-grid">
-        {STORIES.map(([n, who, what]) => (
-          <a key={n} className="story" href="https://www.pbha.org/120stories"
-            target="_blank" rel="noopener noreferrer">
-            <span className="story-n">#{n}</span>
-            <span className="story-who">{who}</span>
-            <span className="meta">{what}</span>
-          </a>
-        ))}
-      </div>
-
-      <div className="card card-pad" style={{ marginTop: 32 }}>
-        <h3 className="h-3" style={{ marginBottom: 8 }}>Add to the record</h3>
-        <p className="meta" style={{ marginBottom: 18, maxWidth: 620 }}>
-          If you were there for the 1970s rebuilding, the 1995 rally, the first winter of the
-          shelter, or a summer nobody has written up, that account exists nowhere but with you.
-          Submissions are read by the PBHA team.
-        </p>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <a className="btn btn-primary" href="https://www.tfaforms.com/5223933"
-            target="_blank" rel="noopener noreferrer">Submit your story</a>
-          <a className="btn btn-ghost" href="mailto:120Stories@pbha.org">120Stories@pbha.org</a>
-        </div>
       </div>
     </div>
   );
@@ -2635,7 +2473,6 @@ function App() {
       {me && screen === "welcome" && <WelcomeScreen me={me} setScreen={setScreen} />}
       {me && screen === "directory" && <DirectoryScreen onOpenProfile={openProfile} />}
       {me && screen === "study" && <StudyScreen />}
-      {me && screen === "archives" && <ArchivesScreen />}
       {me && screen === "profile" && profileId && (
         <ProfileScreen userId={profileId} onBack={() => { setScreen("directory"); setProfileId(null); }} />
       )}
