@@ -1537,8 +1537,7 @@ function WelcomeScreen({ me, setScreen }) {
         More than <span className="em-n">30,000</span> alumni have run
         <span className="em-u"> the Phillips Brooks House Association</span>&rsquo;s programs
         since <span className="em-n">1904</span>. The Alumni Network is where they find each
-        other again. Current students are here too, so the people running a program this
-        year can reach the people who ran it before them.
+        other again as well as connect with current students!
       </p>
 
       <hr className="rule" style={{ margin: "40px 0 32px" }} />
@@ -2728,10 +2727,6 @@ function ProfileScreen({ userId, onBack, onUnreadChange }) {
 
   return (
     <div className="wrap page">
-      <button className="btn btn-ghost btn-sm" onClick={onBack} style={{ marginBottom: 28 }}>
-        ← Directory
-      </button>
-
       {/* A square photo beside a name, with everything that qualifies the
           person — their year, whether they mentor — up by the name rather
           than stacked under the picture. Below that the text runs the full
