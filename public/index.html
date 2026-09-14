@@ -430,7 +430,7 @@ footer.site {
    contact details — stays selectable. */
 .chip, .stamp, .stamp-year, .scope-btn, .btn, .check, .eyebrow,
 .person-card, .row-person, nav.site-nav button, .map-btn, .account-btn, .account-menu button,
-.pill-select, .pill-menu button {
+.pill-select, .pill-menu button, .site-bar-here {
   -webkit-user-select: none;
   user-select: none;
 }
@@ -634,6 +634,45 @@ footer.site {
 .pill-menu button.is-on { background: var(--orange); color: var(--white); }
 
 .account-initials { font-size: 13px; font-weight: 700; letter-spacing: 0.04em; }
+
+/* ---------- pbha.org's own bar, above the alumni section ---------- */
+
+.site-bar { background: var(--white); border-bottom: 1px solid var(--rule); }
+.site-bar-inner {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 var(--pad);
+  min-height: 65px;
+}
+.site-bar-logo { flex: none; display: flex; }
+.site-bar-logo img { width: 35px; height: 51px; object-fit: contain; }
+.site-bar-nav { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
+.site-bar-nav a, .site-bar-here {
+  font-size: 15px; font-weight: 500; color: var(--ink);
+  text-decoration: none; white-space: nowrap;
+  padding: 4px 0; border-bottom: 2px solid transparent;
+}
+.site-bar-nav a:hover { color: var(--orange); }
+.site-bar-here { border-bottom-color: var(--orange); }
+.site-bar-actions { margin-left: auto; display: flex; align-items: center; gap: 18px; }
+.site-bar-actions a { color: var(--ink); display: flex; text-decoration: none; }
+.site-bar-actions a:hover { color: var(--orange); }
+.site-bar-actions .btn:hover { color: var(--white); }
+
+/* The alumni row underneath reads as a subsection of the bar above it. */
+header.site { background: var(--wash); }
+
+@media (max-width: 1180px) {
+  .site-bar-actions a:not(.btn) { display: none; }
+  .site-bar-inner { padding-top: 10px; padding-bottom: 10px; }
+}
+@media (max-width: 860px) {
+  .site-bar-nav { gap: 14px; }
+  .site-bar-nav a, .site-bar-here { font-size: 14px; }
+}
 </style>
 </head>
 <body>
@@ -713,6 +752,75 @@ const splitCareer = (career) => {
   const [title, org] = String(career || "").split(" · ");
   return { title: title || "", org: org || "" };
 };
+
+// pbha.org's own top-level sections, each pointing at the page that section
+// opens to. This bar sits above the alumni section at all times, signed in or
+// out, so a member never loses the rest of the site.
+const SITE_NAV = [
+  { label: "About Us", href: "/mission-and-impact" },
+  { label: "SUP", href: "/sup" },
+  { label: "Programs", href: "/programs" },
+  { label: "For Participants", href: "/youthtermapp" },
+  { label: "For Volunteers", href: "/apply" },
+  { label: "Events", href: "/coles-2026" },
+  { label: "Features", href: "/125" },
+];
+
+const Social = {
+  facebook: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6A22 22 0 0 0 14.3 3.5c-2.4 0-4 1.45-4 4.1v2.3H7.6V13h2.7v8z"/>
+    </svg>
+  ),
+  linkedin: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M4.98 3.5A2.5 2.5 0 1 0 5 8.5a2.5 2.5 0 0 0 0-5zM3 9.5h4V21H3zM9.5 9.5h3.8v1.6h.05c.53-.95 1.83-1.95 3.76-1.95 4.02 0 4.76 2.5 4.76 5.76V21h-4v-4.9c0-1.17-.02-2.68-1.7-2.68-1.7 0-1.96 1.28-1.96 2.6V21h-3.7z"/>
+    </svg>
+  ),
+  instagram: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
+      <rect x="3" y="3" width="18" height="18" rx="5"/>
+      <circle cx="12" cy="12" r="4"/>
+      <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/>
+    </svg>
+  ),
+  mail: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
+      <rect x="2.5" y="5" width="19" height="14" rx="2"/>
+      <path d="M3 6.5l9 6.5 9-6.5"/>
+    </svg>
+  ),
+};
+
+function SiteBar() {
+  return (
+    <div className="site-bar">
+      <div className="site-bar-inner">
+        <a className="site-bar-logo" href="https://www.pbha.org" target="_blank" rel="noopener noreferrer"
+          aria-label="Phillips Brooks House Association">
+          <img src="pbha-logo.png" alt="Phillips Brooks House Association" />
+        </a>
+        <nav className="site-bar-nav">
+          {SITE_NAV.map((item) => (
+            <a key={item.label} href={"https://www.pbha.org" + item.href}
+              target="_blank" rel="noopener noreferrer">{item.label}</a>
+          ))}
+          {/* The tab this section adds. It is the page you are on, so it does
+              not navigate anywhere. */}
+          <span className="site-bar-here">Alumni</span>
+        </nav>
+        <div className="site-bar-actions">
+          <a href="https://www.facebook.com/PBHAserves" target="_blank" rel="noopener noreferrer" aria-label="PBHA on Facebook"><Social.facebook /></a>
+          <a href="https://www.linkedin.com/company/phillips-brooks-house-association-inc-" target="_blank" rel="noopener noreferrer" aria-label="PBHA on LinkedIn"><Social.linkedin /></a>
+          <a href="https://www.instagram.com/pbha" target="_blank" rel="noopener noreferrer" aria-label="PBHA on Instagram"><Social.instagram /></a>
+          <a href="mailto:pbha@pbha.org" aria-label="Email PBHA"><Social.mail /></a>
+          <a className="btn btn-primary btn-sm" href="https://donatenow.networkforgood.org/1439676"
+            target="_blank" rel="noopener noreferrer">Donate</a>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const SECTIONS = [
   { key: "welcome", label: "Welcome" },
@@ -913,11 +1021,7 @@ function GateScreen({ onSignedIn }) {
     <div className="wrap page">
       <div className="gate">
         <div className="eyebrow" style={{ marginBottom: 20 }}>Phillips Brooks House Association</div>
-        <h1 className="h-1 accent">PBHA Alumni Network</h1>
-        <p className="lede" style={{ marginTop: 20 }}>
-          Every PBHA volunteer, coordinator, and director, in one place. Find the people
-          you served with, and be findable by the students who came after you.
-        </p>
+        <h1 className="h-1 accent">Alumni Network</h1>
 
         <div className="gate-tabs">
           <button className={`btn ${mode === "signin" ? "btn-primary" : "btn-ghost"}`}
@@ -939,7 +1043,7 @@ function GateScreen({ onSignedIn }) {
           )}
           {mode === "signup" && (
             <Field label="Class year" hint="The year you graduated, or expect to.">
-              <input className="input" type="number" min="1930" max="2050"
+              <input className="input" type="number" min="1904" max="2050"
                 value={form.year} onChange={set("year")} required />
             </Field>
           )}
@@ -954,12 +1058,6 @@ function GateScreen({ onSignedIn }) {
               value={form.password} onChange={set("password")} required />
           </Field>
           {mode === "signup" && (
-            <Field label="Invite code" hint="Only if PBHA gave you one.">
-              <input className="input" value={form.inviteCode} onChange={set("inviteCode")} />
-            </Field>
-          )}
-
-          {mode === "signup" && (
             <p className="meta" style={{ marginBottom: 18, textAlign: "left" }}>
               By joining you agree to use the network to reconnect with PBHA members, and not
               to export it, scrape it, or add anyone to a mailing list without asking.
@@ -967,13 +1065,6 @@ function GateScreen({ onSignedIn }) {
           )}
 
           {error && <div className="banner banner-error" style={{ marginBottom: 16 }}>{error}</div>}
-
-          {demo && (
-            <p className="meta" style={{ marginBottom: 16, fontSize: 13, textAlign: "left" }}>
-              Preview of a network that is not live yet — any email and password will sign you
-              in, and the members you will see are invented.
-            </p>
-          )}
 
           <button className="btn btn-primary" style={{ width: "100%" }} disabled={busy}>
             {busy ? "One moment…" : mode === "signin" ? "Sign in" : "Create account"}
@@ -1762,7 +1853,8 @@ function DirectoryMap({ locations, people, onOpenProfile }) {
   );
 }
 
-const YEAR_MIN = 1950;
+// PBHA was founded in 1904; nobody can have a PBHA class year before it.
+const YEAR_MIN = 1904;
 const YEAR_MAX = new Date().getFullYear() + 4;
 const YEAR_SPAN = YEAR_MAX - YEAR_MIN;
 
@@ -2348,7 +2440,7 @@ function MyProfileScreen({ me, onSaved }) {
           <Field label="First name"><input className="input" value={form.first} onChange={set("first")} required /></Field>
           <Field label="Last name"><input className="input" value={form.last} onChange={set("last")} required /></Field>
           <Field label="Pronouns"><input className="input" value={form.pronouns} onChange={set("pronouns")} placeholder="she/her" /></Field>
-          <Field label="Class year"><input className="input" type="number" min="1930" max="2050" value={form.year} onChange={set("year")} required /></Field>
+          <Field label="Class year"><input className="input" type="number" min="1904" max="2050" value={form.year} onChange={set("year")} required /></Field>
           <Field label="Concentration"><input className="input" value={form.concentration} onChange={set("concentration")} placeholder="Social Studies" /></Field>
           <Field label="House">
             <input className="input" list="house-options" value={form.house} onChange={set("house")} placeholder="Currier" />
@@ -2499,13 +2591,14 @@ function App() {
 
   return (
     <>
+      <SiteBar />
+
       <header className="site">
         <div className="site-inner">
-          <a className="brand" href="https://www.pbha.org" target="_blank" rel="noopener noreferrer">
-            <Logo />
+          <a className="brand" href="#" onClick={(e) => { e.preventDefault(); setScreen("welcome"); }}>
             <span>
-              <span className="brand-name">Phillips Brooks House Association</span><br/>
-              <span className="brand-sub">Alumni Network</span>
+              <span className="brand-name">Alumni Network</span><br/>
+              <span className="brand-sub">Phillips Brooks House Association</span>
             </span>
           </a>
 

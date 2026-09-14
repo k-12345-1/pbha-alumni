@@ -27,7 +27,7 @@ export const signupSchema = z
     year: z.coerce
       .number()
       .int()
-      .min(1930, "Class year must be 1930 or later")
+      .min(1904, "Class year must be 1904 or later")
       .max(2050, "Class year must be 2050 or earlier"),
     inviteCode: z.string().max(120).optional(),
     acceptTerms: z.literal(true, {

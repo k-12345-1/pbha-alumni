@@ -16,7 +16,7 @@ export const profileUpdateSchema = z
     first: z.string().trim().min(1).max(60).refine(noEmoji, NO_EMOJI_MSG).optional(),
     last: z.string().trim().min(1).max(60).refine(noEmoji, NO_EMOJI_MSG).optional(),
     pronouns: z.string().max(40).nullable().optional(),
-    year: z.coerce.number().int().min(1930).max(2050).optional(),
+    year: z.coerce.number().int().min(1904).max(2050).optional(),
     location: z.string().max(120).nullable().optional(),
     photoUrl: httpUrl("photoUrl").nullable().optional(),
 
@@ -54,8 +54,8 @@ const asArray = <T>(v: T | T[] | undefined): T[] | undefined =>
 
 export const directoryQuerySchema = z.object({
   q: z.string().max(120).optional(),
-  yearFrom: z.coerce.number().int().min(1930).max(2100).optional(),
-  yearTo: z.coerce.number().int().min(1930).max(2100).optional(),
+  yearFrom: z.coerce.number().int().min(1904).max(2100).optional(),
+  yearTo: z.coerce.number().int().min(1904).max(2100).optional(),
   industry: z.union([z.string(), z.array(z.string())]).optional().transform(asArray),
   program: z.union([z.string(), z.array(z.string())]).optional().transform(asArray),
   house: z.union([z.string(), z.array(z.string())]).optional().transform(asArray),
