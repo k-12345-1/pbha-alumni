@@ -552,6 +552,54 @@ footer.site {
 .link-card p { margin: 10px 0 16px; }
 .tile-cta { font-size: 13px; font-weight: 600; color: var(--orange); }
 
+/* Get involved: a numbered index, ruled between rows. */
+.involve-list { list-style: none; margin: 0; padding: 0; }
+.involve-list li { border-bottom: 1px solid var(--rule); }
+.involve-list li:first-child { border-top: 1px solid var(--rule); }
+.involve-row {
+  display: grid;
+  grid-template-columns: 56px minmax(200px, 1fr) minmax(0, 1.6fr) auto;
+  gap: 24px;
+  align-items: baseline;
+  width: 100%;
+  padding: 22px 4px;
+  background: none; border: 0;
+  text-align: left;
+  text-decoration: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: background .15s;
+}
+.involve-row:hover { background: var(--wash); }
+.involve-n {
+  font-size: 13px; font-weight: 700;
+  color: var(--ink); opacity: .3;
+  letter-spacing: .04em;
+}
+.involve-title { font-size: 19px; font-weight: 700; line-height: 1.3; }
+.involve-body { font-size: 14px; color: var(--ink-mute); line-height: 1.55; }
+.involve-cta {
+  font-size: 13px; font-weight: 600; color: var(--orange);
+  white-space: nowrap; justify-self: end;
+}
+/* The arrow steps forward on hover, the way the site's buttons do. */
+.involve-cta span { display: inline-block; transition: transform .15s; }
+.involve-row:hover .involve-cta span { transform: translateX(3px); }
+.involve-row:hover .involve-n { opacity: .55; }
+
+@media (max-width: 900px) {
+  .involve-row {
+    grid-template-columns: 40px 1fr;
+    gap: 6px 16px;
+    row-gap: 6px;
+  }
+  .involve-n { grid-row: 1; }
+  .involve-title { grid-column: 2; }
+  .involve-body { grid-column: 2; }
+  .involve-cta { grid-column: 2; justify-self: start; margin-top: 4px; }
+}
+
 /* ---------- study ---------- */
 
 .stat-band {
@@ -1542,24 +1590,32 @@ function WelcomeScreen({ me, setScreen }) {
 
       <hr className="rule" style={{ margin: "40px 0 32px" }} />
 
-      <h2 className="h-2" style={{ marginBottom: 20 }}>Get involved</h2>
-      <div className="link-grid">
-        {GET_INVOLVED.map((g) => {
+      <h2 className="h-2" style={{ marginBottom: 4 }}>Get involved</h2>
+      {/* An index rather than a grid of boxes: six ways in, numbered, each
+          on its own line with a rule under it. Six bordered cards read as
+          six competing objects; a numbered list reads as one list. */}
+      <ol className="involve-list">
+        {GET_INVOLVED.map((g, i) => {
           const inner = (
             <>
-              <div className="h-3">{g.title}</div>
-              <p className="meta">{g.body}</p>
-              <span className="tile-cta">{g.cta} →</span>
+              <span className="involve-n">{String(i + 1).padStart(2, "0")}</span>
+              <span className="involve-title">{g.title}</span>
+              <span className="involve-body">{g.body}</span>
+              <span className="involve-cta">{g.cta} <span aria-hidden="true">→</span></span>
             </>
           );
           // One of these stays in the app; the rest open on PBHA's site.
-          return g.screen ? (
-            <button key={g.title} className="link-card" onClick={() => setScreen(g.screen)}>{inner}</button>
-          ) : (
-            <a key={g.title} className="link-card" href={g.href} target="_blank" rel="noopener noreferrer">{inner}</a>
+          return (
+            <li key={g.title}>
+              {g.screen ? (
+                <button className="involve-row" onClick={() => setScreen(g.screen)}>{inner}</button>
+              ) : (
+                <a className="involve-row" href={g.href} target="_blank" rel="noopener noreferrer">{inner}</a>
+              )}
+            </li>
           );
         })}
-      </div>
+      </ol>
     </div>
   );
 }
