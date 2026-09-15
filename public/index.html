@@ -2147,13 +2147,7 @@ function StudyScreen() {
       </div>
 
       <section className="band" style={{ marginTop: 48 }}>
-        <div className="band-head reveal">
-          <h2 className="h-2">PBHA&rsquo;s unique model</h2>
-          <p className="meta note" style={{ margin: "8px auto 0" }}>
-            Analysis of the survey results found three components behind the effect on student
-            volunteers.
-          </p>
-        </div>
+        <h2 className="h-2 band-head reveal">PBHA&rsquo;s unique model</h2>
         <ol className="model-list band-body">
           {STUDY_MODEL.map((m, i) => (
             <li key={m.title} className="reveal" style={{ transitionDelay: `${i * 90}ms` }}>
@@ -2171,7 +2165,9 @@ function StudyScreen() {
         <h2 className="h-2 band-head" style={{ marginBottom: 8 }}>
           Five ways PBHA develops citizens and citizen leaders
         </h2>
-        <p className="meta note" style={{ margin: "0 auto 8px" }}>
+        {/* No measure cap on this one: it is a single sentence meant to sit
+            on a single line under the heading. */}
+        <p className="meta" style={{ margin: "0 0 8px", textAlign: "center" }}>
           Where two figures are given, the first is all respondents and the second is alumni who
           took part in intensive programming.
         </p>
@@ -2266,10 +2262,7 @@ function StudyScreen() {
       <hr className="rule" style={{ margin: "48px 0 32px" }} />
 
       <section className="band">
-        <div className="band-head reveal">
-          <h2 className="h-2">PBHA by the numbers</h2>
-          <p className="meta" style={{ marginTop: 8 }}>Every year.</p>
-        </div>
+        <h2 className="h-2 band-head reveal">PBHA by the numbers</h2>
         <div className="band-body two-up" style={{ gap: 32 }}>
           {STUDY_ANNUAL.map((col, i) => (
             <div key={col.head} className="reveal" style={{ transitionDelay: `${i * 90}ms` }}>
