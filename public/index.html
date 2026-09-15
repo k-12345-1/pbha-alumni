@@ -996,11 +996,6 @@ footer.site {
   color: var(--orange);
   min-width: 3.4em;
 }
-.decade-t {
-  font-size: 13px; font-weight: 600;
-  letter-spacing: .1em; text-transform: uppercase;
-  color: var(--ink-mute);
-}
 /* A plus that becomes a minus, drawn rather than typed so it sits on the
    baseline the same way at every size. */
 .decade-mark {
@@ -1025,8 +1020,6 @@ footer.site {
    not. */
 .decade-panel[hidden] { display: none; }
 .decade-inner { overflow: hidden; padding: 0 4px 34px; min-width: 0; }
-.decade-inner .plain-list { padding-left: 18px; margin: 0 0 26px; max-width: 70ch; }
-.decade-inner .plain-list li { margin-bottom: 10px; }
 .decade-none { color: var(--ink-mute); font-size: 14.5px; margin: 0; }
 
 /* The photographs, scrolled sideways. */
@@ -2574,9 +2567,8 @@ function StudyScreen() {
 /**
  * The archive, by decade.
  *
- * 1980s to 2020s, each one collapsed until it is opened. The history is
- * PBHA's own published account, with each item placed in the decade it
- * states. Photographs sit in the decade they were actually taken:
+ * 1980s to 2020s, each one collapsed until it is opened, and nothing in
+ * it but the photographs. Each sits in the decade it was actually taken:
  * PBHA's Flickr begins in 2012, so the first three decades have none.
  *
  * Flickr's search reports nearly 4,000 photos "taken" before 1990, but
@@ -2586,39 +2578,11 @@ function StudyScreen() {
  * thing an archive cannot do.
  */
 const DECADES = [
-  {
-    decade: "1980s",
-    title: "Shelter and scale",
-    items: [
-      "The Harvard Square Homeless Shelter opens at University Lutheran Church.",
-      "A $1 million capital campaign runs in 1986.",
-      "The Summer Urban Program grows into a twelve-camp network serving more than 700 children.",
-    ],
-    photos: [],
-  },
-  {
-    decade: "1990s",
-    title: "Independence",
-    items: [
-      "1992: the cabinet votes to create a student board of directors.",
-      "November 1995: a cabinet resolution urges \u201Ca more rational, autonomous structure.\u201D On 7 December, more than 2,000 people join a rally.",
-      "By-laws are rewritten in spring 1996, a one-year trial agreement follows that summer, and a final agreement is signed in September 1997.",
-    ],
-    photos: [],
-  },
-  {
-    decade: "2000s",
-    title: "Centennial",
-    items: [
-      "A $7.25 million Centennial Campaign runs toward the association\u2019s hundredth year in 2004.",
-      "The Living Wage Campaign runs through PSLM, later SLAM, including a Massachusetts Hall sit-in and a plane over commencement.",
-    ],
-    photos: [],
-  },
+  { decade: "1980s", photos: [] },
+  { decade: "1990s", photos: [] },
+  { decade: "2000s", photos: [] },
   {
     decade: "2010s",
-    title: "",
-    items: [],
     photos: [
       { src: "photos/buddies-2013-b.jpg", caption: "Alzheimer\u2019s Buddies", year: "2013" },
       { src: "photos/buddies-2013-a.jpg", caption: "Alzheimer\u2019s Buddies", year: "2013" },
@@ -2627,12 +2591,6 @@ const DECADES = [
   },
   {
     decade: "2020s",
-    title: "Toward the 125th",
-    items: [
-      "More than 85 programs and over 1,400 volunteers.",
-      "2024: PBHA marks 120 years and begins 120 Stories.",
-      "The Road to the 125th runs toward the anniversary in 2029.",
-    ],
     photos: [
       { src: "photos/reunion-group-2025.jpg", caption: "PBHA 50th\u201370th Reunion, Classes of 1955\u20131975", year: "June 2025" },
       { src: "photos/reunion-hall-2025.jpg", caption: "Alumni Day, Phillips Brooks House", year: "June 2025" },
@@ -2697,8 +2655,7 @@ function ArchivesScreen() {
       <hr className="rule" style={{ margin: "22px 0 32px" }} />
 
       <p className="statement statement-mid reveal">
-        Four decades of the Phillips Brooks House Association, in its own account
-        and its own photographs.
+        Four decades of the Phillips Brooks House Association, in photographs.
       </p>
 
       <ol className="decades">
@@ -2712,7 +2669,6 @@ function ArchivesScreen() {
                   aria-controls={`decade-${d.decade}`}
                   onClick={() => setOpen(isOpen ? null : d.decade)}>
                   <span className="decade-n">{d.decade}</span>
-                  {d.title && <span className="decade-t">{d.title}</span>}
                   <span className="decade-mark" aria-hidden="true" />
                 </button>
               </h2>
@@ -2721,11 +2677,6 @@ function ArchivesScreen() {
                   animated. The inner element needs the overflow. */}
               <div className="decade-panel" id={`decade-${d.decade}`} hidden={!isOpen}>
                 <div className="decade-inner">
-                  {d.items.length > 0 && (
-                    <ul className="plain-list">
-                      {d.items.map((it) => <li key={it}>{it}</li>)}
-                    </ul>
-                  )}
                   {d.photos.length > 0 ? (
                     <Strip photos={d.photos} />
                   ) : (
