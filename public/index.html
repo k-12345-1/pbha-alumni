@@ -737,15 +737,12 @@ footer.site {
   margin-bottom: 56px;
 }
 .ground-navy .h-2 { color: var(--white); }
-.ground-cream .h-2 { color: var(--navy); }
-.ground-cream .model-list li { border-top-color: var(--navy); }
 .ground-navy .part-label { color: var(--orange); }
 .ground-navy .eyebrow { color: rgba(255, 255, 255, .62); }
 .ground-navy .meta { color: rgba(255, 255, 255, .72); }
 .ground-navy .em-n { color: var(--orange); }
 
 .ground-wash { background: var(--wash); margin-top: 56px; }
-.ground-cream { background: var(--cream); }
 
 /* A band with a curved edge needs room for the curve, and the curve has
    to sit outside the padding so text never lands on it. */
@@ -2351,8 +2348,7 @@ function StudyScreen() {
 
       {/* 2 — the model, on PBHA's navy. A different ground is the fastest
           way to say "this is a different kind of thing". */}
-      <section className="bleed ground-cream wave-in wave-out">
-        <Wave side="top" fill="var(--white)" />
+      <section>
         <div className="part reveal">
           <div className="part-label">The model</div>
           <h2 className="h-2 band-head">Three things PBHA does</h2>
@@ -2366,7 +2362,6 @@ function StudyScreen() {
             ))}
           </ol>
         </div>
-        <Wave side="bottom" fill="var(--white)" line="var(--orange)" />
       </section>
 
       {/* 3 — the findings, on white, each one plated so it reads as its
