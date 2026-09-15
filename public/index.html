@@ -797,7 +797,7 @@ footer.site {
    and the panel is already saying "this is someone talking". */
 .pull {
   margin: 40px 0 0;
-  padding: 44px 7% 40px;
+  padding: 44px 5% 40px;
   background: var(--cream);
   border-radius: 28px;
   text-align: center;
@@ -812,7 +812,9 @@ footer.site {
 .pull blockquote { margin: 0; }
 .pull p {
   margin: 0 auto;
-  max-width: 44ch;
+  /* Wide inside the panel rather than a narrow column down its middle:
+     the block is the frame, the words should use it. */
+  max-width: 68ch;
   font-size: clamp(17px, 1.5vw, 21px);
   line-height: 1.62;
   font-weight: 500;
@@ -924,17 +926,6 @@ footer.site {
 .plain-list { margin: 0; padding-left: 20px; }
 .plain-list li { margin-bottom: 6px; line-height: 1.55; }
 
-.annual-list { margin-top: 12px; }
-.annual {
-  display: grid; grid-template-columns: 76px 1fr; gap: 12px;
-  align-items: baseline;
-  padding: 13px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, .16);
-  font-size: 15px;
-  line-height: 1.45;
-}
-.annual:last-child { border-bottom: 0; }
-.annual .em-n { font-size: 21px; }
 
 /* ---- motion ------------------------------------------------------- *
  *
@@ -2117,31 +2108,6 @@ const STUDY_ROLES = [
   ["Anti-Poverty", 365], ["Community Organizing", 301],
 ];
 
-const STUDY_ANNUAL = [
-  {
-    head: "PBHA",
-    rows: [
-      ["1,500", "college volunteers"],
-      ["140", "summer college student internships"],
-      ["45", "Chan Stride Leadership participants"],
-      ["22", "student officers"],
-      ["270", "student program directors"],
-      ["350", "shelter guests"],
-      ["600", "adult English language learners"],
-      ["100", "high school teens employed through the Summer Urban Program"],
-    ],
-  },
-  {
-    head: "The people PBHA serves",
-    rows: [
-      ["1,500", "children enrolled in programming"],
-      ["80%", "of enrolled families make less than $50K annually"],
-      ["99%", "of parents surveyed felt their child was safe in the summer at SUP"],
-      ["94%", "of parents surveyed felt SUP helped their child learn more about their identity and take pride in it"],
-      ["75%", "of SUP campers increase literacy and math skills"],
-    ],
-  },
-];
 
 // The width goes in a custom property rather than straight on the element:
 // the fill sits at zero until its block is revealed, and CSS reads the
@@ -2498,33 +2464,6 @@ function StudyScreen() {
       </section>
 
       <Quotes />
-
-      {/* 4 — the annual figures, on navy, the way the report sets them. */}
-      <section className="bleed ground-navy wave-in wave-out">
-        <Wave side="top" fill="var(--white)" />
-        <div className="part band-split reveal">
-          <div>
-            <div className="part-label">Every year</div>
-            <h2 className="h-2">PBHA by the numbers</h2>
-          </div>
-          <div className="band-body two-up" style={{ gap: 40 }}>
-            {STUDY_ANNUAL.map((col, i) => (
-              <div key={col.head} className="reveal" style={{ transitionDelay: `${i * 90}ms` }}>
-                <div className="eyebrow">{col.head}</div>
-                <div className="annual-list">
-                  {col.rows.map(([n, label]) => (
-                    <div className="annual" key={label}>
-                      <span className="em-n">{n}</span>
-                      <span>{label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        <Wave side="bottom" fill="var(--white)" />
-      </section>
 
       {/* 5 — credits, on the wash, smaller: a colophon, not a finding. */}
       <section className="colophon-band">
