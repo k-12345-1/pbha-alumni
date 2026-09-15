@@ -825,7 +825,9 @@ footer.site {
 .way-text > p { margin-top: 0; }
 .way-data { min-width: 0; }
 .way-quote { grid-column: 1 / -1; }
-.chart + .chart { margin-top: 26px; }
+/* Every chart, not just a chart after a chart: the first one sat flush
+   against the findings table above it. */
+.chart { margin-top: 26px; }
 
 /* A filled plate rather than a faint numeral. At 35% opacity the number
    was decoration; solid, it is the thing that tells five findings apart
