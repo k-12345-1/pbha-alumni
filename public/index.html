@@ -849,6 +849,10 @@ footer.site {
 .quote-slide.is-on { opacity: 1; visibility: visible; }
 
 .quotes-dots { display: flex; gap: 8px; justify-content: center; margin-top: 22px; }
+/* The carousel is the last thing on the page, so its own bottom padding
+   stacks on the page's and left 238px of nothing above the footer. */
+.quotes { padding-bottom: 0; }
+.page.study { padding-bottom: 56px; }
 .quotes-dots button {
   width: 8px; height: 8px; padding: 0;
   border: 0; border-radius: 50%;
