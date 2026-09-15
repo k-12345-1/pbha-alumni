@@ -669,6 +669,75 @@ footer.site {
 
 .link-orange { color: var(--orange); text-decoration: underline; text-underline-offset: 3px; }
 
+/* A quote from an alum, set the way the report sets them: full-bleed
+   orange, the words large enough to stop on. */
+.pull {
+  margin: 36px 0 0;
+  padding: 30px 34px;
+  background: var(--orange);
+  color: var(--white);
+}
+.pull p {
+  margin: 0;
+  font-size: clamp(16px, 1.35vw, 19px);
+  line-height: 1.55;
+  font-weight: 500;
+  font-style: italic;
+}
+.pull cite {
+  display: block;
+  margin-top: 14px;
+  font-size: 12px; font-weight: 700; font-style: normal;
+  letter-spacing: .14em; text-transform: uppercase;
+  opacity: .85;
+}
+
+/* The three components of PBHA's model, and the five ways: both are
+   numbered lists where the number is a column, not a bullet. */
+.model-list { list-style: none; margin: 0; padding: 0; }
+.model-list li {
+  display: grid; grid-template-columns: 56px 1fr; gap: 20px;
+  padding: 20px 0;
+  border-top: 1px solid var(--rule);
+}
+.model-list li:last-child { border-bottom: 1px solid var(--rule); }
+.model-n { font-size: 13px; font-weight: 700; color: var(--ink); opacity: .3; letter-spacing: .04em; }
+
+.way {
+  display: grid; grid-template-columns: 76px 1fr; gap: 20px;
+  padding: 40px 0;
+  border-top: 1px solid var(--rule);
+}
+.way-n {
+  font-size: 54px; font-weight: 700; line-height: .9;
+  color: var(--orange); opacity: .35;
+}
+.way-title {
+  font-size: clamp(19px, 1.8vw, 23px); line-height: 1.3;
+  margin: 0 0 12px;
+}
+
+.plain-list { margin: 0; padding-left: 20px; }
+.plain-list li { margin-bottom: 6px; line-height: 1.55; }
+
+.annual {
+  display: grid; grid-template-columns: 76px 1fr; gap: 12px;
+  align-items: baseline;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+.annual:last-child { border-bottom: 0; }
+.annual .em-n { font-size: 19px; }
+
+@media (max-width: 720px) {
+  .way { grid-template-columns: 1fr; gap: 8px; padding: 30px 0; }
+  .way-n { font-size: 38px; }
+  .model-list li { grid-template-columns: 1fr; gap: 6px; }
+  .pull { padding: 24px 22px; }
+}
+
 /* ---------- archives ---------- */
 
 .era { border-bottom: 1px solid var(--rule); }
@@ -1694,17 +1763,361 @@ function WelcomeScreen({ me }) {
 }
 
 /* ------------------------------------------------------------------ *
- * Alumni Study — header only for now. PBHA's survey findings (n=1,078),
- * the field breakdown, and the researcher credits were built out and
- * then held back pending a decision on what to publish here; they are
- * one `git revert` away.
+ * Alumni Study — "Transforming Generations", PBHA's alumni impact
+ * report. Every figure and every quote below is from that report; the
+ * page adds structure, not findings.
  * ------------------------------------------------------------------ */
 
+const STUDY_HEADLINE = [
+  { n: "1,078", label: "alumni answered the 2022 survey" },
+  { n: "95%", label: "voted in the last two years" },
+  { n: "93%", label: "gave money or goods to a social justice cause" },
+  { n: "91%", label: "came to think of themselves as a leader through PBHA" },
+];
+
+// PBHA's three components of its own model.
+const STUDY_MODEL = [
+  {
+    title: "Meaningful service",
+    body: "Year-round service and social action opportunities that are deeply grounded in community, involve real-life responsibilities, and centre opportunities for leadership and innovation unique among Harvard experiences.",
+  },
+  {
+    title: "Community of practice",
+    body: "Student-led community volunteers, leads, and reflects with each other, facilitating mutual learning, relationship development, and a supportive, inclusive environment.",
+  },
+  {
+    title: "Intentional leadership development",
+    body: "Staff coaching, alumni mentorship, and intentional training and reflection, which have substantially increased in the last 20 years, provide the scaffolding for transformative student leadership development.",
+  },
+];
+
+// Where the report gives a figure for all respondents and a second for
+// alumni who took part in intensive programming, both are kept: the gap
+// between the two columns is most of what the study found.
+const STUDY_WAYS = [
+  {
+    title: "PBHA builds the pathways to a lifetime of public purpose, professional and pro bono service.",
+    body: "For generations, PBHA has inspired and trained tens of thousands of the country's and the world's most impactful public service leaders. Alumni report that their PBHA experience nurtured their passion for public service work and strengthened their commitment to addressing social challenges.",
+    rows: [
+      ["Their passion for public service work was nurtured at PBHA", "82%", "96%"],
+      ["Their PBHA experience strengthened their commitment to addressing social challenges", "80%", "94%"],
+    ],
+    quote: {
+      body: "PBHA helped to form my personal and professional life after Radcliffe. The skills I learned at PBHA provided the basis for my nonprofit management career. In addition to volunteer activities I have served as director/manager or trustee/board member in every organization I have been involved with over the past 60+ years.",
+      year: "'67",
+    },
+  },
+  {
+    title: "PBHA inspires a commitment to civic engagement through volunteering, philanthropy, organizing, and advocacy.",
+    body: "Respondents shared the extent to which participation in PBHA catalyzes involvement in civic and public service volunteer efforts, from voting to continued pro bono and board service.",
+    rows: [
+      ["Voted, in the last two years", "95%", null],
+      ["Donated money or goods to a social justice cause", "93%", null],
+      ["Volunteered in a political context", "58%", null],
+    ],
+    tallies: [
+      ["962", "board seats taken"],
+      ["2,671", "volunteer or pro bono roles filled"],
+    ],
+    quote: {
+      body: "PBHA is what really started the trajectory of my whole adult life! All of my best friends are from PBHA, and I decided to become a teacher in Boston because of my work in PBHA. It also encouraged me to be a more active voter and community member.",
+      year: "'11",
+    },
+  },
+  {
+    title: "PBHA teaches concrete skills that impact professional success long after graduation.",
+    body: "Alumni across the board reported that volunteering at PBHA equipped them with competencies to thrive and make an impact in a wide variety of social impact fields following graduation. Those who participated in summer internships, director and officer roles, and the Chan Stride program reported even higher transformative leadership development.",
+    rows: [
+      ["Developed a deeper belief in their capabilities", "79%", null],
+      ["Learned effective leadership and management skills — strategic planning, meeting facilitation, decision making, supervising", null, "88%"],
+      ["Came to think of themselves as a leader due to their PBHA involvement", null, "91%"],
+    ],
+    list: {
+      lead: "More than half of respondents reported PBHA helped them develop:",
+      items: [
+        "creative problem solving skills",
+        "content-area skills, including teaching, fundraising, budgeting, and legal advocacy",
+        "the skills to deliver quality programming that addresses community need",
+      ],
+    },
+    quote: {
+      body: "I've used my PBHA skills every day. I have worked at a non profit since I graduated college and then law school. It helped me see the big picture and contribute to growing my nonprofit and leading a team of public interest lawyers.",
+      year: "'07",
+    },
+  },
+  {
+    title: "PBHA facilitates a sense of belonging on campus that encourages diverse leadership, especially for first-generation, BIPOC, and low-income students.",
+    body: "Low-income, first-generation, and BIPOC alumni credited PBHA's programs and supports, especially PBHA's community, culture, values, and staff, with providing a deep sense of belonging at Harvard. In the wake of the United States Supreme Court's recent decision regarding affirmative action, the importance of PBHA as a place of belonging for BIPOC students is even more critical.",
+    quote: {
+      body: "PBHA provided me with a safe space when I was in college. At PBHA, I found people who shared aspects of my identity (eg being first-gen, growing up low-income) and shared my interests (eg youth work and social justice work). PBHA taught me how to build community with others, how to manage others, and how a non-profit operates. My work in education and non-profits now 100% is a result of the impact PBHA had on me.",
+      year: "'16",
+    },
+  },
+  {
+    title: "PBHA instills empathy and the ability to work with people from a wide range of backgrounds and communities.",
+    body: "Alumni shared that they left PBHA better able to work effectively across difference and with more empathy for others' lived experiences. Volunteers reported developing a connection to the communities they worked in while at PBHA. Additionally, more affluent students reported learning about equity and anti-racism through PBHA's programming.",
+    rows: [
+      ["Reported that PBHA helped them work effectively with people of different backgrounds to achieve common goals", "70%", "90%"],
+      ["Felt that they developed a connection to the communities they worked with while at PBHA", "75%", "96%"],
+      ["Reported that PBHA influenced their sense of the importance of having empathy for others' lived experiences", "83%", "94%"],
+    ],
+  },
+];
+
+const STUDY_FIELDS = [
+  ["Education", 450], ["Healthcare", 278], ["Business", 216], ["Legal", 200],
+  ["Government", 185], ["Social Services", 173], ["Sciences", 100], ["Technology", 92],
+];
+
+// The 1,196 executive or management roles, by the kind of organization.
+const STUDY_ROLES = [
+  ["Education", 618], ["Youth Organizations", 369],
+  ["Anti-Poverty", 365], ["Community Organizing", 301],
+];
+
+const STUDY_ANNUAL = [
+  {
+    head: "PBHA",
+    rows: [
+      ["1,500", "college volunteers"],
+      ["140", "summer college student internships"],
+      ["45", "Chan Stride Leadership participants"],
+      ["22", "student officers"],
+      ["270", "student program directors"],
+      ["350", "shelter guests"],
+      ["600", "adult English language learners"],
+      ["100", "high school teens employed through the Summer Urban Program"],
+    ],
+  },
+  {
+    head: "The people PBHA serves",
+    rows: [
+      ["1,500", "children enrolled in programming"],
+      ["80%", "of enrolled families make less than $50K annually"],
+      ["99%", "of parents surveyed felt their child was safe in the summer at SUP"],
+      ["94%", "of parents surveyed felt SUP helped their child learn more about their identity and take pride in it"],
+      ["75%", "of SUP campers increase literacy and math skills"],
+    ],
+  },
+];
+
+function Bar({ label, value, max }) {
+  return (
+    <div className="bar-row">
+      <span className="bar-label">{label}</span>
+      <span className="bar-track">
+        <span className="bar-fill" style={{ width: `${(value / max) * 100}%` }} />
+      </span>
+      <span className="bar-value">{value}</span>
+    </div>
+  );
+}
+
+function Pull({ body, year }) {
+  return (
+    <blockquote className="pull">
+      <p>{body}</p>
+      <cite>Class of {year.replace("'", "’")}</cite>
+    </blockquote>
+  );
+}
+
 function StudyScreen() {
+  const maxField = STUDY_FIELDS[0][1];
+  const maxRole = STUDY_ROLES[0][1];
+
   return (
     <div className="wrap page">
       <h1 className="h-1 accent">Alumni Study</h1>
       <hr className="rule" style={{ margin: "22px 0 32px" }} />
+
+      <div className="eyebrow" style={{ marginBottom: 14 }}>Transforming Generations</div>
+      <p className="lede" style={{ maxWidth: 820 }}>
+        In <span className="em-n">2022</span> the Alumni Association asked PBHA alumni what their
+        service years did to the rest of their lives. <span className="em-n">1,078</span> people
+        answered, from all but two Harvard classes between <span className="em-n">1948</span> and{" "}
+        <span className="em-n">2021</span>. Respondents closely matched the demographics of Harvard
+        overall and represented a broad range of professional fields.
+      </p>
+
+      <div className="stat-band">
+        {STUDY_HEADLINE.map((h) => (
+          <div key={h.label}>
+            <div className="stat-n">{h.n}</div>
+            <div className="meta" style={{ marginTop: 6 }}>{h.label}</div>
+          </div>
+        ))}
+      </div>
+
+      <hr className="rule" style={{ margin: "48px 0 32px" }} />
+
+      <h2 className="h-2" style={{ marginBottom: 14 }}>What the survey was measuring</h2>
+      <p style={{ maxWidth: 820, margin: "0 0 12px" }}>
+        For almost 120 years PBHA has been working in communities across Greater Boston. Each year
+        1,500 student volunteers join with PBHA&rsquo;s community partners to run more than 70
+        social service and social action programs, serving more than 8,000 constituents. Over
+        30,000 PBHA alumni continue to have a transformative positive impact on the world well
+        beyond their undergraduate years.
+      </p>
+      <p style={{ maxWidth: 820, margin: "0 0 28px" }}>
+        PBHA&rsquo;s impact is deep and broad, providing students with immersive volunteer
+        opportunities ranging from two hours per week to intensive summer internships and
+        leadership roles that last throughout a student&rsquo;s Harvard experience.{" "}
+        <strong>The survey results point to strong outcomes across the board that increase with
+        depth of experience</strong> &mdash; which is why the figures below are given twice
+        wherever PBHA reported them that way.
+      </p>
+
+      <Pull
+        body="I was really active in PBHA during a time in my life where I was figuring out the person I was going to be. The experiences and opportunities for reflection I had with PBHA made service part of my identity — for the rest of my life, I've asked myself whether what I'm doing makes the world better, and how. This is how I think of who I am."
+        year="'03" />
+
+      <h2 className="h-2" style={{ margin: "48px 0 6px" }}>PBHA&rsquo;s unique model</h2>
+      <p className="meta" style={{ marginBottom: 22, maxWidth: 820 }}>
+        Analysis of the survey results found three components behind the effect on student
+        volunteers.
+      </p>
+      <ol className="model-list">
+        {STUDY_MODEL.map((m, i) => (
+          <li key={m.title}>
+            <span className="model-n">{String(i + 1).padStart(2, "0")}</span>
+            <div>
+              <div className="h-3" style={{ marginBottom: 6 }}>{m.title}</div>
+              <p className="meta" style={{ margin: 0 }}>{m.body}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      <hr className="rule" style={{ margin: "48px 0 32px" }} />
+
+      <h2 className="h-2" style={{ marginBottom: 6 }}>
+        Five ways PBHA develops citizens and citizen leaders
+      </h2>
+      <p className="meta" style={{ marginBottom: 8, maxWidth: 820 }}>
+        Where two figures are given, the first is all respondents and the second is alumni who
+        took part in intensive programming.
+      </p>
+
+      {STUDY_WAYS.map((w, i) => (
+        <section key={w.title} className="way">
+          <div className="way-n">{i + 1}</div>
+          <div>
+            <h3 className="way-title">{w.title}</h3>
+            <p style={{ maxWidth: 780 }}>{w.body}</p>
+
+            {w.rows && (
+              <div className="card" style={{ marginTop: 22 }}>
+                <div className="finding finding-head">
+                  <span>Finding</span><span>All</span><span>Intensive</span>
+                </div>
+                {w.rows.map((r) => (
+                  <div className="finding" key={r[0]}>
+                    <span>{r[0]}</span>
+                    <span className={r[1] ? "em-n" : "meta"}>{r[1] || "—"}</span>
+                    <span className={r[2] ? "em-n" : "meta"}>{r[2] || "—"}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {w.list && (
+              <>
+                <p style={{ margin: "22px 0 8px", fontWeight: 600 }}>{w.list.lead}</p>
+                <ul className="plain-list">
+                  {w.list.items.map((it) => <li key={it}>{it}</li>)}
+                </ul>
+              </>
+            )}
+
+            {w.tallies && (
+              <div className="stat-band" style={{ marginTop: 26 }}>
+                {w.tallies.map((t) => (
+                  <div key={t[1]}>
+                    <div className="stat-n">{t[0]}</div>
+                    <div className="meta" style={{ marginTop: 6, maxWidth: 220 }}>{t[1]}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* The two breakdowns PBHA published under the first finding. */}
+            {i === 0 && (
+              <div className="two-up" style={{ marginTop: 30, gap: 32 }}>
+                <div>
+                  <div className="eyebrow" style={{ marginBottom: 12 }}>
+                    Top fields of professional work
+                  </div>
+                  <div className="card card-pad">
+                    {STUDY_FIELDS.map(([label, value]) => (
+                      <Bar key={label} label={label} value={value} max={maxField} />
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <div className="eyebrow" style={{ marginBottom: 12 }}>
+                    1,196 executive or management roles, by organization
+                  </div>
+                  <div className="card card-pad">
+                    {STUDY_ROLES.map(([label, value]) => (
+                      <Bar key={label} label={label} value={value} max={maxRole} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {w.quote && <Pull body={w.quote.body} year={w.quote.year} />}
+          </div>
+        </section>
+      ))}
+
+      <hr className="rule" style={{ margin: "48px 0 32px" }} />
+
+      <h2 className="h-2" style={{ marginBottom: 6 }}>PBHA by the numbers</h2>
+      <p className="meta" style={{ marginBottom: 24 }}>Every year.</p>
+      <div className="two-up" style={{ gap: 32 }}>
+        {STUDY_ANNUAL.map((col) => (
+          <div key={col.head}>
+            <div className="eyebrow" style={{ marginBottom: 12 }}>{col.head}</div>
+            <div className="card">
+              {col.rows.map(([n, label]) => (
+                <div className="annual" key={label}>
+                  <span className="em-n">{n}</span>
+                  <span>{label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <Pull
+        body="My time with PBHA was the most powerful learning experience I've ever had. The combination of experiential learning, coaching/mentoring from staff, support and challenge from a community of peers, and leadership development both prepared me for my career as a social worker and educator, and inspired me to continue fighting for social justice in my personal and professional lives."
+        year="'11" />
+
+      <hr className="rule" style={{ margin: "48px 0 24px" }} />
+
+      <h2 className="h-2" style={{ marginBottom: 14 }}>Who did this</h2>
+      <p style={{ maxWidth: 820, margin: "0 0 16px" }}>
+        As is true of most things at PBHA, this summary was fueled by collective efforts.{" "}
+        <strong>Christine Tran</strong> and <strong>Sammy Lee</strong> conducted the primary
+        analysis of the alumni survey data as part of their Vanderbilt Leadership &amp; Learning in
+        Organizations PhD capstone project. <strong>Leah Robinson</strong> developed the survey as
+        an HGSE student advised by <strong>Professors Alexis Redding</strong> and{" "}
+        <strong>Julie Reuben</strong>. <strong>Nancy Sato</strong>, Class of &rsquo;75, guided the
+        overall impact study, and <strong>Sam Greenberg</strong> analyzed and summarized the final
+        study outcomes. The PBHA&ndash;Alumni board envisioned the initiative and supported it
+        through all the stages, and PBHA students and staff reached out to alumni, coded the
+        responses, and coordinated meetings.
+      </p>
+      <p className="meta" style={{ maxWidth: 820, marginBottom: 24 }}>
+        The report gives findings rather than methodology: response rate, fielding dates, and how
+        &ldquo;intensive programming&rdquo; was defined are not stated in it. Read the figures with
+        that in mind.
+      </p>
+      <a className="btn btn-primary" href="https://www.pbha.org/alumni-impact"
+        target="_blank" rel="noopener noreferrer">PBHA&rsquo;s impact pages</a>
     </div>
   );
 }
