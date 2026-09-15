@@ -976,80 +976,99 @@ footer.site {
 .archives p { line-height: 1.68; }
 .archives p.statement { line-height: 1.34; }
 
-.eras { list-style: none; margin: 0; padding: 0; }
-.era {
-  display: grid;
-  grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
-  gap: 48px;
-  padding: 40px 0;
-  border-top: 1px solid var(--rule);
-}
-.era-when { position: sticky; top: 96px; align-self: start; }
-.era-years { font-size: 26px; font-weight: 700; color: var(--orange); line-height: 1.1; }
-.era-name { font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-mute); margin-top: 8px; }
-.era-what { min-width: 0; }
-.era-what .plain-list { padding-left: 18px; }
-.era-what .plain-list li { margin-bottom: 10px; }
-.era-none { color: var(--ink-mute); font-size: 14.5px; margin: 18px 0 0; }
+.decades { list-style: none; margin: 40px 0 0; padding: 0; }
+.decade { border-top: 1px solid var(--rule); }
+.decade:last-child { border-bottom: 1px solid var(--rule); }
+.decade h2 { margin: 0; font: inherit; }
 
-.era-shots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px; }
-.era-shots figure, .shot-grid figure { margin: 0; }
-.era-shots img, .shot-grid img {
+.decade-btn {
+  display: flex; align-items: baseline; gap: 20px;
+  width: 100%;
+  padding: 26px 4px;
+  background: none; border: 0;
+  text-align: left; font: inherit;
+  cursor: pointer;
+  transition: background .15s;
+}
+.decade-btn:hover { background: var(--wash); }
+.decade-n {
+  font-size: clamp(28px, 3vw, 42px); font-weight: 700; line-height: 1;
+  color: var(--orange);
+  min-width: 3.4em;
+}
+.decade-t {
+  font-size: 13px; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ink-mute);
+}
+/* A plus that becomes a minus, drawn rather than typed so it sits on the
+   baseline the same way at every size. */
+.decade-mark {
+  margin-left: auto; align-self: center;
+  position: relative; width: 16px; height: 16px; flex: none;
+}
+.decade-mark::before, .decade-mark::after {
+  content: ""; position: absolute; inset: 0; margin: auto;
+  background: var(--ink);
+  transition: transform .25s ease, opacity .25s ease;
+}
+.decade-mark::before { width: 16px; height: 2px; }
+.decade-mark::after { width: 2px; height: 16px; }
+.decade.is-open .decade-mark::after { transform: rotate(90deg); opacity: 0; }
+.decade.is-open .decade-mark::before { background: var(--orange); }
+
+.decade-panel { display: grid; grid-template-rows: 1fr; }
+.decade-inner { overflow: hidden; padding: 0 4px 34px; min-width: 0; }
+.decade-inner .plain-list { padding-left: 18px; margin: 0 0 26px; max-width: 70ch; }
+.decade-inner .plain-list li { margin-bottom: 10px; }
+.decade-none { color: var(--ink-mute); font-size: 14.5px; margin: 0; }
+
+/* The photographs, scrolled sideways. */
+.strip-wrap { position: relative; }
+.strip {
+  display: flex; gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: 4px;
+  padding-bottom: 6px;
+  /* No visible scrollbar over the photographs; the arrows and a drag do
+     the same job. */
+  scrollbar-width: none;
+}
+.strip::-webkit-scrollbar { display: none; }
+.strip figure {
+  margin: 0; flex: 0 0 auto;
+  width: min(340px, 74vw);
+  scroll-snap-align: start;
+}
+.strip img {
   width: 100%; aspect-ratio: 3 / 2; object-fit: cover;
   border-radius: 4px; display: block;
   background: var(--wash-2);
 }
-.era-shots figcaption {
-  margin-top: 8px;
-  font-size: 12px; color: var(--ink-mute);
-}
-
-.shot-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-.shot-grid figcaption {
+.strip figcaption {
   margin-top: 10px;
-  font-size: 12.5px; line-height: 1.45;
-  color: rgba(255, 255, 255, .8);
+  font-size: 12.5px; line-height: 1.45; color: var(--ink-mute);
 }
-.shot-grid figcaption span {
-  display: block;
-  margin-top: 3px;
+.strip figcaption span {
+  display: block; margin-top: 3px;
   font-size: 11px; font-weight: 700;
   letter-spacing: .12em; text-transform: uppercase;
   color: var(--orange);
 }
 
-@media (max-width: 1000px) {
-  .era { grid-template-columns: 1fr; gap: 14px; }
-  .era-when { position: static; }
-  .shot-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 620px) {
-  .era-shots { grid-template-columns: 1fr; }
-  .shot-grid { grid-template-columns: 1fr; }
-}
-
-.era { border-bottom: 1px solid var(--rule); }
-.era:last-child { border-bottom: 0; }
-.era-head {
-  display: grid;
-  grid-template-columns: 130px 1fr 24px;
-  gap: 16px;
-  align-items: center;
-  width: 100%;
-  padding: 18px 20px;
-  background: none;
-  border: 0;
+.strip-nav { display: flex; gap: 10px; margin-top: 16px; }
+.strip-nav button {
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  color: var(--ink);
   cursor: pointer;
-  text-align: left;
-  font: inherit;
+  transition: border-color .15s, color .15s;
 }
-.era-head:hover { background: var(--wash); }
-.era-years { font-size: 13px; font-weight: 600; color: var(--orange); letter-spacing: .04em; }
-.era-title { font-size: 17px; font-weight: 600; }
-.era-mark { font-size: 18px; color: var(--ink-mute); text-align: right; }
-.era-body { margin: 0; padding: 0 20px 22px 166px; }
-.era-body li { margin-bottom: 10px; max-width: 680px; }
-.era-body li:last-child { margin-bottom: 0; }
+.strip-nav button:hover { border-color: var(--orange); color: var(--orange); }
 
 .story-grid {
   display: grid;
@@ -1074,8 +1093,6 @@ footer.site {
 }
 @media (max-width: 700px) {
   .link-grid, .story-grid { grid-template-columns: 1fr; }
-  .era-head { grid-template-columns: 100px 1fr 20px; gap: 10px; }
-  .era-body { padding-left: 20px; }
   .finding { grid-template-columns: 1fr 60px 70px; gap: 10px; }
   .bar-row { grid-template-columns: 110px 1fr 40px; }
 }
@@ -2541,105 +2558,124 @@ function StudyScreen() {
  * are recoverable from git history.
  * ------------------------------------------------------------------ */
 
-const ERAS = [
+/**
+ * The archive, by decade.
+ *
+ * 1980s to 2020s, each one collapsed until it is opened. The history is
+ * PBHA's own published account, with each item placed in the decade it
+ * states. Photographs sit in the decade they were actually taken:
+ * PBHA's Flickr begins in 2012, so the first three decades have none.
+ *
+ * Flickr's search reports nearly 4,000 photos "taken" before 1990, but
+ * those are files with no EXIF date, defaulted to an epoch — one is a
+ * 2025 summer-programme group shot dated 1 January 1980. Putting them
+ * under a decade heading would be inventing a record, which is the one
+ * thing an archive cannot do.
+ */
+const DECADES = [
   {
-    era: "Origins",
-    years: "1893–1904",
-    items: [
-      "Phillips Brooks House is built in memory of Reverend Phillips Brooks, a Trinity Church preacher, Harvard graduate, and advocate for social service. Plans are completed on his death in 1893.",
-      "The House is dedicated on 23 January 1900, to serve “the ideal of piety, charity, and hospitality.”",
-      "In 1904, six organizations formally organize as the Phillips Brooks House Association.",
-    ],
-  },
-  {
-    era: "The first half-century",
-    years: "1900s–1940s",
-    items: ["By the 1920s every religious group has withdrawn, leaving PBHA a secular service association."],
-  },
-  {
-    era: "Opening up",
-    years: "1950s–1960s",
-    items: [
-      "1954: Radcliffe students are admitted to full participation.",
-      "A Mental Health Committee forms; students organize with the Roosevelt Towers tenants' council.",
-      "1969: PBHA commits the house to being a common meeting ground during the protests, and produces a twelve-page report, The Critique of Harvard Expansion.",
-    ],
-  },
-  {
-    era: "Collapse and rebuilding",
-    years: "1970s",
-    items: [
-      "Membership falls from over 1,000 students to fewer than 200.",
-      "PBHA incorporates in 1973 and hires its first full-time graduate secretary — now the executive director — in 1974.",
-      "The Environmental Action Committee, the Committee on Women's Issues, and Harvard's first women's center are founded, the last on the second floor of Phillips Brooks House.",
-      "Michael Robinson '74: “The approach quickly evolved from arms-length charity to an involved attack on basic social and political problems.”",
-    ],
-  },
-  {
-    era: "Shelter and scale",
-    years: "1980s",
+    decade: "1980s",
+    title: "Shelter and scale",
     items: [
       "The Harvard Square Homeless Shelter opens at University Lutheran Church.",
       "A $1 million capital campaign runs in 1986.",
       "The Summer Urban Program grows into a twelve-camp network serving more than 700 children.",
     ],
+    photos: [],
   },
   {
-    era: "Independence",
-    years: "1990s–2000s",
+    decade: "1990s",
+    title: "Independence",
     items: [
       "1992: the cabinet votes to create a student board of directors.",
-      "November 1995: a cabinet resolution urges “a more rational, autonomous structure.” On 7 December, more than 2,000 people join a rally.",
+      "November 1995: a cabinet resolution urges \u201Ca more rational, autonomous structure.\u201D On 7 December, more than 2,000 people join a rally.",
       "By-laws are rewritten in spring 1996, a one-year trial agreement follows that summer, and a final agreement is signed in September 1997.",
-      "A $7.25 million Centennial Campaign follows. The Living Wage Campaign runs through PSLM, later SLAM, including a Massachusetts Hall sit-in and a plane over commencement.",
+    ],
+    photos: [],
+  },
+  {
+    decade: "2000s",
+    title: "Centennial",
+    items: [
+      "A $7.25 million Centennial Campaign runs toward the association\u2019s hundredth year in 2004.",
+      "The Living Wage Campaign runs through PSLM, later SLAM, including a Massachusetts Hall sit-in and a plane over commencement.",
+    ],
+    photos: [],
+  },
+  {
+    decade: "2010s",
+    title: "",
+    items: [],
+    photos: [
+      { src: "photos/buddies-2013-b.jpg", caption: "Alzheimer\u2019s Buddies", year: "2013" },
+      { src: "photos/buddies-2013-a.jpg", caption: "Alzheimer\u2019s Buddies", year: "2013" },
+      { src: "photos/buddies-2013-c.jpg", caption: "Alzheimer\u2019s Buddies", year: "2013" },
     ],
   },
   {
-    era: "Present day",
-    years: "2004–",
+    decade: "2020s",
+    title: "Toward the 125th",
     items: [
       "More than 85 programs and over 1,400 volunteers.",
       "2024: PBHA marks 120 years and begins 120 Stories.",
       "The Road to the 125th runs toward the anniversary in 2029.",
     ],
+    photos: [
+      { src: "photos/reunion-group-2025.jpg", caption: "PBHA 50th\u201370th Reunion, Classes of 1955\u20131975", year: "June 2025" },
+      { src: "photos/reunion-hall-2025.jpg", caption: "Alumni Day, Phillips Brooks House", year: "June 2025" },
+      { src: "photos/reunion-friends-2025.jpg", caption: "PBHA 5th\u201345th Reunion, Classes of 1980\u20132020", year: "June 2025" },
+      { src: "photos/reunion-balloons-2025.jpg", caption: "Reunion weekend", year: "June 2025" },
+      { src: "photos/reunion-pbha-2025.jpg", caption: "Reunion weekend", year: "June 2025" },
+      { src: "photos/reunion-room-2025.jpg", caption: "Alumni Day public service panel", year: "June 2025" },
+      { src: "photos/gathering-125th-a.jpg", caption: "Road to the 125th, Southern California", year: "2025" },
+      { src: "photos/gathering-125th-b.jpg", caption: "Road to the 125th, Southern California", year: "2025" },
+    ],
   },
 ];
 
 /**
- * The photographs.
- *
- * PBHA's Flickr begins in 2012, so the earlier decades have no picture
- * here — deliberately. Flickr's own search reports nearly 4,000 photos
- * "taken" before 1990, but they are files whose EXIF date is missing and
- * so defaults to an epoch: one of them is a 2025 summer-programme group
- * shot dated 1 January 1980. Putting those under a decade heading would
- * be inventing a record, which is the one thing an archive cannot do.
+ * A strip of photographs you scroll sideways. Native overflow scrolling
+ * with snap points, so a trackpad, a touchscreen and the arrows all do
+ * the same thing — and it still works if the arrows never get a click.
  */
-const ERA_PHOTOS = {
-  "1970s": null,
-  "1980s": null,
-  "1990s–2000s": null,
-  "2004–": [
-    { src: "photos/buddies-2013-b.jpg", caption: "Alzheimer's Buddies, 2013" },
-    { src: "photos/buddies-2013-a.jpg", caption: "Alzheimer's Buddies, 2013" },
-    { src: "photos/buddies-2013-c.jpg", caption: "Alzheimer's Buddies, 2013" },
-  ],
-};
+function Strip({ photos }) {
+  const rail = React.useRef(null);
+  const by = (dir) => {
+    const el = rail.current;
+    if (!el) return;
+    const card = el.querySelector("figure");
+    const step = card ? card.getBoundingClientRect().width + 16 : 320;
+    el.scrollBy({ left: dir * step, behavior: "smooth" });
+  };
 
-// The alumni photographs, which are all recent: PBHA's reunions and the
-// gatherings for the 125th.
-const ALUMNI_PHOTOS = [
-  { src: "photos/reunion-group-2025.jpg", caption: "PBHA 50th–70th Reunion, Classes of 1955–1975", year: "June 2025" },
-  { src: "photos/reunion-hall-2025.jpg", caption: "Alumni Day, Phillips Brooks House", year: "June 2025" },
-  { src: "photos/reunion-friends-2025.jpg", caption: "PBHA 5th–45th Reunion, Classes of 1980–2020", year: "June 2025" },
-  { src: "photos/reunion-balloons-2025.jpg", caption: "Reunion weekend", year: "June 2025" },
-  { src: "photos/reunion-pbha-2025.jpg", caption: "Reunion weekend", year: "June 2025" },
-  { src: "photos/reunion-room-2025.jpg", caption: "Alumni Day public service panel", year: "June 2025" },
-  { src: "photos/gathering-125th-a.jpg", caption: "Road to the 125th, Southern California gathering", year: "2025" },
-  { src: "photos/gathering-125th-b.jpg", caption: "Road to the 125th, Southern California gathering", year: "2025" },
-];
+  return (
+    <div className="strip-wrap">
+      <div className="strip" ref={rail}>
+        {photos.map((ph) => (
+          <figure key={ph.src}>
+            <img src={ph.src} alt={ph.caption} loading="lazy" />
+            <figcaption>{ph.caption}<span>{ph.year}</span></figcaption>
+          </figure>
+        ))}
+      </div>
+      {photos.length > 1 && (
+        <div className="strip-nav">
+          <button type="button" onClick={() => by(-1)} aria-label="Scroll photographs left">
+            <Chevron dir="left" />
+          </button>
+          <button type="button" onClick={() => by(1)} aria-label="Scroll photographs right">
+            <Chevron dir="right" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function ArchivesScreen() {
+  // One open at a time: a timeline you can see the whole shape of, with
+  // one decade unfolded inside it.
+  const [open, setOpen] = React.useState(null);
   useReveal(".archives");
 
   return (
@@ -2648,1791 +2684,50 @@ function ArchivesScreen() {
       <hr className="rule" style={{ margin: "22px 0 32px" }} />
 
       <p className="statement statement-mid reveal">
-        PBHA has been at this since <span className="em-n">1904</span>. What follows is the
-        association&rsquo;s own account of itself, decade by decade.
+        Four decades of the Phillips Brooks House Association, in its own account
+        and its own photographs.
       </p>
 
-      <section className="part">
-        <div className="part-label reveal">Since 1904</div>
-        <h2 className="h-2 band-head reveal">The decades</h2>
+      <ol className="decades">
+        {DECADES.map((d) => {
+          const isOpen = open === d.decade;
+          return (
+            <li key={d.decade} className={`decade reveal ${isOpen ? "is-open" : ""}`}>
+              <h2>
+                <button type="button" className="decade-btn"
+                  aria-expanded={isOpen}
+                  aria-controls={`decade-${d.decade}`}
+                  onClick={() => setOpen(isOpen ? null : d.decade)}>
+                  <span className="decade-n">{d.decade}</span>
+                  {d.title && <span className="decade-t">{d.title}</span>}
+                  <span className="decade-mark" aria-hidden="true" />
+                </button>
+              </h2>
 
-        <ol className="eras">
-          {ERAS.map((e) => {
-            const shots = ERA_PHOTOS[e.years];
-            return (
-              <li key={e.era} className="era reveal">
-                <div className="era-when">
-                  <div className="era-years">{e.years}</div>
-                  <div className="era-name">{e.era}</div>
-                </div>
-                <div className="era-what">
-                  <ul className="plain-list">
-                    {e.items.map((it) => <li key={it}>{it}</li>)}
-                  </ul>
-                  {shots ? (
-                    <div className="era-shots">
-                      {shots.map((ph) => (
-                        <figure key={ph.src}>
-                          <img src={ph.src} alt={ph.caption} loading="lazy" />
-                          <figcaption>{ph.caption}</figcaption>
-                        </figure>
-                      ))}
-                    </div>
+              {/* 0fr to 1fr rather than height: auto, which cannot be
+                  animated. The inner element needs the overflow. */}
+              <div className="decade-panel" id={`decade-${d.decade}`} hidden={!isOpen}>
+                <div className="decade-inner">
+                  {d.items.length > 0 && (
+                    <ul className="plain-list">
+                      {d.items.map((it) => <li key={it}>{it}</li>)}
+                    </ul>
+                  )}
+                  {d.photos.length > 0 ? (
+                    <Strip photos={d.photos} />
                   ) : (
-                    /* Said rather than left blank: an empty slot reads as a
-                       page that failed to load, a sentence reads as a gap
-                       someone could still fill. */
-                    <p className="era-none">
+                    /* Said rather than left blank: an empty panel reads as
+                       something that failed to load. */
+                    <p className="decade-none">
                       No photographs from these years have been digitised yet.
                     </p>
                   )}
                 </div>
-              </li>
-            );
-          })}
-        </ol>
-      </section>
-
-      <section className="bleed ground-navy wave-out">
-        <div className="part reveal">
-          <div className="part-label">The alumni</div>
-          <h2 className="h-2 band-head">Reunions and gatherings</h2>
-          <div className="shot-grid">
-            {ALUMNI_PHOTOS.map((ph, i) => (
-              <figure key={ph.src} className="reveal" style={{ transitionDelay: `${(i % 4) * 80}ms` }}>
-                <img src={ph.src} alt={ph.caption} loading="lazy" />
-                <figcaption>{ph.caption}<span>{ph.year}</span></figcaption>
-              </figure>
-            ))}
-          </div>
-        </div>
-        <Wave side="bottom" fill="var(--white)" />
-      </section>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- * Donate
- *
- * PBHA takes gifts through two hosted forms that disagree with each
- * other: Network for Good (amounts $25-$5,000; One Time / Monthly /
- * Quarterly / Annual; a designation dropdown) and Click & Pledge for
- * Road to the 125th (amounts $25-$25,000; One time / Yearly; a
- * multiyear pledge question; no designation). Both ask the Harvard
- * class-credit question and both offer anonymous giving.
- *
- * This page is the front of that, in PBHA's own layout: it gathers the
- * choices in one place and hands off to whichever processor can take
- * the gift. It deliberately collects NO payment details — card entry
- * stays on the processor's secured page, which is also the only place
- * it belongs.
- * ------------------------------------------------------------------ */
-
-const GIFT_AMOUNTS = [25, 50, 100, 250, 500, 1000, 2500, 5000];
-
-const FREQUENCIES = [
-  { key: "once", label: "One time" },
-  { key: "monthly", label: "Monthly" },
-  { key: "quarterly", label: "Quarterly" },
-  { key: "annual", label: "Annual" },
-];
-
-// Network for Good's designation list, verbatim.
-const DESIGNATIONS = [
-  "General Program Support",
-  "Summer Urban Program (SUP)",
-  "Harvard Square Homeless Shelter",
-  "Y2Y Harvard Square",
-  "Road to the 125th",
-];
-
-const SOCIETIES = [
-  ["125th Leadership Committee", "$25,000+ a year"],
-  ["Road to the 125th Champion", "$5,000+ a year"],
-  ["125th Road Builder", "$500+ a year"],
-  ["Sustaining Donor", "$20 to $100 a month"],
-];
-
-const NFG_URL = "https://donatenow.networkforgood.org/1439676";
-const CP_URL = "https://connect.clickandpledge.com/Organization/pbha/campaign/125Donation";
-
-function DonateScreen({ me }) {
-  const [amount, setAmount] = React.useState(100);
-  const [other, setOther] = React.useState("");
-  const [frequency, setFrequency] = React.useState("once");
-  const [designation, setDesignation] = React.useState(DESIGNATIONS[0]);
-  const [classCredit, setClassCredit] = React.useState(false);
-  const [anonymous, setAnonymous] = React.useState(false);
-
-  const value = amount === "other" ? Number(other) || 0 : amount;
-  const fmt = (n) => "$" + n.toLocaleString("en-US");
-
-  // Road to the 125th is run through Click & Pledge, everything else
-  // through Network for Good — and Click & Pledge only takes one-time and
-  // yearly gifts, so a monthly pledge to the campaign has to go the other
-  // way. Sending someone to a processor that cannot take their gift is
-  // worse than sending them one click further.
-  const campaign = designation === "Road to the 125th";
-  const cpCanTake = frequency === "once" || frequency === "annual";
-  const processor = campaign && cpCanTake ? "clickandpledge" : "networkforgood";
-  const href = processor === "clickandpledge" ? CP_URL : NFG_URL;
-
-  return (
-    <div className="wrap page">
-      <h1 className="h-1 accent">Donate</h1>
-      <hr className="rule" style={{ margin: "22px 0 32px" }} />
-
-      <p className="lede" style={{ maxWidth: 720, marginBottom: 36 }}>
-        Students raise nearly half of PBHA's budget every year. Gifts from alumni are what
-        keep <span className="em-u">80+ programs</span> running for the
-        <span className="em-n"> 1,500</span> students and
-        <span className="em-n"> 10,000</span> neighbors they serve.
-      </p>
-
-      <div className="give-layout">
-        <div>
-          <h2 className="h-2" style={{ marginBottom: 16 }}>Choose your gift</h2>
-          <div className="amount-grid">
-            {GIFT_AMOUNTS.map((a) => (
-              <button key={a} className={`amount ${amount === a ? "is-on" : ""}`}
-                onClick={() => setAmount(a)}>{fmt(a)}</button>
-            ))}
-            <button className={`amount ${amount === "other" ? "is-on" : ""}`}
-              onClick={() => setAmount("other")}>Other</button>
-          </div>
-          {amount === "other" && (
-            <div style={{ marginTop: 14, maxWidth: 240 }}>
-              <input className="input" inputMode="decimal" value={other} placeholder="Amount"
-                aria-label="Other amount"
-                onChange={(e) => setOther(e.target.value.replace(/[^0-9.]/g, ""))} />
-            </div>
-          )}
-
-          <h2 className="h-2" style={{ margin: "36px 0 16px" }}>How often</h2>
-          <div className="pill-row">
-            {FREQUENCIES.map((f) => (
-              <button key={f.key} className={`chip ${frequency === f.key ? "is-on" : ""}`}
-                onClick={() => setFrequency(f.key)}>{f.label}</button>
-            ))}
-          </div>
-          <p className="meta" style={{ marginTop: 10 }}>
-            A recurring gift is the steadiest support PBHA can plan around.
-          </p>
-
-          <h2 className="h-2" style={{ margin: "36px 0 16px" }}>Where it goes</h2>
-          <div className="pill-row">
-            {DESIGNATIONS.map((d) => (
-              <button key={d} className={`chip ${designation === d ? "is-on" : ""}`}
-                onClick={() => setDesignation(d)}>{d}</button>
-            ))}
-          </div>
-
-          <h2 className="h-2" style={{ margin: "36px 0 16px" }}>A few options</h2>
-          <div style={{ display: "flex", flexDirection: "column", gap: 14, maxWidth: 640 }}>
-            <label className={`check ${classCredit ? "is-on" : ""}`}
-              onClick={(e) => { e.preventDefault(); setClassCredit(!classCredit); }}>
-              <span className="box" />
-              <span>
-                Count this toward my Harvard College class credit.
-                <span className="meta"> Harvard keeps 15% of a gift made this way, for administration.</span>
-              </span>
-            </label>
-            <label className={`check ${anonymous ? "is-on" : ""}`}
-              onClick={(e) => { e.preventDefault(); setAnonymous(!anonymous); }}>
-              <span className="box" />
-              <span>Make my donation anonymously.</span>
-            </label>
-          </div>
-        </div>
-
-        <aside className="give-summary">
-          <div className="eyebrow" style={{ marginBottom: 14 }}>Your gift</div>
-          <div className="give-total">{value > 0 ? fmt(value) : "—"}</div>
-          <div className="meta" style={{ marginTop: 4 }}>
-            {FREQUENCIES.find((f) => f.key === frequency).label.toLowerCase()}
-            {frequency !== "once" && ", until you stop it"}
-          </div>
-
-          <hr className="rule" style={{ margin: "20px 0" }} />
-
-          <dl className="give-lines">
-            <dt>Going to</dt><dd>{designation}</dd>
-            {me && me.profile && me.profile.year && (
-              <><dt>Class year</dt><dd>{me.profile.year}</dd></>
-            )}
-            {classCredit && (<><dt>Class credit</dt><dd>Yes — Harvard keeps 15%</dd></>)}
-            {anonymous && (<><dt>Anonymous</dt><dd>Yes</dd></>)}
-          </dl>
-
-          <a className="btn btn-primary" style={{ width: "100%", marginTop: 20 }}
-            href={href} target="_blank" rel="noopener noreferrer">Continue to payment</a>
-
-          {/* Said plainly rather than buried: this page takes no card
-              details, and the choices above do not travel with the link. */}
-          <p className="meta" style={{ marginTop: 14, fontSize: 12.5 }}>
-            Payment is completed on PBHA's secured page
-            {processor === "clickandpledge" ? " at Click & Pledge" : " at Network for Good"}.
-            Nothing is charged here, and you will re-enter your amount there.
-          </p>
-          {campaign && !cpCanTake && (
-            <p className="meta" style={{ marginTop: 10, fontSize: 12.5 }}>
-              The 125th campaign form takes one-time and yearly gifts only, so a
-              {" " + frequency} gift goes through PBHA's main donation page instead.
-            </p>
-          )}
-        </aside>
-      </div>
-
-      <hr className="rule" style={{ margin: "56px 0 32px" }} />
-
-      <h2 className="h-2" style={{ marginBottom: 8 }}>Giving societies</h2>
-      <p className="meta" style={{ marginBottom: 24, maxWidth: 680 }}>
-        Road to the 125th is a five-year campaign toward PBHA's anniversary in 2029, aiming to
-        raise annual giving by $1.3 million and take alumni participation from one in ten to
-        one in four.
-      </p>
-      <div className="society-row">
-        {SOCIETIES.map(([name, level]) => (
-          <div key={name} className="society">
-            <div className="society-level">{level}</div>
-            <div className="h-3">{name}</div>
-          </div>
-        ))}
-      </div>
-
-      <hr className="rule" style={{ margin: "48px 0 32px" }} />
-
-      <h2 className="h-2" style={{ marginBottom: 20 }}>Other ways to give</h2>
-      <div className="link-grid">
-        <div className="link-card" style={{ cursor: "default" }}>
-          <div className="h-3">By check</div>
-          <p className="meta">
-            Phillips Brooks House Association, 1 Harvard Yard, Cambridge, MA 02138. Write your
-            designation on the memo line.
-          </p>
-        </div>
-        <a className="link-card" href="https://community.alumni.harvard.edu/give/16040771"
-          target="_blank" rel="noopener noreferrer">
-          <div className="h-3">Through Harvard, for class credit</div>
-          <p className="meta">
-            Fund &ldquo;General Support of the PBHA Fund&rdquo;, allocation code 310-330584RG.
-            Harvard keeps 15%.
-          </p>
-          <span className="tile-cta">Harvard giving →</span>
-        </a>
-        <a className="link-card" href="https://forms.gle/dH8MTUAXPabQmqXp7"
-          target="_blank" rel="noopener noreferrer">
-          <div className="h-3">Pledge over several years</div>
-          <p className="meta">
-            Tell PBHA what you intend to give between now and 2029 so they can plan against it.
-          </p>
-          <span className="tile-cta">Pledge form →</span>
-        </a>
-      </div>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- * Messages — one-to-one, between signed-in members.
- * ------------------------------------------------------------------ */
-
-const when = (iso) => {
-  const d = new Date(iso);
-  const now = new Date();
-  const sameDay = d.toDateString() === now.toDateString();
-  if (sameDay) return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-  const sameYear = d.getFullYear() === now.getFullYear();
-  return d.toLocaleDateString([], sameYear
-    ? { month: "short", day: "numeric" }
-    : { month: "short", day: "numeric", year: "numeric" });
-};
-
-// One conversation: what has been said, and the box to add to it. It owns
-// its own fetch so it can be dropped straight onto a member's profile as
-// well as into the Messages screen. The callbacks live in a ref because
-// they are written inline at both call sites — in the dependency array a
-// fresh function every render would refetch the thread forever.
-function Conversation({ threadId, showHead, onOpenProfile, onRead, onSent, onDeleted, initialDraft }) {
-  const [thread, setThread] = React.useState(null);
-  const [draft, setDraft] = React.useState(initialDraft || "");
-  const [busy, setBusy] = React.useState(false);
-  const [error, setError] = React.useState("");
-  const [confirming, setConfirming] = React.useState(false);
-  const [removing, setRemoving] = React.useState(false);
-  const endRef = React.useRef(null);
-  const cb = React.useRef({});
-  cb.current = { onRead, onSent };
-
-  React.useEffect(() => {
-    if (!threadId) { setThread(null); return; }
-    let dead = false;
-    setThread(null);
-    setConfirming(false);
-    setRemoving(false);
-    // Arriving from the directory: address it to them. Only on the way in —
-    // a later render must not wipe what has been typed since.
-    if (initialDraft) setDraft(initialDraft);
-    api.get("/api/messages/" + encodeURIComponent(threadId))
-      .then((t) => {
-        if (dead) return;
-        setThread(t);
-        // Opening a conversation reads it.
-        return api.post("/api/messages/" + encodeURIComponent(threadId) + "/read");
-      })
-      .then(() => { if (!dead && cb.current.onRead) cb.current.onRead(); })
-      .catch((err) => { if (!dead) setError(err.message); });
-    return () => { dead = true; };
-  }, [threadId]);
-
-  React.useEffect(() => {
-    if (endRef.current) endRef.current.scrollIntoView({ block: "end" });
-  }, [thread && thread.messages.length]);
-
-  const remove = async () => {
-    setRemoving(true);
-    setError("");
-    try {
-      await api.del("/api/messages/" + encodeURIComponent(threadId));
-      setConfirming(false);
-      if (onDeleted) onDeleted(threadId);
-    } catch (err) {
-      setError(err.message);
-      setRemoving(false);
-    }
-  };
-
-  const send = async (e) => {
-    e.preventDefault();
-    const body = draft.trim();
-    if (!body || !threadId) return;
-    setBusy(true);
-    setError("");
-    try {
-      const sent = await api.post("/api/messages/" + encodeURIComponent(threadId), { body });
-      setThread((t) => (t ? { ...t, messages: [...t.messages, sent] } : t));
-      setDraft("");
-      if (cb.current.onSent) cb.current.onSent();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  if (!thread) {
-    return <p className="meta" style={{ padding: 24 }}>{error || "Loading…"}</p>;
-  }
-
-  return (
-    <>
-      {showHead && (
-        <div className="msg-head">
-          {thread.with ? (
-            <button className="msg-head-name" onClick={() => onOpenProfile(thread.with.userId)}>
-              {thread.with.first} {thread.with.last}
-              {thread.with.year && <span className="meta"> · {shortYear(thread.with.year)}</span>}
-            </button>
-          ) : <span className="msg-head-name">Former member</span>}
-
-          {/* Two steps, because this cannot be undone. The confirm replaces
-              the button rather than opening a dialog over it, so the
-              conversation being deleted stays visible while you decide. */}
-          {confirming ? (
-            <span className="msg-confirm">
-              <span className="meta">Delete this conversation?</span>
-              <button type="button" className="btn btn-ghost btn-sm" onClick={() => setConfirming(false)}>
-                Keep
-              </button>
-              <button type="button" className="btn btn-primary btn-sm" onClick={remove} disabled={removing}>
-                {removing ? "Deleting…" : "Delete"}
-              </button>
-            </span>
-          ) : (
-            <button type="button" className="msg-del" onClick={() => setConfirming(true)}
-              aria-label="Delete this conversation">
-              Delete
-            </button>
-          )}
-        </div>
-      )}
-
-      <div className="msg-body">
-        {thread.messages.length === 0 && <p className="meta">Nothing here yet. Say hello.</p>}
-        {thread.messages.map((m) => (
-          <div key={m.id} className={`bubble-row ${m.fromMe ? "mine" : ""}`}>
-            <div className="bubble">
-              {m.body}
-              <span className="bubble-time">{when(m.createdAt)}</span>
-            </div>
-          </div>
-        ))}
-        <div ref={endRef} />
-      </div>
-
-      {error && <div className="banner banner-error" style={{ margin: "0 16px 12px" }}>{error}</div>}
-
-      <form className="msg-compose" onSubmit={send}>
-        <textarea className="input" value={draft} rows={2}
-          placeholder="Write a message" aria-label="Write a message"
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
-            // Enter sends; Shift+Enter breaks the line.
-            if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(e); }
-          }} />
-        <button className="btn btn-primary" disabled={busy || !draft.trim()}>Send</button>
-      </form>
-    </>
-  );
-}
-
-/**
- * Start a conversation by typing a name, rather than by going back to the
- * directory to find the person's card. Searches the same endpoint the
- * directory does, so "chen", "boston" and "CHAP" all find people — but the
- * label says name, because that is what someone starting a message has in
- * mind.
- */
-function NewMessage({ onPick, onCancel }) {
-  const [q, setQ] = React.useState("");
-  const [people, setPeople] = React.useState([]);
-  const [busy, setBusy] = React.useState(false);
-  const [error, setError] = React.useState("");
-
-  React.useEffect(() => {
-    const term = q.trim();
-    if (term.length < 2) { setPeople([]); return; }
-    // Wait for a pause in typing rather than querying on every keystroke.
-    let dead = false;
-    const t = setTimeout(() => {
-      setBusy(true);
-      api.get("/api/directory?pageSize=8&q=" + encodeURIComponent(term))
-        .then((r) => {
-          if (dead) return;
-          // You cannot write to yourself, and someone who has messages off
-          // has already said no — neither belongs in a list of people to
-          // start a conversation with.
-          // Slice here as well as asking for eight: the static demo answers
-          // this endpoint from memory and does not honour pageSize.
-          setPeople(r.items.filter((p) => !p.isSelf && p.openToMessages !== false).slice(0, 8));
-        })
-        .catch((err) => { if (!dead) setError(err.message); })
-        .finally(() => { if (!dead) setBusy(false); });
-    }, 220);
-    return () => { dead = true; clearTimeout(t); };
-  }, [q]);
-
-  return (
-    <div className="msg-new">
-      <div className="msg-new-head">
-        <span className="eyebrow">New message</span>
-        <button type="button" className="msg-new-x" onClick={onCancel} aria-label="Cancel">×</button>
-      </div>
-      <input className="input" autoFocus value={q} placeholder="Type a name"
-        aria-label="Search for someone to write to"
-        onChange={(e) => setQ(e.target.value)}
-        onKeyDown={(e) => { if (e.key === "Escape") onCancel(); }} />
-      {error && <p className="meta" style={{ marginTop: 8 }}>{error}</p>}
-      {q.trim().length >= 2 && !busy && people.length === 0 && !error && (
-        <p className="meta" style={{ marginTop: 10 }}>Nobody by that name.</p>
-      )}
-      <div className="msg-new-results">
-        {people.map((p) => (
-          <button key={p.userId} type="button" className="msg-new-hit" onClick={() => onPick(p)}>
-            <span className="avatar">
-              {p.photoUrl
-                ? <img src={p.photoUrl} alt="" />
-                : <span className="initials" style={{ fontSize: 12, opacity: .5 }}>
-                    {initials(p.first, p.last)}
-                  </span>}
-            </span>
-            <span style={{ minWidth: 0 }}>
-              <span className="msg-name">{p.first} {p.last}</span>
-              <span className="msg-snippet">
-                {shortYear(p.year)}{p.location ? " · " + p.location : ""}
-              </span>
-            </span>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function MessagesScreen({ openThreadId, onOpenProfile, draftFor, onUnreadChange }) {
-  const [threads, setThreads] = React.useState([]);
-  const [active, setActive] = React.useState(openThreadId || null);
-  const [error, setError] = React.useState("");
-  const [picking, setPicking] = React.useState(false);
-  // A draft started from this screen, which the App-level one cannot know
-  // about. Whichever names the open conversation wins.
-  const [ownDraft, setOwnDraft] = React.useState(null);
-
-  const loadThreads = React.useCallback(() => {
-    api.get("/api/messages")
-      .then((r) => {
-        setThreads(r.threads);
-        // Nothing selected yet: open the most recent conversation rather
-        // than showing an empty pane beside a full list.
-        setActive((cur) => cur || (r.threads[0] ? r.threads[0].threadId : null));
-      })
-      .catch((err) => setError(err.message));
-  }, []);
-
-  React.useEffect(() => { loadThreads(); }, [loadThreads]);
-  React.useEffect(() => { if (openThreadId) setActive(openThreadId); }, [openThreadId]);
-
-  // Writing to someone new. openThread finds an existing conversation
-  // before it creates one, so picking someone you have already written to
-  // reopens that thread rather than starting a second one beside it.
-  const startWith = async (person) => {
-    setError("");
-    try {
-      const { threadId } = await api.post("/api/messages/open", { userId: person.userId });
-      setOwnDraft({ threadId, text: `Hi ${person.first}, ` });
-      setActive(threadId);
-      setPicking(false);
-      loadThreads();
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
-  const draft = [ownDraft, draftFor].find((d) => d && d.threadId === active);
-
-  // After a delete, land on whatever conversation is next in the list
-  // rather than on an empty pane. The deleted one is dropped from local
-  // state first so the choice is made against the list as it will be.
-  const afterDelete = (gone) => {
-    const rest = threads.filter((t) => t.threadId !== gone);
-    setThreads(rest);
-    setOwnDraft(null);
-    setActive(rest[0] ? rest[0].threadId : null);
-    loadThreads();
-    onUnreadChange && onUnreadChange();
-  };
-
-  return (
-    <div className="wrap page">
-      <h1 className="h-1 accent">Messages</h1>
-      <hr className="rule" style={{ margin: "22px 0 32px" }} />
-
-      {error && <div className="banner banner-error" style={{ marginBottom: 20 }}>{error}</div>}
-
-      {threads.length === 0 && !active ? (
-        <>
-          <p className="meta" style={{ marginBottom: 18 }}>
-            No conversations yet.
-          </p>
-          {picking
-            ? <div className="card" style={{ maxWidth: 420 }}>
-                <NewMessage onPick={startWith} onCancel={() => setPicking(false)} />
               </div>
-            : <button className="btn btn-primary btn-sm" onClick={() => setPicking(true)}>
-                New message
-              </button>}
-        </>
-      ) : (
-        <div className="msg-layout">
-          <div className="msg-list card">
-            {picking ? (
-              <NewMessage onPick={startWith} onCancel={() => setPicking(false)} />
-            ) : (
-              <button className="msg-new-btn" onClick={() => setPicking(true)}>
-                <span aria-hidden="true">+</span> New message
-              </button>
-            )}
-            {threads.map((t) => (
-              <button key={t.threadId}
-                className={`msg-row ${t.threadId === active ? "is-on" : ""}`}
-                onClick={() => setActive(t.threadId)}>
-                <span className="avatar">
-                  {t.with && t.with.photoUrl
-                    ? <img src={t.with.photoUrl} alt="" />
-                    : <span className="initials" style={{ fontSize: 13, opacity: .5 }}>
-                        {t.with ? initials(t.with.first, t.with.last) : "?"}
-                      </span>}
-                </span>
-                <span style={{ minWidth: 0 }}>
-                  <span className="msg-name">
-                    {t.with ? `${t.with.first} ${t.with.last}` : "Former member"}
-                    {t.unread > 0 && <span className="msg-dot" aria-label={`${t.unread} unread`} />}
-                  </span>
-                  <span className="msg-snippet">
-                    {t.lastMessage ? (t.lastMessage.fromMe ? "You: " : "") + t.lastMessage.body : ""}
-                  </span>
-                </span>
-                <span className="meta" style={{ fontSize: 12 }}>
-                  {t.lastMessage ? when(t.lastMessage.createdAt) : ""}
-                </span>
-              </button>
-            ))}
-          </div>
-
-          <div className="msg-pane card">
-            {!active
-              ? <p className="meta" style={{ padding: 24 }}>Pick a conversation.</p>
-              : <Conversation threadId={active} showHead onOpenProfile={onOpenProfile}
-                  initialDraft={draft ? draft.text : ""}
-                  onRead={() => { loadThreads(); onUnreadChange && onUnreadChange(); }}
-                  onSent={loadThreads}
-                  onDeleted={afterDelete} />}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- * Directory map — where members are, on a Robinson world projection.
- *
- * Ported from the FOP alumni directory. Three inputs, all static and
- * already cached: the projected country outlines (geo/world.json), the
- * text-to-coordinate lookup built by scripts/geocode-locations.js
- * (geo/locations.json), and the location counts the directory already
- * fetches for its facets. Nothing geocodes at request time.
- *
- * Paths are relative, not root-absolute, so the same code works served
- * from the site root and from the /pbha-alumni/ GitHub Pages base.
- * ------------------------------------------------------------------ */
-
-// Bump when geo/*.json is rebuilt — those files are cached, so without a
-// version a regenerated map keeps showing the previous build.
-const GEO_V = "1";
-
-// How far the map will zoom. The outlines are Natural Earth 50m; past this
-// a screen pixel is finer than the source geometry.
-const MAX_Z = 64;
-
-// Shorthands folded onto the full name so they land on one dot rather than
-// two stacked in the same spot. Must match CANON in scripts/geocode-locations.js.
-const CANON = {
-  "cambridge": "cambridge, ma",
-  "boston": "boston, ma",
-  "sf": "san francisco, ca",
-  "san francisco": "san francisco, ca",
-  "nyc": "new york, ny",
-  "new york city": "new york, ny",
-  "dc": "washington, dc",
-  "washington, d.c.": "washington, dc",
-  "london": "london, uk",
-};
-
-function DirectoryMap({ locations, people, onOpenProfile }) {
-  const [world, setWorld] = React.useState(null);
-  const [coords, setCoords] = React.useState(null);
-  const [failed, setFailed] = React.useState(false);
-  const [hover, setHover] = React.useState(null);
-  const [picked, setPicked] = React.useState(null);
-  const isTouch = typeof window !== "undefined" && !!window.matchMedia &&
-                  window.matchMedia("(pointer: coarse)").matches;
-  const [z, setZ] = React.useState(1);
-  const [pan, setPan] = React.useState({ x: 0, y: 0 });
-  const svgRef = React.useRef(null);
-  const drag = React.useRef(null);
-  const gesture = React.useRef(null);
-
-  React.useEffect(() => {
-    let dead = false;
-    Promise.all([
-      fetch("geo/world.json?v=" + GEO_V).then((r) => r.json()),
-      fetch("geo/locations.json?v=" + GEO_V).then((r) => r.json()).catch(() => ({})),
-    ])
-      .then(([w, c]) => { if (!dead) { setWorld(w); setCoords(c); } })
-      .catch(() => { if (!dead) setFailed(true); });
-    return () => { dead = true; };
-  }, []);
-
-  const norm = (v) => {
-    const k = String(v || "").toLowerCase().trim().replace(/\s+/g, " ").replace(/\s*,\s*/g, ", ");
-    return CANON[k] || k;
-  };
-
-  // Robinson, matching scripts/build-world.py exactly. If the two drift the
-  // dots stop landing on their coastlines.
-  const project = React.useCallback((lat, lon, w) => {
-    const PLEN = [1.0000, 0.9986, 0.9954, 0.9900, 0.9822, 0.9730, 0.9600, 0.9427, 0.9216,
-                  0.8962, 0.8679, 0.8350, 0.7986, 0.7597, 0.7186, 0.6732, 0.6213, 0.5722, 0.5322];
-    const PDIST = [0.0000, 0.0620, 0.1240, 0.1860, 0.2480, 0.3100, 0.3720, 0.4340, 0.4958,
-                   0.5571, 0.6176, 0.6769, 0.7346, 0.7903, 0.8435, 0.8936, 0.9394, 0.9761, 1.0000];
-    const KX = 0.8487, KY = 1.3523;
-    const a = Math.min(Math.abs(lat), 90) / 5;
-    const i = Math.min(Math.floor(a), 17);
-    const t = a - i;
-    const xf = PLEN[i] + (PLEN[i + 1] - PLEN[i]) * t;
-    const yf = PDIST[i] + (PDIST[i + 1] - PDIST[i]) * t;
-    const x = KX * xf * (lon * Math.PI / 180);
-    const y = KY * yf * (lat >= 0 ? 1 : -1);
-    const halfW = KX * Math.PI, halfH = KY;
-    const sc = Math.min(w.w / (2 * halfW), w.h / (2 * halfH));
-    return [x * sc + w.w / 2, w.h / 2 - y * sc];
-  }, []);
-
-  // Join counts to coordinates. Several typed spellings can share one place,
-  // so sum them onto a single dot instead of stacking near-identical circles.
-  const dots = React.useMemo(() => {
-    if (!world || !coords) return [];
-    const byKey = new Map();
-    (locations || []).forEach((l) => {
-      const key = norm(l.name);
-      const hit = coords[key];
-      if (!hit) return;
-      const prev = byKey.get(key);
-      if (prev) {
-        prev.count += l.count;
-        if (l.name.length > prev.label.length) prev.label = l.name;
-        return;
-      }
-      byKey.set(key, { key, label: l.name, count: l.count, lat: hit.lat, lon: hit.lon });
-    });
-    const out = [...byKey.values()];
-    const max = out.reduce((m, d) => Math.max(m, d.count), 1);
-    out.forEach((d) => {
-      const [x, y] = project(d.lat, d.lon, world);
-      d.x = x; d.y = y;
-      d.r = 3.4 + 11 * Math.sqrt(d.count / max);   // area, not radius, tracks count
-    });
-    // Biggest first in the DOM so small dots stay clickable on top of them.
-    return out.sort((a, b) => b.count - a.count);
-  }, [world, coords, locations, project]);
-
-  // Visible window. The base is world.view, the bounding box of the land, so
-  // the empty polar ocean is cropped rather than padding the frame. On a phone
-  // that crop works against us — it makes the frame wider, and width is what
-  // limits a narrow screen — so touch gets the full canvas plus a margin.
-  const V = React.useMemo(() => {
-    if (!world) return null;
-    const land = world.view || [0, 0, world.w, world.h];
-    if (!isTouch) return land;
-    const padY = world.h * 0.1;
-    return [0, -padY, world.w, world.h + padY * 2];
-  }, [world, isTouch]);
-  const BX = V ? V[0] : 0, BY = V ? V[1] : 0, BW = V ? V[2] : 0, BH = V ? V[3] : 0;
-  const CX = BX + BW / 2, CY = BY + BH / 2;
-  const vw = BW / z, vh = BH / z;
-  const clamp = (pt, zz) => {
-    if (!V) return { x: 0, y: 0 };
-    const mx = Math.max(0, (BW - BW / zz) / 2);
-    const my = Math.max(0, (BH - BH / zz) / 2);
-    return { x: Math.max(-mx, Math.min(mx, pt.x)), y: Math.max(-my, Math.min(my, pt.y)) };
-  };
-  const vx = CX + pan.x - vw / 2;
-  const vy = CY + pan.y - vh / 2;
-
-  // Wheel zoom toward the cursor. Bound natively with passive:false so
-  // preventDefault actually stops the page scrolling underneath.
-  React.useEffect(() => {
-    const el = svgRef.current;
-    if (!el || !world) return;
-    const onWheel = (e) => {
-      e.preventDefault();
-      const r = el.getBoundingClientRect();
-      const fx = (e.clientX - r.left) / r.width, fy = (e.clientY - r.top) / r.height;
-      const mx = vx + fx * vw, my = vy + fy * vh;
-      const nz = Math.max(1, Math.min(MAX_Z, z * (e.deltaY < 0 ? 1.15 : 1 / 1.15)));
-      const nvw = BW / nz, nvh = BH / nz;
-      setZ(nz);
-      setPan(clamp({ x: (mx - fx * nvw) + nvw / 2 - CX,
-                     y: (my - fy * nvh) + nvh / 2 - CY }, nz));
-    };
-    el.addEventListener("wheel", onWheel, { passive: false });
-    return () => el.removeEventListener("wheel", onWheel);
-  }, [world, z, pan.x, pan.y, vx, vy, vw, vh]);
-
-  // Touch: two fingers pinch toward the midpoint, one finger pans once zoomed.
-  React.useEffect(() => {
-    const el = svgRef.current;
-    if (!el || !world) return;
-    const spread = (a, b) => Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
-
-    const onStart = (e) => {
-      if (e.touches.length === 2) {
-        const [a, b] = e.touches;
-        gesture.current = {
-          mode: "pinch", d: spread(a, b),
-          cx: (a.clientX + b.clientX) / 2, cy: (a.clientY + b.clientY) / 2,
-          z, pan: { ...pan },
-        };
-      } else if (e.touches.length === 1 && z > 1) {
-        gesture.current = { mode: "pan", x: e.touches[0].clientX, y: e.touches[0].clientY, z, pan: { ...pan } };
-      }
-    };
-    const onMove = (e) => {
-      const g = gesture.current;
-      if (!g) return;
-      const r = el.getBoundingClientRect();
-      if (g.mode === "pinch" && e.touches.length === 2) {
-        e.preventDefault();
-        const [a, b] = e.touches;
-        const nz = Math.max(1, Math.min(MAX_Z, g.z * (spread(a, b) / (g.d || 1))));
-        // Keep whatever was under the pinch midpoint pinned under it, so the
-        // map grows out of the spot being pinched.
-        const fx = (g.cx - r.left) / r.width, fy = (g.cy - r.top) / r.height;
-        const sw = BW / g.z, sh = BH / g.z;
-        const mx = CX + g.pan.x - sw / 2 + fx * sw;
-        const my = CY + g.pan.y - sh / 2 + fy * sh;
-        const nw = BW / nz, nh = BH / nz;
-        setZ(nz);
-        setPan(clamp({ x: (mx - fx * nw) + nw / 2 - CX,
-                       y: (my - fy * nh) + nh / 2 - CY }, nz));
-      } else if (g.mode === "pan" && e.touches.length === 1) {
-        e.preventDefault();
-        const t = e.touches[0];
-        const dx = (t.clientX - g.x) / r.width * (BW / g.z);
-        const dy = (t.clientY - g.y) / r.height * (BH / g.z);
-        setPan(clamp({ x: g.pan.x - dx, y: g.pan.y - dy }, g.z));
-      }
-    };
-    const onEnd = (e) => {
-      if (e.touches.length === 0) { gesture.current = null; return; }
-      // Lifting one finger of a pinch hands over to a pan cleanly rather than
-      // leaving a stale two-finger gesture running.
-      if (e.touches.length === 1) {
-        gesture.current = { mode: "pan", x: e.touches[0].clientX, y: e.touches[0].clientY, z, pan: { ...pan } };
-      }
-    };
-
-    el.addEventListener("touchstart", onStart, { passive: false });
-    el.addEventListener("touchmove", onMove, { passive: false });
-    el.addEventListener("touchend", onEnd, { passive: false });
-    el.addEventListener("touchcancel", onEnd, { passive: false });
-    return () => {
-      el.removeEventListener("touchstart", onStart);
-      el.removeEventListener("touchmove", onMove);
-      el.removeEventListener("touchend", onEnd);
-      el.removeEventListener("touchcancel", onEnd);
-    };
-  }, [world, z, pan.x, pan.y]);
-
-  const onDown = (e) => { if (z > 1) drag.current = { x: e.clientX, y: e.clientY, pan: { ...pan } }; };
-  const onMove = (e) => {
-    if (!drag.current || !world) return;
-    const r = e.currentTarget.getBoundingClientRect();
-    const dx = (e.clientX - drag.current.x) / r.width * vw;
-    const dy = (e.clientY - drag.current.y) / r.height * vh;
-    setPan(clamp({ x: drag.current.pan.x - dx, y: drag.current.pan.y - dy }, z));
-  };
-  const endDrag = () => { drag.current = null; };
-  const reset = () => { setZ(1); setPan({ x: 0, y: 0 }); };
-
-  const atPicked = React.useMemo(() => {
-    if (!picked) return [];
-    return (people || []).filter((p) => norm(p.location) === picked.key);
-  }, [picked, people]);
-
-  const placed = dots.reduce((n, d) => n + d.count, 0);
-
-  if (failed) return <div className="card card-pad meta">The map could not be loaded.</div>;
-  if (!world || !coords) return <div className="card card-pad meta">Loading the map…</div>;
-  if (!dots.length) {
-    return (
-      <div className="card card-pad meta">
-        No locations have been placed on the map yet. Run <code>node scripts/geocode-locations.js</code> to resolve them.
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      <div className="card" style={{ position: "relative", padding: 0, overflow: "hidden", background: "var(--wash)" }}>
-        <svg ref={svgRef} viewBox={`${vx} ${vy} ${vw} ${vh}`}
-             style={{ display: "block", width: "100%", height: "auto",
-                      cursor: z > 1 ? (drag.current ? "grabbing" : "grab") : "default", touchAction: "none" }}
-             onMouseDown={onDown} onMouseMove={onMove} onMouseUp={endDrag} onMouseLeave={endDrag}
-             role="img" aria-label="World map of member locations">
-          <g fill="var(--white)" stroke="var(--rule)" strokeWidth="0.8" strokeLinejoin="round">
-            {world.paths.map((d, i) => <path key={i} d={d} vectorEffect="non-scaling-stroke" />)}
-          </g>
-          {dots.map((d) => {
-            const sel = picked && picked.key === d.key;
-            const on = sel || (hover && hover.key === d.key);
-            // Dots shrink as the map grows, so a tight cluster pulls apart:
-            // Boston and Cambridge are one blob at 1x and two dots by 64x. The
-            // floor keeps a single-member place from vanishing.
-            const screenR = Math.max(3, (on ? d.r + 1.5 : d.r) * Math.pow(z, -0.35));
-            const rr = screenR / z;
-            return (
-              <circle key={d.key} cx={d.x} cy={d.y} r={rr}
-                fill={on ? "var(--orange-dark)" : "var(--orange)"} fillOpacity={on ? 0.95 : 0.7}
-                stroke="var(--white)" strokeWidth={1.2 / z} style={{ cursor: "pointer" }}
-                onMouseEnter={() => setHover(d)} onMouseLeave={() => setHover(null)}
-                onClick={() => setPicked(picked && picked.key === d.key ? null : d)}>
-                <title>{d.count} in {d.label}</title>
-              </circle>
-            );
-          })}
-        </svg>
-        <div style={{ position: "absolute", right: 16, bottom: 16, display: "flex", flexDirection: "column", gap: 6 }}>
-          {[["+", () => { const nz = Math.min(MAX_Z, z * 1.5); setZ(nz); setPan((pt) => clamp(pt, nz)); }],
-            ["−", () => { const nz = Math.max(1, z / 1.5); setZ(nz); setPan((pt) => clamp(pt, nz)); }]].map(([lab, fn]) => (
-            <button key={lab} className="map-btn" onClick={fn}
-              aria-label={lab === "+" ? "Zoom in" : "Zoom out"}>{lab}</button>
-          ))}
-          {z > 1 && (
-            <button className="map-btn" onClick={reset} aria-label="Reset the view"
-              style={{ fontSize: 9.5, lineHeight: 1, color: "var(--ink-mute)" }}>reset</button>
-          )}
-        </div>
-        {hover && (
-          <div style={{ position: "absolute", left: `${((hover.x - vx) / vw) * 100}%`, top: `${((hover.y - vy) / vh) * 100}%`,
-                        transform: "translate(-50%, -175%)", pointerEvents: "none", whiteSpace: "nowrap",
-                        background: "var(--ink)", color: "var(--white)", fontSize: 12, padding: "5px 10px", borderRadius: 300 }}>
-            <strong>{hover.count}</strong> in {hover.label}
-          </div>
-        )}
-      </div>
-
-      {picked && (
-        <div className="card" style={{ marginTop: 14, padding: "18px 20px" }}>
-          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>
-            <div>
-              <span className="h-3">{picked.label}</span>
-              <span className="meta" style={{ marginLeft: 10 }}>
-                {picked.count} {picked.count === 1 ? "member" : "members"}
-              </span>
-            </div>
-            <button onClick={() => setPicked(null)}
-              style={{ background: "none", border: 0, padding: 0, font: "inherit", fontSize: 13,
-                       color: "var(--ink-mute)", cursor: "pointer", textDecoration: "underline" }}>
-              clear
-            </button>
-          </div>
-          {atPicked.length ? (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))", gap: 8 }}>
-              {atPicked.map((p) => (
-                <button key={p.userId} onClick={() => onOpenProfile(p.userId)}
-                  onMouseEnter={() => api.prefetch("/api/users/" + encodeURIComponent(p.userId))}
-                  style={{ display: "block", textAlign: "left", width: "100%", background: "transparent",
-                           border: "1px solid var(--rule)", borderRadius: 2, padding: "10px 12px",
-                           cursor: "pointer", font: "inherit", color: "inherit" }}>
-                  <div style={{ fontSize: 14, fontWeight: 500 }}>{p.first} {p.last}</div>
-                  {p.career && <div className="meta" style={{ fontSize: 12.5 }}>{splitCareer(p.career).title}</div>}
-                </button>
-              ))}
-            </div>
-          ) : (
-            // Dot counts come from site-wide facets but the cards come from the
-            // current result set, so a filter can legitimately leave a place
-            // with nobody to show.
-            <p className="meta" style={{ margin: 0 }}>No one here matches the filters you have set.</p>
-          )}
-        </div>
-      )}
-
-      <div className="meta" style={{ marginTop: 10, display: "flex", flexWrap: "wrap", gap: 14, alignItems: "baseline", fontSize: 12.5 }}>
-        <span><span className="em-n">{placed}</span> {placed === 1 ? "member" : "members"} across {dots.length} {dots.length === 1 ? "place" : "places"}</span>
-        <span style={{ marginLeft: "auto" }}>
-          {isTouch ? "Pinch to zoom · drag to pan · tap a place" : "Scroll to zoom · drag to pan · click a place"}
-        </span>
-      </div>
-    </div>
-  );
-}
-
-// PBHA was founded in 1904; nobody can have a PBHA class year before it.
-const YEAR_MIN = 1904;
-const YEAR_MAX = new Date().getFullYear() + 4;
-// Newest first: most people are looking for a recent class, not 1904.
-const YEARS = Array.from({ length: YEAR_MAX - YEAR_MIN + 1 }, (_, i) => YEAR_MAX - i);
-
-function FilterGroup({ label, children }) {
-  return (
-    <div style={{ marginBottom: 26 }}>
-      <div className="eyebrow" style={{ marginBottom: 10 }}>{label}</div>
-      {children}
-    </div>
-  );
-}
-
-function PersonCard({ person, onOpen, onMessage }) {
-  const { title, org } = splitCareer(person.career);
-  // The card was a <button>, which cannot hold the Message button — a
-  // button inside a button is invalid, and the browser will not deliver
-  // the inner click. A div that answers Enter and Space the way a button
-  // does keeps the keyboard behaviour without the nesting.
-  return (
-    <div className="card person-card" role="button" tabIndex={0}
-      onClick={() => onOpen(person.userId)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(person.userId); }
-      }}
-      onMouseEnter={() => api.prefetch("/api/users/" + encodeURIComponent(person.userId))}>
-      <div className="person-photo">
-        <Photo person={person} />
-        <span className="stamp">{person.isCurrentStudent ? "Student" : "Alum"}</span>
-        <span className="stamp-year">{shortYear(person.year)}</span>
-      </div>
-      <div className="person-body">
-        <h3 className="h-3">{person.first} {person.last}</h3>
-        {title && <div className="meta" style={{ marginTop: 5 }}>{title}</div>}
-        {org && <div className="meta">{org}</div>}
-        {(person.pbhaRole || person.programs.length > 0) && (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 12 }}>
-            {person.pbhaRole && <span className="chip chip-static">{person.pbhaRole}</span>}
-            {person.programs.slice(0, 2).map((p) => (
-              <span key={p} className="chip chip-static">{p}</span>
-            ))}
-            {person.programs.length > 2 && (
-              <span className="chip chip-static">+{person.programs.length - 2}</span>
-            )}
-          </div>
-        )}
-        {person.location && (
-          <div className="meta" style={{ marginTop: 12, display: "inline-flex", alignItems: "center", gap: 5 }}>
-            <Pin /> {person.location}
-          </div>
-        )}
-        {!person.isSelf && person.openToMessages !== false && (
-          <div className="person-actions">
-            {/* stopPropagation, or the click also opens the profile the
-                card is a link to. */}
-            <button type="button" className="btn btn-ghost btn-sm"
-              onClick={(e) => { e.stopPropagation(); onMessage(person); }}>
-              Message
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function PersonRow({ person, onOpen }) {
-  const { title, org } = splitCareer(person.career);
-  return (
-    <button className="row-person" onClick={() => onOpen(person.userId)}
-      onMouseEnter={() => api.prefetch("/api/users/" + encodeURIComponent(person.userId))}>
-      <span className="avatar"><Photo person={person} /></span>
-      <span>
-        <span style={{ display: "block", fontWeight: 500 }}>{person.first} {person.last}</span>
-        <span className="meta">{shortYear(person.year)}{person.isCurrentStudent ? " · Student" : ""}</span>
-      </span>
-      <span>
-        <span style={{ display: "block", fontSize: 13.5 }}>{title || "—"}</span>
-        {org && <span className="meta">{org}</span>}
-      </span>
-      <span className="meta" style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
-        {person.location ? <><Pin /> {person.location}</> : "—"}
-      </span>
-      <span style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
-        {person.pbhaRole && <span className="chip chip-static">{person.pbhaRole}</span>}
-      </span>
-    </button>
-  );
-}
-
-function DirectoryScreen({ onOpenProfile, onMessage }) {
-  const [q, setQ] = React.useState("");
-  const [who, setWho] = React.useState("all");
-  const [programs, setPrograms] = React.useState([]);
-  const [industries, setIndustries] = React.useState([]);
-  const [roles, setRoles] = React.useState([]);
-  const [houses, setHouses] = React.useState([]);
-  const [yearFrom, setYearFrom] = React.useState(YEAR_MIN);
-  const [yearTo, setYearTo] = React.useState(YEAR_MAX);
-  const [mentorOnly, setMentorOnly] = React.useState(false);
-  const [sort, setSort] = React.useState("recent");
-  const [layout, setLayout] = React.useState("grid");
-
-  const [results, setResults] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState("");
-  const [facets, setFacets] = React.useState({
-    programs: [], industries: [], locations: [], roles: [], houses: [],
-    totalAlumni: 0, totalStudents: 0,
-  });
-
-  // Facets do not depend on the filters, so they are fetched once.
-  React.useEffect(() => {
-    api.get("/api/directory/facets").then(setFacets).catch(() => {});
-  }, []);
-
-  const toggle = (list, value, set) =>
-    set(list.includes(value) ? list.filter((x) => x !== value) : [...list, value]);
-
-  // Refetch on any filter change, debounced so typing a full name fires one
-  // request at the end rather than one per keystroke.
-  React.useEffect(() => {
-    setLoading(true);
-    let cancelled = false;
-    const handle = setTimeout(() => {
-      const params = new URLSearchParams();
-      if (q.trim()) params.set("q", q.trim());
-      params.set("who", who);
-      params.set("sort", sort);
-      params.set("yearFrom", String(yearFrom));
-      params.set("yearTo", String(yearTo));
-      if (mentorOnly) params.set("openToMentor", "true");
-      programs.forEach((p) => params.append("program", p));
-      industries.forEach((i) => params.append("industry", i));
-      roles.forEach((r) => params.append("role", r));
-      houses.forEach((h) => params.append("house", h));
-      // The page renders everything in one fetch — no load-more UI — so the
-      // page size matches the server's cap.
-      params.set("pageSize", "2000");
-
-      api.get("/api/directory?" + params.toString())
-        .then((res) => {
-          if (cancelled) return;
-          setResults(res.items);
-          setError("");
-        })
-        .catch((err) => {
-          if (cancelled) return;
-          setResults([]);
-          setError(err.message);
-        })
-        .finally(() => { if (!cancelled) setLoading(false); });
-    }, 250);
-    return () => { cancelled = true; clearTimeout(handle); };
-  }, [q, who, sort, yearFrom, yearTo, mentorOnly, programs, industries, roles, houses]);
-
-  const total = facets.totalAlumni + facets.totalStudents;
-  const activeFilters = [
-    ...programs.map((p) => ({ label: p, clear: () => toggle(programs, p, setPrograms) })),
-    ...industries.map((i) => ({ label: i, clear: () => toggle(industries, i, setIndustries) })),
-    ...roles.map((r) => ({ label: r, clear: () => toggle(roles, r, setRoles) })),
-    ...houses.map((h) => ({ label: h, clear: () => toggle(houses, h, setHouses) })),
-    ...(mentorOnly ? [{ label: "open to mentor", clear: () => setMentorOnly(false) }] : []),
-  ];
-
-  const clearAll = () => {
-    setQ(""); setWho("all"); setPrograms([]); setIndustries([]); setRoles([]); setHouses([]);
-    setYearFrom(YEAR_MIN); setYearTo(YEAR_MAX); setMentorOnly(false);
-  };
-
-  return (
-    <div className="wrap page">
-      <h1 className="h-1 accent">Directory</h1>
-      <hr className="rule" style={{ margin: "22px 0 32px" }} />
-
-      <div className="directory-layout" style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: 44 }}>
-        <aside className="directory-rail">
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
-            <span className="eyebrow">Filters</span>
-            <button onClick={clearAll}
-              style={{ background: "none", border: 0, padding: 0, cursor: "pointer",
-                       fontSize: 12, textDecoration: "underline", color: "var(--ink-mute)" }}>
-              clear all
-            </button>
-          </div>
-
-          <label className="search" style={{ marginBottom: 24 }}>
-            <SearchIcon />
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Name, city, PBHA Role, etc..." />
-          </label>
-
-          <FilterGroup label="Show">
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {[
-                { k: "all", l: `Everyone · ${total}` },
-                { k: "alumni", l: `Alumni · ${facets.totalAlumni}` },
-                { k: "students", l: `Current students · ${facets.totalStudents}` },
-              ].map((s) => (
-                <button key={s.k} className={`scope-btn ${who === s.k ? "is-on" : ""}`}
-                  onClick={() => setWho(s.k)}>{s.l}</button>
-              ))}
-            </div>
-          </FilterGroup>
-
-          <FilterGroup label="Class year">
-            <div className="year-range">
-              <Select value={yearFrom} label="Earliest class year"
-                onChange={(v) => { setYearFrom(v); if (v > yearTo) setYearTo(v); }}
-                options={YEARS.map((y) => ({ value: y, label: String(y) }))} />
-              <span className="meta">to</span>
-              <Select value={yearTo} label="Latest class year"
-                onChange={(v) => { setYearTo(v); if (v < yearFrom) setYearFrom(v); }}
-                options={YEARS.map((y) => ({ value: y, label: String(y) }))} />
-            </div>
-          </FilterGroup>
-
-          <FilterGroup label="PBHA role">
-            <Select value={roles[0] || ""} label="PBHA role"
-              onChange={(v) => setRoles(v ? [v] : [])}
-              options={[{ value: "", label: "All roles" }].concat(
-                facets.roles.map((r) => ({ value: r.name, label: `${r.name} · ${r.count}` })),
-              )} />
-          </FilterGroup>
-
-          <FilterGroup label="Program">
-            <Select value={programs[0] || ""} label="Program"
-              onChange={(v) => setPrograms(v ? [v] : [])}
-              options={[{ value: "", label: "All programs" }].concat(
-                facets.programs.map((p) => ({ value: p.name, label: `${p.name} · ${p.count}` })),
-              )} />
-          </FilterGroup>
-
-          <FilterGroup label="House">
-            <Select value={houses[0] || ""} label="House"
-              onChange={(v) => setHouses(v ? [v] : [])}
-              options={[{ value: "", label: "All Houses" }].concat(
-                facets.houses.map((h) => ({ value: h.name, label: `${h.name} · ${h.count}` })),
-              )} />
-          </FilterGroup>
-
-          <FilterGroup label="Field of work">
-            <Select value={industries[0] || ""} label="Field of work"
-              onChange={(v) => setIndustries(v ? [v] : [])}
-              options={[{ value: "", label: "All fields" }].concat(
-                facets.industries.map((i) => ({ value: i.name, label: `${i.name} · ${i.count}` })),
-              )} />
-          </FilterGroup>
-
-          <FilterGroup label="Mentorship">
-            <label className={`check ${mentorOnly ? "is-on" : ""}`}
-              onClick={(e) => { e.preventDefault(); setMentorOnly(!mentorOnly); }}>
-              <span className="box" />
-              <span>Only members open to mentoring</span>
-            </label>
-          </FilterGroup>
-        </aside>
-
-        <section>
-          <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", marginBottom: 20 }}>
-            <span className="meta">
-              {loading ? "Searching…" : `${results.length} of ${total} members`}
-            </span>
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-              {activeFilters.map((f) => (
-                <button key={f.label} className="chip is-on" onClick={f.clear}>{f.label} ✕</button>
-              ))}
-            </div>
-            <div style={{ display: "flex", gap: 8, marginLeft: "auto", alignItems: "center" }}>
-              <Select value={sort} onChange={setSort} label="Sort the directory"
-                options={[
-                  { value: "recent", label: "Recently joined" },
-                  { value: "year-desc", label: "Class year — newest" },
-                  { value: "year-asc", label: "Class year — oldest" },
-                  { value: "name", label: "Last name (A–Z)" },
-                ]} />
-              <button className={`btn btn-sm ${layout === "grid" ? "btn-ink" : "btn-ghost"}`}
-                onClick={() => setLayout("grid")}>Grid</button>
-              <button className={`btn btn-sm ${layout === "list" ? "btn-ink" : "btn-ghost"}`}
-                onClick={() => setLayout("list")}>List</button>
-              <button className={`btn btn-sm ${layout === "map" ? "btn-ink" : "btn-ghost"}`}
-                onClick={() => setLayout("map")}>Map</button>
-            </div>
-          </div>
-
-          {error && <div className="banner banner-error" style={{ marginBottom: 20 }}>{error}</div>}
-
-          {!loading && results.length === 0 && !error && layout !== "map" && (
-            <div className="card empty">No members match those filters.</div>
-          )}
-
-          {layout === "map" ? (
-            <DirectoryMap
-              locations={facets.locations || []}
-              people={results}
-              onOpenProfile={onOpenProfile}
-            />
-          ) : layout === "grid" ? (
-            <div className="grid-people">
-              {results.map((p) => (
-                <PersonCard key={p.userId} person={p} onOpen={onOpenProfile} onMessage={onMessage} />
-              ))}
-            </div>
-          ) : (
-            results.length > 0 && (
-              <div className="card" style={{ overflow: "hidden" }}>
-                {results.map((p) => (
-                  <PersonRow key={p.userId} person={p} onOpen={onOpenProfile} />
-                ))}
-              </div>
-            )
-          )}
-        </section>
-      </div>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- * Profile
- * ------------------------------------------------------------------ */
-
-function ProfileScreen({ userId, onBack, onMessage }) {
-  const [person, setPerson] = React.useState(null);
-  const [error, setError] = React.useState("");
-  const [opening, setOpening] = React.useState(false);
-
-  // Same destination as the Message button on a directory card: the
-  // Messages section, on a conversation with this person, addressed to
-  // them. One button, one place messages live.
-  const write = async () => {
-    setOpening(true);
-    try {
-      await onMessage(person);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setOpening(false);
-    }
-  };
-
-  React.useEffect(() => {
-    setPerson(null);
-    setError("");
-    api.get("/api/users/" + encodeURIComponent(userId))
-      .then(setPerson)
-      .catch((err) => setError(err.message));
-  }, [userId]);
-
-  if (error) {
-    return (
-      <div className="wrap page">
-        <div className="banner banner-error">{error}</div>
-        <button className="btn btn-ghost btn-sm" style={{ marginTop: 20 }} onClick={onBack}>Back</button>
-      </div>
-    );
-  }
-  if (!person) return <div className="wrap page"><p className="meta">Loading…</p></div>;
-
-  const { title, org } = splitCareer(person.career);
-  const programYears = person.programYears || {};
-
-  return (
-    <div className="wrap page">
-      {/* A square photo beside a name, with everything that qualifies the
-          person — their year, whether they mentor — up by the name rather
-          than stacked under the picture. Below that the text runs the full
-          width of the page, so a bio is not reading in a 1000px column
-          with 400px of white beside it. */}
-      <div className="profile-head">
-        <div className="profile-photo">
-          <Photo person={person} />
-        </div>
-
-        <div className="profile-id">
-          <h1 className="h-1">{person.first} {person.last}</h1>
-          {person.pronouns && <div className="meta" style={{ marginTop: 6 }}>{person.pronouns}</div>}
-
-          {/* The chips say what this person is; the button is something to
-              do about it. On its own line, the one thing to click is not
-              sitting in a row of things that only look clickable. */}
-          <div className="profile-chips">
-            <span className="chip chip-static">
-              {person.isCurrentStudent ? "Current student" : "Alum"} · {person.year}
-            </span>
-            {person.openToMentor && <span className="chip chip-static">Open to mentoring</span>}
-          </div>
-
-          {/* On everyone's profile but your own. Someone who has turned
-              messages off still gets the row, saying so, rather than a
-              profile that silently offers no way to write: the absence of
-              a button reads as a bug, not as a choice. The server is what
-              actually refuses either way. */}
-          {!person.isSelf && (
-            <div className="profile-act">
-              {person.openToMessages === false ? (
-                <span className="chip chip-static" title="This member has messages turned off">
-                  Not accepting messages
-                </span>
-              ) : (
-                <button className="btn btn-primary btn-sm" onClick={write} disabled={opening}>
-                  {opening ? "One moment…" : "Send a message"}
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="profile-body">
-        <div>
-          <div style={{ marginTop: 0 }}>
-            {title && <div className="h-3">{title}</div>}
-            {org && <div className="lede" style={{ marginTop: 2 }}>{org}</div>}
-            <div className="meta" style={{ marginTop: 10, display: "flex", gap: 18, flexWrap: "wrap" }}>
-              {person.location && (
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
-                  <Pin /> {person.location}
-                </span>
-              )}
-              {person.industry && <span>{person.industry}</span>}
-              {person.concentration && <span>Concentrated in {person.concentration}</span>}
-              {person.house && <span>{person.house} House</span>}
-            </div>
-          </div>
-
-          {person.bio && (
-            <>
-              <hr className="rule" style={{ margin: "28px 0" }} />
-              <h2 className="h-2" style={{ marginBottom: 12 }}>About</h2>
-              <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{person.bio}</p>
-            </>
-          )}
-
-          <hr className="rule" style={{ margin: "28px 0" }} />
-
-          <h2 className="h-2" style={{ marginBottom: 12 }}>At PBHA</h2>
-          {person.pbhaRole && (
-            <div style={{ marginBottom: 12 }}>
-              <span className="chip chip-static">{person.pbhaRole}</span>
-            </div>
-          )}
-          {person.programs.length > 0 ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {person.programs.map((p) => (
-                <div key={p} style={{ display: "flex", gap: 10, alignItems: "baseline", flexWrap: "wrap" }}>
-                  <span style={{ fontWeight: 500 }}>{p}</span>
-                  {programYears[p] && <span className="meta">{programYears[p]}</span>}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="meta">No programs listed yet.</p>
-          )}
-          {person.involvement && (
-            <p style={{ margin: "16px 0 0", whiteSpace: "pre-wrap" }}>
-              {person.involvement}
-            </p>
-          )}
-
-          {/* Only rendered when its owner has chosen to show it — the server
-              blanks these fields for everyone else, so there is nothing here
-              to reveal by inspecting the response. */}
-          {(person.gender || (person.raceEthnicity && person.raceEthnicity.length > 0)) && (
-            <>
-              <hr className="rule" style={{ margin: "28px 0" }} />
-              <h2 className="h-2" style={{ marginBottom: 12 }}>Identity</h2>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                {person.gender && <span className="chip chip-static">{person.gender}</span>}
-                {(person.raceEthnicity || []).map((r) => (
-                  <span key={r} className="chip chip-static">{r}</span>
-                ))}
-              </div>
-              {person.isSelf && !person.showIdentity && (
-                <p className="meta" style={{ marginTop: 10 }}>
-                  Only you can see this. Turn it on in your profile to share it.
-                </p>
-              )}
-            </>
-          )}
-
-          {person.reachOut && (
-            <>
-              <hr className="rule" style={{ margin: "28px 0" }} />
-              <h2 className="h-2" style={{ marginBottom: 12 }}>Students should reach out about</h2>
-              <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{person.reachOut}</p>
-            </>
-          )}
-        </div>
-      </div>
-
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- * My profile
- * ------------------------------------------------------------------ */
-
-function MyProfileScreen({ me, onSaved }) {
-  const [form, setForm] = React.useState(null);
-  const [privacy, setPrivacy] = React.useState(null);
-  const [vocab, setVocab] = React.useState({ programs: [], roles: [], houses: [], genders: [], races: [], industries: [], cities: [] });
-  const [status, setStatus] = React.useState("");
-  const [error, setError] = React.useState("");
-  const [busy, setBusy] = React.useState(false);
-  const [selfRace, setSelfRace] = React.useState("");
-  const [selfRaceOpen, setSelfRaceOpen] = React.useState(false);
-  const [photoBusy, setPhotoBusy] = React.useState(false);
-  const [photoError, setPhotoError] = React.useState("");
-  const fileRef = React.useRef(null);
-
-  React.useEffect(() => {
-    Promise.all([
-      api.get("/api/users/" + encodeURIComponent(me.id)),
-      api.get("/api/users/me/privacy"),
-      api.get("/api/vocab"),
-    ])
-      .then(([profile, priv, v]) => {
-        setForm({
-          first: profile.first || "",
-          last: profile.last || "",
-          pronouns: profile.pronouns || "",
-          year: profile.year || "",
-          location: profile.location || "",
-          photoUrl: profile.photoUrl || "",
-          career: profile.career || "",
-          industry: profile.industry || "",
-          concentration: profile.concentration || "",
-          house: profile.house || "",
-          bio: profile.bio || "",
-          programs: profile.programs || [],
-          pbhaRole: profile.pbhaRole || "",
-          involvement: profile.involvement || "",
-          gender: profile.gender || "",
-          raceEthnicity: (profile.raceEthnicity || []).filter((r) => (v.races || []).includes(r)),
-          openToMentor: !!profile.openToMentor,
-          reachOut: profile.reachOut || "",
-        });
-        const own = (profile.raceEthnicity || []).filter((r) => !(v.races || []).includes(r));
-        if (own.length > 0) { setSelfRace(own.join(", ")); setSelfRaceOpen(true); }
-        setPrivacy(priv);
-        setVocab(v);
-      })
-      .catch((err) => setError(err.message));
-  }, [me.id]);
-
-  if (error && !form) return <div className="wrap page"><div className="banner banner-error">{error}</div></div>;
-  if (!form) return <div className="wrap page"><p className="meta">Loading…</p></div>;
-
-  const set = (k) => (e) => {
-    const v = e.target.type === "checkbox" ? e.target.checked : e.target.value;
-    setForm((f) => ({ ...f, [k]: v }));
-  };
-  const toggleIn = (key) => (name) =>
-    setForm((f) => ({
-      ...f,
-      [key]: f[key].includes(name) ? f[key].filter((x) => x !== name) : [...f[key], name],
-    }));
-  const toggleProgram = toggleIn("programs");
-  const toggleRace = toggleIn("raceEthnicity");
-
-  // The photo is sent on its own, not with the rest of the form: it is the
-  // one field where you want to see the result before you decide to save.
-  const uploadPhoto = async (file) => {
-    setPhotoError("");
-    setPhotoBusy(true);
-    try {
-      const dataUrl = await squareJpeg(file);
-      const r = await api.put("/api/users/me/photo", { dataUrl });
-      setForm((f) => ({ ...f, photoUrl: r.photoUrl }));
-      onSaved();
-    } catch (err) {
-      setPhotoError(err.message || "That photo could not be read.");
-    } finally {
-      setPhotoBusy(false);
-    }
-  };
-
-  const removePhoto = async () => {
-    setPhotoError("");
-    setPhotoBusy(true);
-    try {
-      await api.del("/api/users/me/photo");
-      setForm((f) => ({ ...f, photoUrl: "" }));
-      onSaved();
-    } catch (err) {
-      setPhotoError(err.message);
-    } finally {
-      setPhotoBusy(false);
-    }
-  };
-
-  // The self-describe chip opens a box rather than adding a chip. What gets
-  // typed there is one more entry in raceEthnicity, folded in on save.
-  const openSelfRace = () => {
-    if (selfRaceOpen) {
-      setSelfRaceOpen(false);
-      setSelfRace("");
-    } else {
-      setSelfRaceOpen(true);
-    }
-  };
-
-  const save = async (e) => {
-    e.preventDefault();
-    setBusy(true); setStatus(""); setError("");
-    try {
-      // Empty text inputs are sent as null, not "", so a cleared field really
-      // clears rather than storing a blank string the filters would match.
-      const blank = (v) => (v.trim() === "" ? null : v.trim());
-      await api.patch("/api/users/me", {
-        first: form.first.trim(),
-        last: form.last.trim(),
-        pronouns: blank(form.pronouns),
-        year: Number(form.year),
-        location: blank(form.location),
-        career: blank(form.career),
-        industry: blank(form.industry),
-        concentration: blank(form.concentration),
-        house: blank(form.house),
-        bio: blank(form.bio),
-        programs: form.programs,
-        pbhaRole: blank(form.pbhaRole),
-        involvement: blank(form.involvement),
-        gender: blank(form.gender),
-        raceEthnicity: selfRaceOpen && selfRace.trim()
-          ? [...form.raceEthnicity, selfRace.trim()]
-          : form.raceEthnicity,
-        openToMentor: form.openToMentor,
-        reachOut: blank(form.reachOut),
-      });
-      setStatus("Saved.");
-      onSaved && onSaved();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const savePrivacy = async (patch) => {
-    const next = { ...privacy, ...patch };
-    setPrivacy(next);
-    try {
-      await api.patch("/api/users/me/privacy", patch);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
-  return (
-    <div className="wrap page" style={{ maxWidth: 880 }}>
-      <h1 className="h-1 accent">Your profile</h1>
-      <p className="lede" style={{ marginTop: 12 }}>
-        This is what other PBHA members see in the directory.
-      </p>
-      <hr className="rule" style={{ margin: "28px 0 32px" }} />
-
-      <form onSubmit={save}>
-        <h2 className="h-2" style={{ marginBottom: 18 }}>You at Harvard</h2>
-        <div className="two-up">
-          <Field label="First name"><input className="input" value={form.first} onChange={set("first")} required /></Field>
-          <Field label="Last name"><input className="input" value={form.last} onChange={set("last")} required /></Field>
-          <Field label="Pronouns"><input className="input" value={form.pronouns} onChange={set("pronouns")} placeholder="Pronouns" /></Field>
-          <Field label="Class year"><input className="input" type="number" min="1904" max="2050" value={form.year} onChange={set("year")} placeholder="Class year" required /></Field>
-          <Field label="Concentration">
-            <input className="input" value={form.concentration} onChange={set("concentration")} placeholder="Concentration" />
-          </Field>
-          <Field label="House">
-            <Combo label="House" placeholder="House" options={vocab.houses}
-              value={form.house} onChange={(v) => setForm((f) => ({ ...f, house: v }))} />
-          </Field>
-        </div>
-
-        <hr className="rule" style={{ margin: "36px 0 28px" }} />
-        <h2 className="h-2" style={{ marginBottom: 18 }}>You now</h2>
-        <div className="two-up">
-          <Field label="Where you live">
-            <Combo label="Where you live" placeholder="Where you live" options={vocab.cities}
-              max={8} value={form.location}
-              onChange={(v) => setForm((f) => ({ ...f, location: v }))}
-              onBlur={(v) => setForm((f) => ({ ...f, location: normalizeLocation(v) }))} />
-          </Field>
-          <Field label="Field of work">
-            <Combo label="Field of work" placeholder="Field of work" options={vocab.industries}
-              value={form.industry} onChange={(v) => setForm((f) => ({ ...f, industry: v }))} />
-          </Field>
-        </div>
-        <Field label="What you do">
-          <input className="input" value={form.career} onChange={set("career")}
-            placeholder="What you do" />
-        </Field>
-        <div className="field">
-          <span className="eyebrow" style={{ display: "block", marginBottom: 7 }}>Photo</span>
-          <div className="photo-field">
-            <span className="photo-preview photo-preview-lg">
-              {form.photoUrl
-                ? <img src={form.photoUrl} alt="" />
-                : <span className="initials" style={{ fontSize: 20 }}>{initials(form.first, form.last)}</span>}
-            </span>
-            <div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <button type="button" className="btn btn-ghost btn-sm"
-                  onClick={() => fileRef.current && fileRef.current.click()} disabled={photoBusy}>
-                  {photoBusy ? "Working…" : form.photoUrl ? "Replace photo" : "Upload a photo"}
-                </button>
-                {form.photoUrl && (
-                  <button type="button" className="btn btn-ghost btn-sm" onClick={removePhoto} disabled={photoBusy}>
-                    Remove
-                  </button>
-                )}
-              </div>
-              {photoError && <span className="meta" style={{ marginTop: 6, display: "block" }}>{photoError}</span>}
-            </div>
-            <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp"
-              style={{ display: "none" }} aria-label="Choose a photo"
-              onChange={(e) => { const f = e.target.files && e.target.files[0]; e.target.value = ""; if (f) uploadPhoto(f); }} />
-          </div>
-        </div>
-        <Field label="About you"><textarea className="input" value={form.bio} onChange={set("bio")} placeholder="About you" /></Field>
-
-        <hr className="rule" style={{ margin: "36px 0 28px" }} />
-        <h2 className="h-2" style={{ marginBottom: 18 }}>You at PBHA</h2>
-        <Field label="Role">
-          <Select value={form.pbhaRole} label="Role"
-            onChange={(v) => setForm((f) => ({ ...f, pbhaRole: v }))}
-            options={[{ value: "", label: "Not listed" }].concat(
-              vocab.roles.map((r) => ({ value: r, label: r })),
-            )} />
-        </Field>
-        <div className="field">
-          <span className="eyebrow" style={{ display: "block", marginBottom: 10 }}>Programs</span>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-            {vocab.programs.map((p) => (
-              <button type="button" key={p}
-                className={`chip ${form.programs.includes(p) ? "is-on" : ""}`}
-                onClick={() => toggleProgram(p)}>{p}</button>
-            ))}
-          </div>
-        </div>
-        <Field label="Your involvement">
-          <textarea className="input" value={form.involvement} onChange={set("involvement")} placeholder="Your involvement" />
-        </Field>
-
-        <hr className="rule" style={{ margin: "36px 0 28px" }} />
-        <h2 className="h-2" style={{ marginBottom: 12 }}>Mentoring</h2>
-        <div className="field">
-          <label className={`check ${form.openToMentor ? "is-on" : ""}`}
-            onClick={(e) => { e.preventDefault(); setForm((f) => ({ ...f, openToMentor: !f.openToMentor })); }}>
-            <span className="box" />
-            <span>I'm open to hearing from current students</span>
-          </label>
-        </div>
-        {form.openToMentor && (
-          <Field label="Students should reach out to me about:">
-            <textarea className="input" value={form.reachOut} onChange={set("reachOut")}
-              placeholder="Students should reach out to me about" />
-          </Field>
-        )}
-
-        <hr className="rule" style={{ margin: "36px 0 28px" }} />
-        <h2 className="h-2" style={{ marginBottom: 12 }}>Identity</h2>
-        <Field label="Gender">
-          {/* Picking "Prefer to self-describe" is a request for a blank box,
-              not an answer. Saving the phrase itself would put it on the
-              profile as though it were the person's gender. */}
-          <Combo label="Gender" placeholder="Gender" options={vocab.genders}
-            value={form.gender}
-            onChange={(v) => setForm((f) => ({ ...f, gender: v === SELF_DESCRIBE ? "" : v }))} />
-        </Field>
-        <div className="field">
-          <span className="eyebrow" style={{ display: "block", marginBottom: 10 }}>Race and ethnicity</span>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-            {vocab.races.map((r) => (
-              <button type="button" key={r}
-                className={`chip ${r === SELF_DESCRIBE ? (selfRaceOpen ? "is-on" : "") : (form.raceEthnicity.includes(r) ? "is-on" : "")}`}
-                onClick={() => (r === SELF_DESCRIBE ? openSelfRace() : toggleRace(r))}>{r}</button>
-            ))}
-          </div>
-          {selfRaceOpen && (
-            <input className="input" style={{ marginTop: 10, maxWidth: 420 }}
-              autoFocus value={selfRace} aria-label="Describe your race or ethnicity"
-              placeholder="Race and ethnicity"
-              onChange={(e) => setSelfRace(e.target.value)} />
-          )}
-        </div>
-        <div className="field">
-          <label className={`check ${privacy?.showIdentity ? "is-on" : ""}`}
-            onClick={(e) => { e.preventDefault(); savePrivacy({ showIdentity: !privacy.showIdentity }); }}>
-            <span className="box" />
-            <span>Show my identity on my profile to other signed-in members</span>
-          </label>
-        </div>
-
-        {error && <div className="banner banner-error" style={{ marginBottom: 16 }}>{error}</div>}
-        {status && <div className="banner" style={{ marginBottom: 16 }}>{status}</div>}
-
-        <button className="btn btn-primary" disabled={busy}>{busy ? "Saving…" : "Save profile"}</button>
-      </form>
-
+            </li>
+          );
+        })}
+      </ol>
     </div>
   );
 }
