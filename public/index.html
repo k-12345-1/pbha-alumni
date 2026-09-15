@@ -765,6 +765,8 @@ footer.site {
 .band-split .part-label { text-align: left; margin-bottom: 8px; }
 .band-split .h-2 { text-align: left; margin: 0; }
 .band-split .band-body p:first-child { margin-top: 0; }
+.band-single { max-width: 78ch; }
+.band-single p + p { margin-top: 1.1em; }
 
 
 /* pbha.org's own alumni-impact page centres its section headings above
@@ -2400,10 +2402,11 @@ function StudyScreen() {
             <div className="part-label">Background</div>
             <h2 className="h-2">About PBHA and this study</h2>
           </div>
-          {/* One block: what PBHA is, how to read the figures, and who did
-              the work. Two columns because the band is wide — one column
-              of this width runs past a hundred characters a line. */}
-          <div className="band-body prose-2">
+          {/* One block, one column: what PBHA is, how to read the figures,
+              and who did the work. Capped in ch rather than run to the full
+              width of the band, which at this size would be about a hundred
+              and ten characters a line. */}
+          <div className="band-body band-single">
           <p>
             For almost 120 years PBHA has been working in communities across Greater Boston. Each
             year 1,500 student volunteers join with PBHA&rsquo;s community partners to run more
