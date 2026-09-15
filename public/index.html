@@ -374,9 +374,9 @@ textarea.input { min-height: 100px; resize: vertical; line-height: 1.55; }
 .tally-band {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 24px;
-  margin-top: 26px;
-  padding: 22px 24px;
-  background: var(--wash);
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid var(--rule);
 }
 .tally-band .stat-n { font-size: 34px; }
 
@@ -651,22 +651,24 @@ footer.site {
   gap: 32px;
   margin-top: 36px;
 }
+/* Ruled, not boxed. A bordered card around every table, chart and tally
+   turned the page into a stack of rectangles; hairlines carry the same
+   structure without drawing a container around it. */
 .finding {
   display: grid;
   grid-template-columns: 1fr 90px 110px;
   gap: 16px;
   align-items: baseline;
-  padding: 14px 20px;
+  padding: 14px 2px;
   border-bottom: 1px solid var(--rule);
-  font-size: 14.5px;
+  font-size: 15px;
 }
 .finding:last-child { border-bottom: 0; }
 .finding-head {
   font-size: 11px; font-weight: 700; letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--white);
-  background: var(--navy);
-  border-bottom: 0;
+  text-transform: uppercase; color: var(--ink-mute);
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--orange);
 }
 .finding .em-n { font-size: 17px; }
 
@@ -743,14 +745,10 @@ footer.site {
      line, and at roughly half an em per character that puts the type in
      the mid-twenties. Large type over a wide measure is the trade being
      made here: fewer characters per line than the width suggests. */
-  /* 1.62vw, capped at 24px. Below the 1498px page cap the content width
-     is a fixed fraction of the viewport, so a vw-based size holds the
-     same characters per line at every width — which is what keeps this at
-     three lines rather than three lines on one screen and four on the
-     next. 24px is the ceiling: the longest line then runs 1,229px, and a
-     fourth appears once the column drops under 1,220px. */
-  font-size: clamp(18px, 1.62vw, 24px);
-  line-height: 1.45;
+  /* The same scale as the statement on Home. This paragraph is longer, so
+     it takes more lines at that size — matching the type, not the shape. */
+  font-size: clamp(22px, 2.5vw, 36px);
+  line-height: 1.34;
   font-weight: 500;
   margin: 0;
   text-align: center;
@@ -808,7 +806,7 @@ footer.site {
    leave two thirds of the band empty. */
 .model-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
 .model-list li { border-top: 3px solid var(--orange); padding-top: 18px; }
-.model-list p { font-size: 15px; line-height: 1.6; color: rgba(255, 255, 255, .78); }
+.model-list p { font-size: 15px; line-height: 1.6; color: var(--ink-mute); }
 .model-n { font-size: 13px; font-weight: 700; color: var(--orange); letter-spacing: .04em; }
 
 /* Number, narrative, data. The prose column is the readable measure; the
@@ -818,8 +816,8 @@ footer.site {
   display: grid;
   grid-template-columns: 84px minmax(0, 1fr) minmax(0, 1.1fr);
   gap: 20px 40px;
-  padding: 44px 0;
-  border-top: 3px solid var(--ink);
+  padding: 48px 0;
+  border-top: 1px solid var(--rule);
 }
 .way-solo { grid-template-columns: 76px minmax(0, 1fr); }
 .way-solo .way-text { columns: 2; column-gap: 52px; }
@@ -829,18 +827,18 @@ footer.site {
 .way-quote { grid-column: 1 / -1; }
 /* Every chart, not just a chart after a chart: the first one sat flush
    against the findings table above it. */
-.chart { margin-top: 26px; }
+.chart { margin-top: 34px; }
+.chart-body { padding-top: 4px; }
 
-/* A filled plate rather than a faint numeral. At 35% opacity the number
-   was decoration; solid, it is the thing that tells five findings apart
-   at a glance while scrolling. */
+/* Credits: a rule and smaller type, rather than a panel. */
+.colophon-band { border-top: 1px solid var(--rule); margin-top: 24px; }
+
+/* Full-strength orange at a large size, rather than a filled disc. The
+   disc read as one more block; the numeral does the same wayfinding job
+   without adding a shape to a page that already had too many. */
 .way-n {
-  width: 56px; height: 56px;
-  display: grid; place-items: center;
-  background: var(--orange);
-  color: var(--white);
-  font-size: 27px; font-weight: 700; line-height: 1;
-  border-radius: 50%;
+  font-size: 58px; font-weight: 700; line-height: .85;
+  color: var(--orange);
   /* Stays put while its section scrolls, so a reader three tables deep
      still knows which of the five they are in. */
   position: sticky; top: 96px; align-self: start;
@@ -2217,7 +2215,7 @@ function StudyScreen() {
 
       {/* 2 — the model, on PBHA's navy. A different ground is the fastest
           way to say "this is a different kind of thing". */}
-      <section className="bleed ground-navy">
+      <section>
         <div className="part reveal">
           <div className="part-label">The model</div>
           <h2 className="h-2 band-head">Three things PBHA does</h2>
@@ -2269,7 +2267,7 @@ function StudyScreen() {
               {hasData && (
                 <div className="way-data">
                   {w.rows && (
-                    <div className="card reveal">
+                    <div className="table reveal">
                       <div className="finding finding-head">
                         <span>Finding</span><span>All</span><span>Intensive</span>
                       </div>
@@ -2301,7 +2299,7 @@ function StudyScreen() {
                         <div className="eyebrow" style={{ marginBottom: 12 }}>
                           Top fields of professional work
                         </div>
-                        <div className="card card-pad">
+                        <div className="chart-body">
                           {STUDY_FIELDS.map(([label, value], j) => (
                             <Bar key={label} label={label} value={value} max={maxField} i={j} />
                           ))}
@@ -2311,7 +2309,7 @@ function StudyScreen() {
                         <div className="eyebrow" style={{ marginBottom: 12 }}>
                           1,196 executive or management roles, by organization
                         </div>
-                        <div className="card card-pad">
+                        <div className="chart-body">
                           {STUDY_ROLES.map(([label, value], j) => (
                             <Bar key={label} label={label} value={value} max={maxRole} i={j} />
                           ))}
@@ -2362,7 +2360,7 @@ function StudyScreen() {
       </div>
 
       {/* 5 — credits, on the wash, smaller: a colophon, not a finding. */}
-      <section className="bleed ground-wash">
+      <section className="colophon-band">
         <div className="part reveal colophon">
           <div className="part-label">Credits</div>
           <h2 className="h-2 band-head">Who did this</h2>
