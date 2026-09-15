@@ -1733,9 +1733,9 @@ function WelcomeScreen({ me }) {
         other again as well as connect with current students!
       </p>
 
-      <hr className="rule" style={{ margin: "40px 0 32px" }} />
-
-      <h2 className="h-2" style={{ marginBottom: 4 }}>Get involved</h2>
+      {/* No rule here: the list below opens with one of its own, so a
+          second would read as a double line with a heading wedged in. */}
+      <h2 className="h-2" style={{ margin: "60px 0 4px" }}>Get involved</h2>
       {/* An index rather than a grid of boxes: six ways in, numbered, each
           on its own line with a rule under it. Six bordered cards read as
           six competing objects; a numbered list reads as one list. */}
