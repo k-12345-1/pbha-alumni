@@ -686,7 +686,13 @@ footer.site {
      line, and at roughly half an em per character that puts the type in
      the mid-twenties. Large type over a wide measure is the trade being
      made here: fewer characters per line than the width suggests. */
-  font-size: clamp(19px, 1.95vw, 27px);
+  /* 1.62vw, capped at 24px. Below the 1498px page cap the content width
+     is a fixed fraction of the viewport, so a vw-based size holds the
+     same characters per line at every width — which is what keeps this at
+     three lines rather than three lines on one screen and four on the
+     next. 24px is the ceiling: the longest line then runs 1,229px, and a
+     fourth appears once the column drops under 1,220px. */
+  font-size: clamp(18px, 1.62vw, 24px);
   line-height: 1.45;
   font-weight: 500;
   margin: 0;
