@@ -681,14 +681,17 @@ footer.site {
 .study p { line-height: 1.68; }
 
 .study-lede {
-  font-size: clamp(19px, 1.6vw, 23px);
-  line-height: 1.55;
+  /* Sized so it breaks to three lines across the full page width. The
+     paragraph is about 300 characters, so three lines means about 100 a
+     line, and at roughly half an em per character that puts the type in
+     the mid-twenties. Large type over a wide measure is the trade being
+     made here: fewer characters per line than the width suggests. */
+  font-size: clamp(19px, 1.95vw, 27px);
+  line-height: 1.45;
   font-weight: 500;
-  /* Centred, and capped: large type tolerates a wide measure, but not the
-     full 1,270px of the page. */
-  margin: 0 auto;
-  max-width: 1000px;
+  margin: 0;
   text-align: center;
+  text-wrap: balance;
 }
 
 /* pbha.org's own alumni-impact page centres its section headings above
