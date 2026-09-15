@@ -844,6 +844,9 @@ footer.site {
    first, so nothing visible is being resized mid-fade. */
 .quotes-stage {
   display: grid;
+  /* Each quote keeps its own height rather than being stretched to the
+     tallest, so the one on show can be measured for real. */
+  align-items: start;
   transition: height .4s cubic-bezier(.22,.61,.36,1) .28s;
 }
 .quotes-stage > * { grid-area: 1 / 1; }
@@ -2367,7 +2370,12 @@ function Quotes() {
     if (!stage) return;
     const fit = () => {
       const on = stage.children[at];
-      if (on) stage.style.height = on.offsetHeight + "px";
+      if (!on) return;
+      // Measured from the stage's own top, so the panel's top margin —
+      // which grid hands to the item rather than collapsing away — is
+      // counted. offsetHeight alone would miss it.
+      const h = on.getBoundingClientRect().bottom - stage.getBoundingClientRect().top;
+      stage.style.height = Math.round(h) + "px";
     };
     fit();
     const ro = new ResizeObserver(fit);
