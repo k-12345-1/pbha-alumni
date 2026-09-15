@@ -699,6 +699,10 @@ footer.site {
  */
 .study { font-size: 16px; }
 .study p { line-height: 1.68; }
+/* .study p is a class plus a type, so it outranks a bare class — it was
+   quietly overriding the opening paragraph's own line-height. Two classes
+   and a type to win it back. */
+.study p.statement { line-height: 1.34; }
 
 /* ---- telling the parts apart ---------------------------------------- *
  *
@@ -739,22 +743,6 @@ footer.site {
 .ground-wash { background: var(--wash); margin-top: 56px; }
 /* Credits are a colophon, not a finding: smaller, and it should look it. */
 .colophon { font-size: 15px; }
-
-.study-lede {
-  /* Sized so it breaks to three lines across the full page width. The
-     paragraph is about 300 characters, so three lines means about 100 a
-     line, and at roughly half an em per character that puts the type in
-     the mid-twenties. Large type over a wide measure is the trade being
-     made here: fewer characters per line than the width suggests. */
-  /* The same scale as the statement on Home. This paragraph is longer, so
-     it takes more lines at that size — matching the type, not the shape. */
-  font-size: clamp(22px, 2.5vw, 36px);
-  line-height: 1.34;
-  font-weight: 500;
-  margin: 0;
-  text-align: center;
-  text-wrap: balance;
-}
 
 /* pbha.org's own alumni-impact page centres its section headings above
    full-width bodies rather than setting them beside. Matching that means
@@ -2168,7 +2156,7 @@ function StudyScreen() {
       <h1 className="h-1 accent">Alumni Study</h1>
       <hr className="rule" style={{ margin: "22px 0 32px" }} />
 
-      <p className="study-lede reveal">
+      <p className="statement statement-mid reveal">
         In <span className="em-n">2022</span> the Alumni Association asked PBHA alumni what their
         service years did to the rest of their lives. <span className="em-n">1,078</span> people
         answered, from all but two Harvard classes between <span className="em-n">1948</span> and{" "}
