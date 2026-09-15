@@ -821,6 +821,51 @@ footer.site {
 /* The part the report puts in bold, in the accent — the one line a reader
    takes away if they take away nothing else. */
 .pull strong { color: var(--orange); font-weight: 700; }
+/* The carousel around them. */
+.quotes-head {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 24px; flex-wrap: wrap;
+}
+.quotes-head .part-label { text-align: left; margin-bottom: 6px; }
+.quotes-head .h-2 { text-align: left; margin: 0; }
+.quotes-nav { display: flex; gap: 10px; }
+.quotes-nav button {
+  width: 44px; height: 44px;
+  display: grid; place-items: center;
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.quotes-nav button:hover { border-color: var(--orange); color: var(--orange); }
+
+/* All six in one cell: the stage is as tall as the longest quote, so
+   paging through does not make the panel jump. */
+.quotes-stage { display: grid; }
+.quotes-stage > * { grid-area: 1 / 1; }
+.quote-slide {
+  opacity: 0; visibility: hidden;
+  transition: opacity .35s ease;
+}
+.quote-slide.is-on { opacity: 1; visibility: visible; }
+
+.quotes-dots { display: flex; gap: 8px; justify-content: center; margin-top: 22px; }
+.quotes-dots button {
+  width: 8px; height: 8px; padding: 0;
+  border: 0; border-radius: 50%;
+  background: var(--wash-2);
+  cursor: pointer;
+  transition: background .15s, transform .15s;
+}
+.quotes-dots button:hover { background: var(--ink-mute); }
+.quotes-dots button.is-on { background: var(--orange); transform: scale(1.3); }
+
+@media (prefers-reduced-motion: reduce) {
+  .quote-slide { transition: none; }
+}
+
 .pull figcaption {
   margin-top: 22px;
   font-size: 12px; font-weight: 700;
@@ -852,7 +897,6 @@ footer.site {
 .way-solo .way-text .way-title { column-span: all; }
 .way-text > p { margin-top: 0; }
 .way-data { min-width: 0; }
-.way-quote { grid-column: 1 / -1; }
 /* Every chart, not just a chart after a chart: the first one sat flush
    against the findings table above it. */
 .chart { margin-top: 34px; }
@@ -2005,10 +2049,6 @@ const STUDY_WAYS = [
       ["Their passion for public service work was nurtured at PBHA", "82%", "96%"],
       ["Their PBHA experience strengthened their commitment to addressing social challenges", "80%", "94%"],
     ],
-    quote: {
-      body: "PBHA helped to form my personal and professional life after Radcliffe. The skills I learned at PBHA provided the basis for my nonprofit management career. In addition to volunteer activities **I have served as director/manager or trustee/board member in every organization I have been involved with over the past 60+ years**.",
-      year: "'67",
-    },
   },
   {
     title: "PBHA inspires a commitment to civic engagement through volunteering, philanthropy, organizing, and advocacy.",
@@ -2022,10 +2062,6 @@ const STUDY_WAYS = [
       ["962", "board seats taken"],
       ["2,671", "volunteer or pro bono roles filled"],
     ],
-    quote: {
-      body: "PBHA is what really started the trajectory of my whole adult life! All of my best friends are from PBHA, and **I decided to become a teacher** in Boston because of my work in PBHA. **It also encouraged me to be a more active voter** and community member.",
-      year: "'11",
-    },
   },
   {
     title: "PBHA teaches concrete skills that impact professional success long after graduation.",
@@ -2043,18 +2079,10 @@ const STUDY_WAYS = [
         "the skills to deliver quality programming that addresses community need",
       ],
     },
-    quote: {
-      body: "**I've used my PBHA skills every day.** I have worked at a non profit since I graduated college and then law school. It helped me see the big picture and contribute to growing my nonprofit and leading a team of public interest lawyers.",
-      year: "'07",
-    },
   },
   {
     title: "PBHA facilitates a sense of belonging on campus that encourages diverse leadership, especially for first-generation, BIPOC, and low-income students.",
     body: "Low-income, first-generation, and BIPOC alumni credited PBHA's programs and supports, especially PBHA's community, culture, values, and staff, with providing a deep sense of belonging at Harvard. In the wake of the United States Supreme Court's recent decision regarding affirmative action, the importance of PBHA as a place of belonging for BIPOC students is even more critical.",
-    quote: {
-      body: "PBHA provided me with a safe space when I was in college. At PBHA, I found people who shared aspects of my identity (eg being first-gen, growing up low-income) and shared my interests (eg youth work and social justice work). PBHA taught me how to build community with others, how to manage others, and how a non-profit operates. **My work in education and non-profits now 100% is a result of the impact PBHA had on me**.",
-      year: "'16",
-    },
   },
   {
     title: "PBHA instills empathy and the ability to work with people from a wide range of backgrounds and communities.",
@@ -2065,6 +2093,17 @@ const STUDY_WAYS = [
       ["Reported that PBHA influenced their sense of the importance of having empathy for others' lived experiences", "83%", "94%"],
     ],
   },
+];
+
+// Every quote the report prints, in the order it prints them. They used
+// to sit one per finding; collected, they are a section of their own.
+const STUDY_QUOTES = [
+  { body: "I was really active in PBHA during a time in my life where I was figuring out the person I was going to be. **The experiences and opportunities for reflection I had with PBHA made service part of my identity** — for the rest of my life, I've asked myself whether what I'm doing makes the world better, and how. This is how I think of who I am.", year: "'03" },
+  { body: "PBHA helped to form my personal and professional life after Radcliffe. The skills I learned at PBHA provided the basis for my nonprofit management career. In addition to volunteer activities **I have served as director/manager or trustee/board member in every organization I have been involved with over the past 60+ years**.", year: "'67" },
+  { body: "PBHA is what really started the trajectory of my whole adult life! All of my best friends are from PBHA, and **I decided to become a teacher** in Boston because of my work in PBHA. **It also encouraged me to be a more active voter** and community member.", year: "'11" },
+  { body: "**I've used my PBHA skills every day.** I have worked at a non profit since I graduated college and then law school. It helped me see the big picture and contribute to growing my nonprofit and leading a team of public interest lawyers.", year: "'07" },
+  { body: "PBHA provided me with a safe space when I was in college. At PBHA, I found people who shared aspects of my identity (eg being first-gen, growing up low-income) and shared my interests (eg youth work and social justice work). PBHA taught me how to build community with others, how to manage others, and how a non-profit operates. **My work in education and non-profits now 100% is a result of the impact PBHA had on me**.", year: "'16" },
+  { body: "**My time with PBHA was the most powerful learning experience I've ever had.** The combination of experiential learning, coaching/mentoring from staff, support and challenge from a community of peers, and leadership development both prepared me for my career as a social worker and educator, and inspired me to continue fighting for social justice in my personal and professional lives.", year: "'11" },
 ];
 
 const STUDY_FIELDS = [
@@ -2227,6 +2266,67 @@ function useReveal(rootSelector) {
   }, [rootSelector]);
 }
 
+/**
+ * The quotes, one at a time, with arrows.
+ *
+ * Every quote is rendered, stacked in one grid cell, with only the
+ * current one visible. That is what keeps the panel from jumping height
+ * as you page through six quotes of different lengths — the cell is as
+ * tall as the longest, always. visibility:hidden rather than display:none
+ * so the hidden ones still take up that space, and still leave the
+ * accessibility tree.
+ */
+function Quotes() {
+  const [at, setAt] = React.useState(0);
+  const n = STUDY_QUOTES.length;
+  const go = (step) => setAt((c) => (c + step + n) % n);
+
+  return (
+    <section className="part quotes reveal">
+      <div className="quotes-head">
+        <div>
+          <div className="part-label">In their words</div>
+          <h2 className="h-2">Hear from alumni</h2>
+        </div>
+        <div className="quotes-nav">
+          <button type="button" onClick={() => go(-1)} aria-label="Previous quote">
+            <Chevron dir="left" />
+          </button>
+          <button type="button" onClick={() => go(1)} aria-label="Next quote">
+            <Chevron dir="right" />
+          </button>
+        </div>
+      </div>
+
+      <div className="quotes-stage" aria-live="polite">
+        {STUDY_QUOTES.map((q, i) => (
+          <div key={i} className={`quote-slide ${i === at ? "is-on" : ""}`}>
+            <Pull body={q.body} year={q.year} />
+          </div>
+        ))}
+      </div>
+
+      <div className="quotes-dots">
+        {STUDY_QUOTES.map((q, i) => (
+          <button type="button" key={i} onClick={() => setAt(i)}
+            className={i === at ? "is-on" : ""}
+            aria-current={i === at}
+            aria-label={`Quote ${i + 1} of ${n}`} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Chevron({ dir }) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d={dir === "left" ? "M15 4l-8 8 8 8" : "M9 4l8 8-8 8"} />
+    </svg>
+  );
+}
+
 function StudyScreen() {
   const maxField = STUDY_FIELDS[0][1];
   const maxRole = STUDY_ROLES[0][1];
@@ -2282,12 +2382,6 @@ function StudyScreen() {
         </div>
         <Wave side="bottom" fill="var(--white)" />
       </section>
-
-      <div className="reveal">
-        <Pull
-          body="I was really active in PBHA during a time in my life where I was figuring out the person I was going to be. **The experiences and opportunities for reflection I had with PBHA made service part of my identity** — for the rest of my life, I've asked myself whether what I'm doing makes the world better, and how. This is how I think of who I am."
-          year="'03" />
-      </div>
 
       {/* 2 — the model, on PBHA's navy. A different ground is the fastest
           way to say "this is a different kind of thing". */}
@@ -2398,15 +2492,12 @@ function StudyScreen() {
                 </div>
               )}
 
-              {w.quote && (
-                <div className="way-quote reveal">
-                  <Pull body={w.quote.body} year={w.quote.year} />
-                </div>
-              )}
             </section>
           );
         })}
       </section>
+
+      <Quotes />
 
       {/* 4 — the annual figures, on navy, the way the report sets them. */}
       <section className="bleed ground-navy wave-in wave-out">
@@ -2434,12 +2525,6 @@ function StudyScreen() {
         </div>
         <Wave side="bottom" fill="var(--white)" />
       </section>
-
-      <div className="reveal">
-        <Pull
-          body="**My time with PBHA was the most powerful learning experience I've ever had.** The combination of experiential learning, coaching/mentoring from staff, support and challenge from a community of peers, and leadership development both prepared me for my career as a social worker and educator, and inspired me to continue fighting for social justice in my personal and professional lives."
-          year="'11" />
-      </div>
 
       {/* 5 — credits, on the wash, smaller: a colophon, not a finding. */}
       <section className="colophon-band">
