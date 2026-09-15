@@ -2363,8 +2363,13 @@ function Quotes() {
   const stageRef = React.useRef(null);
 
   // The stack's natural height is the tallest quote's, so a short one left
-  // a pile of white above the dots. Measure the one on show instead. The
-  // ResizeObserver keeps it right when the text rewraps at a new width.
+  // a pile of white above the dots. Measure the one on show instead.
+  //
+  // A window listener rather than a ResizeObserver on the slides: the
+  // observer fired on every frame of the height transition and kept
+  // restarting it, which pinned the stage at whatever height it had when
+  // the page loaded. Only a change of width can change a quote's height,
+  // and that is exactly what resize reports.
   React.useLayoutEffect(() => {
     const stage = stageRef.current;
     if (!stage) return;
@@ -2375,12 +2380,12 @@ function Quotes() {
       // which grid hands to the item rather than collapsing away — is
       // counted. offsetHeight alone would miss it.
       const h = on.getBoundingClientRect().bottom - stage.getBoundingClientRect().top;
-      stage.style.height = Math.round(h) + "px";
+      const next = Math.round(h) + "px";
+      if (stage.style.height !== next) stage.style.height = next;
     };
     fit();
-    const ro = new ResizeObserver(fit);
-    Array.prototype.forEach.call(stage.children, (c) => ro.observe(c));
-    return () => ro.disconnect();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
   }, [at]);
 
   return (
