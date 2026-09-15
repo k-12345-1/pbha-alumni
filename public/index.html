@@ -2365,11 +2365,9 @@ function Quotes() {
   // The stack's natural height is the tallest quote's, so a short one left
   // a pile of white above the dots. Measure the one on show instead.
   //
-  // A window listener rather than a ResizeObserver on the slides: the
-  // observer fired on every frame of the height transition and kept
-  // restarting it, which pinned the stage at whatever height it had when
-  // the page loaded. Only a change of width can change a quote's height,
-  // and that is exactly what resize reports.
+  // A window listener rather than a ResizeObserver on the slides: only a
+  // change of width can change a quote's height, and resize reports that
+  // without the observer's risk of re-firing on its own height change.
   React.useLayoutEffect(() => {
     const stage = stageRef.current;
     if (!stage) return;
