@@ -765,8 +765,17 @@ footer.site {
 .band-split .part-label { text-align: left; margin-bottom: 8px; }
 .band-split .h-2 { text-align: left; margin: 0; }
 .band-split .band-body p:first-child { margin-top: 0; }
-/* Credits are a colophon, not a finding: smaller, and it should look it. */
-.colophon { font-size: 15px; }
+
+/* The credits, under the survey text in the same column: a rule to set
+   them apart, and smaller, because a colophon is not a finding. */
+.band-credits {
+  margin-top: 30px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, .22);
+  font-size: 14.5px;
+}
+.band-credits p { margin: 8px 0 0; line-height: 1.6; }
+.band-credits strong { color: var(--white); font-weight: 600; }
 
 /* pbha.org's own alumni-impact page centres its section headings above
    full-width bodies rather than setting them beside. Matching that means
@@ -901,8 +910,6 @@ footer.site {
 .chart { margin-top: 34px; }
 .chart-body { padding-top: 4px; }
 
-/* Credits: a rule and smaller type, rather than a panel. */
-.colophon-band { border-top: 1px solid var(--rule); margin-top: 24px; }
 
 /* Full-strength orange at a large size, rather than a filled disc. The
    disc read as one more block; the numeral does the same wayfinding job
@@ -2341,6 +2348,25 @@ function StudyScreen() {
             with depth of experience</strong> &mdash; which is why the figures below are given
             twice wherever PBHA reported them that way.
           </p>
+
+          {/* The credits belong with this, not alone at the foot of the
+              page: both answer "where did these numbers come from". */}
+          <div className="band-credits">
+            <div className="eyebrow">Who did this</div>
+            <p>
+              As is true of most things at PBHA, this summary was fueled by collective efforts.{" "}
+              <strong>Christine Tran</strong> and <strong>Sammy Lee</strong> conducted the primary
+              analysis of the alumni survey data as part of their Vanderbilt Leadership &amp;
+              Learning in Organizations PhD capstone project. <strong>Leah Robinson</strong>{" "}
+              developed the survey as an HGSE student advised by{" "}
+              <strong>Professors Alexis Redding</strong> and <strong>Julie Reuben</strong>.{" "}
+              <strong>Nancy Sato</strong>, Class of &rsquo;75, guided the overall impact study, and{" "}
+              <strong>Sam Greenberg</strong> analyzed and summarized the final study outcomes. The
+              PBHA&ndash;Alumni board envisioned the initiative and supported it through all the
+              stages, and PBHA students and staff reached out to alumni, coded the responses, and
+              coordinated meetings.
+            </p>
+          </div>
           </div>
         </div>
         <Wave side="bottom" fill="var(--white)" />
@@ -2460,28 +2486,6 @@ function StudyScreen() {
 
       <Quotes />
 
-      {/* 5 — credits, on the wash, smaller: a colophon, not a finding. */}
-      <section className="colophon-band">
-        <div className="part reveal colophon">
-          <div className="part-label">Credits</div>
-          <h2 className="h-2 band-head">Who did this</h2>
-          <div className="prose-2">
-            <p>
-              As is true of most things at PBHA, this summary was fueled by collective efforts.{" "}
-              <strong>Christine Tran</strong> and <strong>Sammy Lee</strong> conducted the primary
-              analysis of the alumni survey data as part of their Vanderbilt Leadership &amp;
-              Learning in Organizations PhD capstone project. <strong>Leah Robinson</strong>{" "}
-              developed the survey as an HGSE student advised by{" "}
-              <strong>Professors Alexis Redding</strong> and <strong>Julie Reuben</strong>.{" "}
-              <strong>Nancy Sato</strong>, Class of &rsquo;75, guided the overall impact study, and{" "}
-              <strong>Sam Greenberg</strong> analyzed and summarized the final study outcomes. The
-              PBHA&ndash;Alumni board envisioned the initiative and supported it through all the
-              stages, and PBHA students and staff reached out to alumni, coded the responses, and
-              coordinated meetings.
-            </p>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }
