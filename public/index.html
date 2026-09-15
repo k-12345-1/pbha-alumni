@@ -2718,8 +2718,10 @@ function ArchivesScreen() {
       <h1 className="h-1 accent">Archives</h1>
       <hr className="rule" style={{ margin: "22px 0 32px" }} />
 
-      <p className="statement statement-mid reveal">
-        Five decades of the Phillips Brooks House Association, in photographs.
+      {/* One line: the size is capped so it cannot wrap at any width the
+          page is designed for. */}
+      <p className="statement statement-mid archives-lede reveal">
+        View the Phillips Brooks House Association across the decades.
       </p>
 
       <ol className="decades">
