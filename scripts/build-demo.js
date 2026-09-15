@@ -208,6 +208,12 @@ const runtime = `
       var th = THREADS.filter(function (t) { return t.threadId === id; })[0];
       if (!th) return Promise.reject(Object.assign(new Error("Conversation not found"), { status: 404 }));
       if (readMark) { th.unread = 0; return Promise.resolve(null); }
+      // Deleting is one-sided on the server, which the demo has no second
+      // side to model — so here it simply drops the thread.
+      if (method === "DELETE") {
+        THREADS = THREADS.filter(function (t) { return t !== th; });
+        return Promise.resolve({ threadId: id, cleared: true });
+      }
       if (method === "POST") {
         var msg = { id: "m" + (++nextId), body: body.body, createdAt: new Date().toISOString(), fromMe: true };
         th.messages.push(msg);

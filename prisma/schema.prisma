@@ -184,6 +184,13 @@ model ThreadParticipant {
   // never opened the thread.
   lastReadAt DateTime?
 
+  // When this person deleted the conversation. Deleting is one-sided: the
+  // other person's copy is untouched, because their half of an exchange is
+  // not yours to destroy. Everything sent before this time is gone from
+  // your view; if they write again the thread returns carrying only what
+  // came after.
+  clearedAt DateTime?
+
   @@id([threadId, userId])
   @@index([userId])
 }

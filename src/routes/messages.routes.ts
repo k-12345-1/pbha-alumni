@@ -61,3 +61,12 @@ messagesRouter.post(
     res.status(204).end();
   }),
 );
+
+// Deletes this person's copy of the conversation. The other participant's
+// is untouched; see clearThread.
+messagesRouter.delete(
+  "/:threadId",
+  asyncHandler(async (req, res) => {
+    res.json(await messagesService.clearThread(req.params.threadId, req.auth!.sub));
+  }),
+);

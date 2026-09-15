@@ -908,7 +908,10 @@ footer.site {
 }
 
 .msg-pane { display: flex; flex-direction: column; min-height: 520px; max-height: 620px; }
-.msg-head { padding: 14px 20px; border-bottom: 1px solid var(--rule); }
+.msg-head {
+  padding: 14px 20px; border-bottom: 1px solid var(--rule);
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
 .msg-head-name {
   background: none; border: 0; padding: 0; cursor: pointer;
   font: inherit; font-size: 16px; font-weight: 600; color: var(--ink);
@@ -937,6 +940,15 @@ footer.site {
 
 .msg-compose { display: flex; gap: 10px; align-items: flex-end; padding: 14px 20px; border-top: 1px solid var(--rule); }
 .msg-compose textarea { min-height: 44px; resize: none; }
+
+.msg-del {
+  background: none; border: 0; cursor: pointer;
+  font: inherit; font-size: 13px; font-weight: 600;
+  color: var(--ink-mute);
+  padding: 4px 2px;
+}
+.msg-del:hover { color: var(--orange); }
+.msg-confirm { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
 /* Starting a conversation, from the top of the thread list. */
 .msg-new-btn {
@@ -1955,11 +1967,13 @@ const when = (iso) => {
 // well as into the Messages screen. The callbacks live in a ref because
 // they are written inline at both call sites — in the dependency array a
 // fresh function every render would refetch the thread forever.
-function Conversation({ threadId, showHead, onOpenProfile, onRead, onSent, initialDraft }) {
+function Conversation({ threadId, showHead, onOpenProfile, onRead, onSent, onDeleted, initialDraft }) {
   const [thread, setThread] = React.useState(null);
   const [draft, setDraft] = React.useState(initialDraft || "");
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState("");
+  const [confirming, setConfirming] = React.useState(false);
+  const [removing, setRemoving] = React.useState(false);
   const endRef = React.useRef(null);
   const cb = React.useRef({});
   cb.current = { onRead, onSent };
@@ -1968,6 +1982,8 @@ function Conversation({ threadId, showHead, onOpenProfile, onRead, onSent, initi
     if (!threadId) { setThread(null); return; }
     let dead = false;
     setThread(null);
+    setConfirming(false);
+    setRemoving(false);
     // Arriving from the directory: address it to them. Only on the way in —
     // a later render must not wipe what has been typed since.
     if (initialDraft) setDraft(initialDraft);
@@ -1986,6 +2002,19 @@ function Conversation({ threadId, showHead, onOpenProfile, onRead, onSent, initi
   React.useEffect(() => {
     if (endRef.current) endRef.current.scrollIntoView({ block: "end" });
   }, [thread && thread.messages.length]);
+
+  const remove = async () => {
+    setRemoving(true);
+    setError("");
+    try {
+      await api.del("/api/messages/" + encodeURIComponent(threadId));
+      setConfirming(false);
+      if (onDeleted) onDeleted(threadId);
+    } catch (err) {
+      setError(err.message);
+      setRemoving(false);
+    }
+  };
 
   const send = async (e) => {
     e.preventDefault();
@@ -2019,6 +2048,26 @@ function Conversation({ threadId, showHead, onOpenProfile, onRead, onSent, initi
               {thread.with.year && <span className="meta"> · {shortYear(thread.with.year)}</span>}
             </button>
           ) : <span className="msg-head-name">Former member</span>}
+
+          {/* Two steps, because this cannot be undone. The confirm replaces
+              the button rather than opening a dialog over it, so the
+              conversation being deleted stays visible while you decide. */}
+          {confirming ? (
+            <span className="msg-confirm">
+              <span className="meta">Delete this conversation?</span>
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => setConfirming(false)}>
+                Keep
+              </button>
+              <button type="button" className="btn btn-primary btn-sm" onClick={remove} disabled={removing}>
+                {removing ? "Deleting…" : "Delete"}
+              </button>
+            </span>
+          ) : (
+            <button type="button" className="msg-del" onClick={() => setConfirming(true)}
+              aria-label="Delete this conversation">
+              Delete
+            </button>
+          )}
         </div>
       )}
 
@@ -2165,6 +2214,18 @@ function MessagesScreen({ openThreadId, onOpenProfile, draftFor, onUnreadChange 
 
   const draft = [ownDraft, draftFor].find((d) => d && d.threadId === active);
 
+  // After a delete, land on whatever conversation is next in the list
+  // rather than on an empty pane. The deleted one is dropped from local
+  // state first so the choice is made against the list as it will be.
+  const afterDelete = (gone) => {
+    const rest = threads.filter((t) => t.threadId !== gone);
+    setThreads(rest);
+    setOwnDraft(null);
+    setActive(rest[0] ? rest[0].threadId : null);
+    loadThreads();
+    onUnreadChange && onUnreadChange();
+  };
+
   return (
     <div className="wrap page">
       <h1 className="h-1 accent">Messages</h1>
@@ -2228,7 +2289,8 @@ function MessagesScreen({ openThreadId, onOpenProfile, draftFor, onUnreadChange 
               : <Conversation threadId={active} showHead onOpenProfile={onOpenProfile}
                   initialDraft={draft ? draft.text : ""}
                   onRead={() => { loadThreads(); onUnreadChange && onUnreadChange(); }}
-                  onSent={loadThreads} />}
+                  onSent={loadThreads}
+                  onDeleted={afterDelete} />}
           </div>
         </div>
       )}
