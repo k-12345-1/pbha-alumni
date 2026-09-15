@@ -669,6 +669,38 @@ footer.site {
 
 .link-orange { color: var(--orange); text-decoration: underline; text-underline-offset: 3px; }
 
+/* ---- the study page ----------------------------------------------- *
+ *
+ * Two problems at once: the page should reach both gutters, and a line of
+ * prose 1,270px wide is about 200 characters, which nobody can read — the
+ * eye loses the start of the next line. Every block below solves it the
+ * same way: the band fills the width, and the text inside it sits in a
+ * column of its own, either beside a heading or beside its own data.
+ */
+.study { font-size: 16px; }
+.study p { line-height: 1.68; }
+
+.study-lede {
+  font-size: clamp(19px, 1.6vw, 23px);
+  line-height: 1.55;
+  font-weight: 500;
+  margin: 0;
+  /* Large type over a wide measure is fine: the bigger the words, the
+     fewer of them fit on a line. */
+  max-width: 1100px;
+}
+
+/* A heading in its own column at the left, body to its right. Full width,
+   and the body never runs past a readable measure. */
+.band { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 48px; }
+.band-head { margin: 0; align-self: start; position: sticky; top: 96px; }
+.band-body { min-width: 0; }
+
+/* Two columns of newspaper text: fills the band, halves the measure. */
+.prose-2 { columns: 2; column-gap: 52px; }
+.prose-2 p { margin-top: 0; break-inside: avoid-column; }
+.prose-2 p:last-child { margin-bottom: 0; }
+
 /* A quote from an alum, set the way the report sets them: full-bleed
    orange, the words large enough to stop on. */
 .pull {
@@ -694,23 +726,36 @@ footer.site {
 
 /* The three components of PBHA's model, and the five ways: both are
    numbered lists where the number is a column, not a bullet. */
-.model-list { list-style: none; margin: 0; padding: 0; }
-.model-list li {
-  display: grid; grid-template-columns: 56px 1fr; gap: 20px;
-  padding: 20px 0;
-  border-top: 1px solid var(--rule);
-}
-.model-list li:last-child { border-bottom: 1px solid var(--rule); }
-.model-n { font-size: 13px; font-weight: 700; color: var(--ink); opacity: .3; letter-spacing: .04em; }
+/* Three abreast rather than stacked: three short paragraphs in one column
+   leave two thirds of the band empty. */
+.model-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+.model-list li { border-top: 2px solid var(--orange); padding-top: 16px; }
+.model-n { font-size: 13px; font-weight: 700; color: var(--orange); letter-spacing: .04em; }
 
+/* Number, narrative, data. The prose column is the readable measure; the
+   data column carries the tables and charts, and between them the section
+   reaches the gutter without a 200-character line anywhere in it. */
 .way {
-  display: grid; grid-template-columns: 76px 1fr; gap: 20px;
-  padding: 40px 0;
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 20px 40px;
+  padding: 44px 0;
   border-top: 1px solid var(--rule);
 }
+.way-solo { grid-template-columns: 76px minmax(0, 1fr); }
+.way-solo .way-text { columns: 2; column-gap: 52px; }
+.way-solo .way-text .way-title { column-span: all; }
+.way-text > p { margin-top: 0; }
+.way-data { min-width: 0; }
+.way-quote { grid-column: 1 / -1; }
+.chart + .chart { margin-top: 26px; }
+
 .way-n {
   font-size: 54px; font-weight: 700; line-height: .9;
   color: var(--orange); opacity: .35;
+  /* Stays put while its section scrolls, so a reader three tables deep
+     still knows which of the five they are in. */
+  position: sticky; top: 96px; align-self: start;
 }
 .way-title {
   font-size: clamp(19px, 1.8vw, 23px); line-height: 1.3;
@@ -731,10 +776,42 @@ footer.site {
 .annual:last-child { border-bottom: 0; }
 .annual .em-n { font-size: 19px; }
 
+/* ---- motion ------------------------------------------------------- *
+ *
+ * Introduction, not decoration: nothing loops, nothing runs twice, and
+ * everything is already in its finished state for anyone who has asked
+ * their system for less of it.
+ */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity .55s ease, transform .55s cubic-bezier(.22, .68, .3, 1);
+  will-change: opacity, transform;
+}
+.reveal.is-in { opacity: 1; transform: none; will-change: auto; }
+
+.bar-fill { width: 0; transition: width .95s cubic-bezier(.22, .68, .3, 1); }
+.is-in .bar-fill { width: var(--w); }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .reveal.is-in { opacity: 1; transform: none; transition: none; }
+  .bar-fill, .is-in .bar-fill { width: var(--w); transition: none; }
+}
+
+@media (max-width: 1100px) {
+  .band { grid-template-columns: 1fr; gap: 20px; }
+  .band-head { position: static; }
+  .way { grid-template-columns: 64px minmax(0, 1fr); }
+  .way-data { grid-column: 2; }
+  .model-list { grid-template-columns: repeat(2, 1fr); }
+}
 @media (max-width: 720px) {
-  .way { grid-template-columns: 1fr; gap: 8px; padding: 30px 0; }
-  .way-n { font-size: 38px; }
-  .model-list li { grid-template-columns: 1fr; gap: 6px; }
+  .study { font-size: 15.5px; }
+  .way { grid-template-columns: 1fr; gap: 10px; padding: 32px 0; }
+  .way-n { font-size: 38px; position: static; }
+  .way-data { grid-column: 1; }
+  .way-solo .way-text, .prose-2 { columns: 1; }
+  .model-list { grid-template-columns: 1fr; gap: 20px; }
   .pull { padding: 24px 22px; }
 }
 
@@ -1901,12 +1978,17 @@ const STUDY_ANNUAL = [
   },
 ];
 
-function Bar({ label, value, max }) {
+// The width goes in a custom property rather than straight on the element:
+// the fill sits at zero until its block is revealed, and CSS reads the
+// property then. Passing it inline as `width` would draw it full-length
+// before anyone had scrolled to it.
+function Bar({ label, value, max, i }) {
   return (
     <div className="bar-row">
       <span className="bar-label">{label}</span>
       <span className="bar-track">
-        <span className="bar-fill" style={{ width: `${(value / max) * 100}%` }} />
+        <span className="bar-fill"
+          style={{ "--w": `${(value / max) * 100}%`, transitionDelay: `${(i || 0) * 70}ms` }} />
       </span>
       <span className="bar-value">{value}</span>
     </div>
@@ -1922,17 +2004,48 @@ function Pull({ body, year }) {
   );
 }
 
+// One observer for the page rather than one per element. Everything with
+// .reveal fades up as it arrives, and a .bar-fill inside a revealed block
+// runs out to its width. Motion is introduction, not decoration: nothing
+// moves on a loop, nothing moves twice, and anyone who has asked their
+// system for less motion gets the finished state immediately.
+function useReveal(deps) {
+  React.useEffect(() => {
+    const nodes = document.querySelectorAll(".reveal:not(.is-in)");
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (still.matches) {
+      nodes.forEach((el) => el.classList.add("is-in"));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          e.target.classList.add("is-in");
+          // Once shown, stop watching: re-animating on the way back up
+          // makes a long page feel restless rather than alive.
+          io.unobserve(e.target);
+        });
+      },
+      { rootMargin: "0px 0px -8% 0px", threshold: 0.06 },
+    );
+    nodes.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, deps || []);
+}
+
 function StudyScreen() {
   const maxField = STUDY_FIELDS[0][1];
   const maxRole = STUDY_ROLES[0][1];
+  useReveal();
 
   return (
-    <div className="wrap page">
+    <div className="wrap page study">
       <h1 className="h-1 accent">Alumni Study</h1>
       <hr className="rule" style={{ margin: "22px 0 32px" }} />
 
-      <div className="eyebrow" style={{ marginBottom: 14 }}>Transforming Generations</div>
-      <p className="lede" style={{ maxWidth: 820 }}>
+      <div className="eyebrow reveal" style={{ marginBottom: 14 }}>Transforming Generations</div>
+      <p className="study-lede reveal">
         In <span className="em-n">2022</span> the Alumni Association asked PBHA alumni what their
         service years did to the rest of their lives. <span className="em-n">1,078</span> people
         answered, from all but two Harvard classes between <span className="em-n">1948</span> and{" "}
@@ -1941,8 +2054,8 @@ function StudyScreen() {
       </p>
 
       <div className="stat-band">
-        {STUDY_HEADLINE.map((h) => (
-          <div key={h.label}>
+        {STUDY_HEADLINE.map((h, i) => (
+          <div key={h.label} className="reveal" style={{ transitionDelay: `${i * 90}ms` }}>
             <div className="stat-n">{h.n}</div>
             <div className="meta" style={{ marginTop: 6 }}>{h.label}</div>
           </div>
@@ -1951,173 +2064,209 @@ function StudyScreen() {
 
       <hr className="rule" style={{ margin: "48px 0 32px" }} />
 
-      <h2 className="h-2" style={{ marginBottom: 14 }}>What the survey was measuring</h2>
-      <p style={{ maxWidth: 820, margin: "0 0 12px" }}>
-        For almost 120 years PBHA has been working in communities across Greater Boston. Each year
-        1,500 student volunteers join with PBHA&rsquo;s community partners to run more than 70
-        social service and social action programs, serving more than 8,000 constituents. Over
-        30,000 PBHA alumni continue to have a transformative positive impact on the world well
-        beyond their undergraduate years.
-      </p>
-      <p style={{ maxWidth: 820, margin: "0 0 28px" }}>
-        PBHA&rsquo;s impact is deep and broad, providing students with immersive volunteer
-        opportunities ranging from two hours per week to intensive summer internships and
-        leadership roles that last throughout a student&rsquo;s Harvard experience.{" "}
-        <strong>The survey results point to strong outcomes across the board that increase with
-        depth of experience</strong> &mdash; which is why the figures below are given twice
-        wherever PBHA reported them that way.
-      </p>
+      <section className="band reveal">
+        <h2 className="h-2 band-head">What the survey was measuring</h2>
+        <div className="band-body prose-2">
+          <p>
+            For almost 120 years PBHA has been working in communities across Greater Boston. Each
+            year 1,500 student volunteers join with PBHA&rsquo;s community partners to run more
+            than 70 social service and social action programs, serving more than 8,000
+            constituents. Over 30,000 PBHA alumni continue to have a transformative positive impact
+            on the world well beyond their undergraduate years.
+          </p>
+          <p>
+            PBHA&rsquo;s impact is deep and broad, providing students with immersive volunteer
+            opportunities ranging from two hours per week to intensive summer internships and
+            leadership roles that last throughout a student&rsquo;s Harvard experience.{" "}
+            <strong>The survey results point to strong outcomes across the board that increase
+            with depth of experience</strong> &mdash; which is why the figures below are given
+            twice wherever PBHA reported them that way.
+          </p>
+        </div>
+      </section>
 
-      <Pull
-        body="I was really active in PBHA during a time in my life where I was figuring out the person I was going to be. The experiences and opportunities for reflection I had with PBHA made service part of my identity — for the rest of my life, I've asked myself whether what I'm doing makes the world better, and how. This is how I think of who I am."
-        year="'03" />
-
-      <h2 className="h-2" style={{ margin: "48px 0 6px" }}>PBHA&rsquo;s unique model</h2>
-      <p className="meta" style={{ marginBottom: 22, maxWidth: 820 }}>
-        Analysis of the survey results found three components behind the effect on student
-        volunteers.
-      </p>
-      <ol className="model-list">
-        {STUDY_MODEL.map((m, i) => (
-          <li key={m.title}>
-            <span className="model-n">{String(i + 1).padStart(2, "0")}</span>
-            <div>
-              <div className="h-3" style={{ marginBottom: 6 }}>{m.title}</div>
-              <p className="meta" style={{ margin: 0 }}>{m.body}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
-
-      <hr className="rule" style={{ margin: "48px 0 32px" }} />
-
-      <h2 className="h-2" style={{ marginBottom: 6 }}>
-        Five ways PBHA develops citizens and citizen leaders
-      </h2>
-      <p className="meta" style={{ marginBottom: 8, maxWidth: 820 }}>
-        Where two figures are given, the first is all respondents and the second is alumni who
-        took part in intensive programming.
-      </p>
-
-      {STUDY_WAYS.map((w, i) => (
-        <section key={w.title} className="way">
-          <div className="way-n">{i + 1}</div>
-          <div>
-            <h3 className="way-title">{w.title}</h3>
-            <p style={{ maxWidth: 780 }}>{w.body}</p>
-
-            {w.rows && (
-              <div className="card" style={{ marginTop: 22 }}>
-                <div className="finding finding-head">
-                  <span>Finding</span><span>All</span><span>Intensive</span>
-                </div>
-                {w.rows.map((r) => (
-                  <div className="finding" key={r[0]}>
-                    <span>{r[0]}</span>
-                    <span className={r[1] ? "em-n" : "meta"}>{r[1] || "—"}</span>
-                    <span className={r[2] ? "em-n" : "meta"}>{r[2] || "—"}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {w.list && (
-              <>
-                <p style={{ margin: "22px 0 8px", fontWeight: 600 }}>{w.list.lead}</p>
-                <ul className="plain-list">
-                  {w.list.items.map((it) => <li key={it}>{it}</li>)}
-                </ul>
-              </>
-            )}
-
-            {w.tallies && (
-              <div className="stat-band" style={{ marginTop: 26 }}>
-                {w.tallies.map((t) => (
-                  <div key={t[1]}>
-                    <div className="stat-n">{t[0]}</div>
-                    <div className="meta" style={{ marginTop: 6, maxWidth: 220 }}>{t[1]}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* The two breakdowns PBHA published under the first finding. */}
-            {i === 0 && (
-              <div className="two-up" style={{ marginTop: 30, gap: 32 }}>
-                <div>
-                  <div className="eyebrow" style={{ marginBottom: 12 }}>
-                    Top fields of professional work
-                  </div>
-                  <div className="card card-pad">
-                    {STUDY_FIELDS.map(([label, value]) => (
-                      <Bar key={label} label={label} value={value} max={maxField} />
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <div className="eyebrow" style={{ marginBottom: 12 }}>
-                    1,196 executive or management roles, by organization
-                  </div>
-                  <div className="card card-pad">
-                    {STUDY_ROLES.map(([label, value]) => (
-                      <Bar key={label} label={label} value={value} max={maxRole} />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {w.quote && <Pull body={w.quote.body} year={w.quote.year} />}
-          </div>
-        </section>
-      ))}
-
-      <hr className="rule" style={{ margin: "48px 0 32px" }} />
-
-      <h2 className="h-2" style={{ marginBottom: 6 }}>PBHA by the numbers</h2>
-      <p className="meta" style={{ marginBottom: 24 }}>Every year.</p>
-      <div className="two-up" style={{ gap: 32 }}>
-        {STUDY_ANNUAL.map((col) => (
-          <div key={col.head}>
-            <div className="eyebrow" style={{ marginBottom: 12 }}>{col.head}</div>
-            <div className="card">
-              {col.rows.map(([n, label]) => (
-                <div className="annual" key={label}>
-                  <span className="em-n">{n}</span>
-                  <span>{label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+      <div className="reveal">
+        <Pull
+          body="I was really active in PBHA during a time in my life where I was figuring out the person I was going to be. The experiences and opportunities for reflection I had with PBHA made service part of my identity — for the rest of my life, I've asked myself whether what I'm doing makes the world better, and how. This is how I think of who I am."
+          year="'03" />
       </div>
 
-      <Pull
-        body="My time with PBHA was the most powerful learning experience I've ever had. The combination of experiential learning, coaching/mentoring from staff, support and challenge from a community of peers, and leadership development both prepared me for my career as a social worker and educator, and inspired me to continue fighting for social justice in my personal and professional lives."
-        year="'11" />
+      <section className="band" style={{ marginTop: 48 }}>
+        <div className="band-head reveal">
+          <h2 className="h-2">PBHA&rsquo;s unique model</h2>
+          <p className="meta" style={{ marginTop: 8 }}>
+            Analysis of the survey results found three components behind the effect on student
+            volunteers.
+          </p>
+        </div>
+        <ol className="model-list band-body">
+          {STUDY_MODEL.map((m, i) => (
+            <li key={m.title} className="reveal" style={{ transitionDelay: `${i * 90}ms` }}>
+              <span className="model-n">{String(i + 1).padStart(2, "0")}</span>
+              <div className="h-3" style={{ margin: "8px 0 8px" }}>{m.title}</div>
+              <p className="meta" style={{ margin: 0 }}>{m.body}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
 
       <hr className="rule" style={{ margin: "48px 0 24px" }} />
 
-      <h2 className="h-2" style={{ marginBottom: 14 }}>Who did this</h2>
-      <p style={{ maxWidth: 820, margin: "0 0 16px" }}>
-        As is true of most things at PBHA, this summary was fueled by collective efforts.{" "}
-        <strong>Christine Tran</strong> and <strong>Sammy Lee</strong> conducted the primary
-        analysis of the alumni survey data as part of their Vanderbilt Leadership &amp; Learning in
-        Organizations PhD capstone project. <strong>Leah Robinson</strong> developed the survey as
-        an HGSE student advised by <strong>Professors Alexis Redding</strong> and{" "}
-        <strong>Julie Reuben</strong>. <strong>Nancy Sato</strong>, Class of &rsquo;75, guided the
-        overall impact study, and <strong>Sam Greenberg</strong> analyzed and summarized the final
-        study outcomes. The PBHA&ndash;Alumni board envisioned the initiative and supported it
-        through all the stages, and PBHA students and staff reached out to alumni, coded the
-        responses, and coordinated meetings.
-      </p>
-      <p className="meta" style={{ maxWidth: 820, marginBottom: 24 }}>
-        The report gives findings rather than methodology: response rate, fielding dates, and how
-        &ldquo;intensive programming&rdquo; was defined are not stated in it. Read the figures with
-        that in mind.
-      </p>
-      <a className="btn btn-primary" href="https://www.pbha.org/alumni-impact"
-        target="_blank" rel="noopener noreferrer">PBHA&rsquo;s impact pages</a>
+      <div className="reveal">
+        <h2 className="h-2" style={{ marginBottom: 6 }}>
+          Five ways PBHA develops citizens and citizen leaders
+        </h2>
+        <p className="meta" style={{ marginBottom: 8 }}>
+          Where two figures are given, the first is all respondents and the second is alumni who
+          took part in intensive programming.
+        </p>
+      </div>
+
+      {STUDY_WAYS.map((w, i) => {
+        const hasData = w.rows || w.tallies || i === 0;
+        return (
+          <section key={w.title} className={`way ${hasData ? "" : "way-solo"}`}>
+            {/* The number stays put while its section scrolls, so a reader
+                three tables deep still knows which of the five they are in. */}
+            <div className="way-n reveal">{i + 1}</div>
+
+            <div className="way-text reveal">
+              <h3 className="way-title">{w.title}</h3>
+              <p>{w.body}</p>
+              {w.list && (
+                <>
+                  <p style={{ margin: "22px 0 8px", fontWeight: 600 }}>{w.list.lead}</p>
+                  <ul className="plain-list">
+                    {w.list.items.map((it) => <li key={it}>{it}</li>)}
+                  </ul>
+                </>
+              )}
+            </div>
+
+            {hasData && (
+              <div className="way-data">
+                {w.rows && (
+                  <div className="card reveal">
+                    <div className="finding finding-head">
+                      <span>Finding</span><span>All</span><span>Intensive</span>
+                    </div>
+                    {w.rows.map((r) => (
+                      <div className="finding" key={r[0]}>
+                        <span>{r[0]}</span>
+                        <span className={r[1] ? "em-n" : "meta"}>{r[1] || "—"}</span>
+                        <span className={r[2] ? "em-n" : "meta"}>{r[2] || "—"}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {w.tallies && (
+                  <div className="stat-band reveal" style={{ marginTop: 26 }}>
+                    {w.tallies.map((t, j) => (
+                      <div key={t[1]} style={{ transitionDelay: `${j * 90}ms` }}>
+                        <div className="stat-n">{t[0]}</div>
+                        <div className="meta" style={{ marginTop: 6 }}>{t[1]}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* The two breakdowns PBHA published under the first finding. */}
+                {i === 0 && (
+                  <>
+                    <div className="chart reveal">
+                      <div className="eyebrow" style={{ marginBottom: 12 }}>
+                        Top fields of professional work
+                      </div>
+                      <div className="card card-pad">
+                        {STUDY_FIELDS.map(([label, value], j) => (
+                          <Bar key={label} label={label} value={value} max={maxField} i={j} />
+                        ))}
+                      </div>
+                    </div>
+                    <div className="chart reveal">
+                      <div className="eyebrow" style={{ marginBottom: 12 }}>
+                        1,196 executive or management roles, by organization
+                      </div>
+                      <div className="card card-pad">
+                        {STUDY_ROLES.map(([label, value], j) => (
+                          <Bar key={label} label={label} value={value} max={maxRole} i={j} />
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
+            {w.quote && (
+              <div className="way-quote reveal">
+                <Pull body={w.quote.body} year={w.quote.year} />
+              </div>
+            )}
+          </section>
+        );
+      })}
+
+      <hr className="rule" style={{ margin: "48px 0 32px" }} />
+
+      <section className="band">
+        <div className="band-head reveal">
+          <h2 className="h-2">PBHA by the numbers</h2>
+          <p className="meta" style={{ marginTop: 8 }}>Every year.</p>
+        </div>
+        <div className="band-body two-up" style={{ gap: 32 }}>
+          {STUDY_ANNUAL.map((col, i) => (
+            <div key={col.head} className="reveal" style={{ transitionDelay: `${i * 90}ms` }}>
+              <div className="eyebrow" style={{ marginBottom: 12 }}>{col.head}</div>
+              <div className="card">
+                {col.rows.map(([n, label]) => (
+                  <div className="annual" key={label}>
+                    <span className="em-n">{n}</span>
+                    <span>{label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div className="reveal">
+        <Pull
+          body="My time with PBHA was the most powerful learning experience I've ever had. The combination of experiential learning, coaching/mentoring from staff, support and challenge from a community of peers, and leadership development both prepared me for my career as a social worker and educator, and inspired me to continue fighting for social justice in my personal and professional lives."
+          year="'11" />
+      </div>
+
+      <hr className="rule" style={{ margin: "48px 0 24px" }} />
+
+      <section className="band reveal">
+        <h2 className="h-2 band-head">Who did this</h2>
+        <div className="band-body">
+          <div className="prose-2">
+            <p>
+              As is true of most things at PBHA, this summary was fueled by collective efforts.{" "}
+              <strong>Christine Tran</strong> and <strong>Sammy Lee</strong> conducted the primary
+              analysis of the alumni survey data as part of their Vanderbilt Leadership &amp;
+              Learning in Organizations PhD capstone project. <strong>Leah Robinson</strong>{" "}
+              developed the survey as an HGSE student advised by{" "}
+              <strong>Professors Alexis Redding</strong> and <strong>Julie Reuben</strong>.{" "}
+              <strong>Nancy Sato</strong>, Class of &rsquo;75, guided the overall impact study, and{" "}
+              <strong>Sam Greenberg</strong> analyzed and summarized the final study outcomes. The
+              PBHA&ndash;Alumni board envisioned the initiative and supported it through all the
+              stages, and PBHA students and staff reached out to alumni, coded the responses, and
+              coordinated meetings.
+            </p>
+          </div>
+          <p className="meta" style={{ margin: "20px 0 24px" }}>
+            The report gives findings rather than methodology: response rate, fielding dates, and
+            how &ldquo;intensive programming&rdquo; was defined are not stated in it. Read the
+            figures with that in mind.
+          </p>
+          <a className="btn btn-primary" href="https://www.pbha.org/alumni-impact"
+            target="_blank" rel="noopener noreferrer">PBHA&rsquo;s impact pages</a>
+        </div>
+      </section>
     </div>
   );
 }
