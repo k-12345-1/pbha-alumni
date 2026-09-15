@@ -44,8 +44,6 @@
   /* PBHA's own navy, sampled from their logo file rather than guessed —
      the report leans on it as heavily as it does on the orange. */
   --navy: #051460;
-  /* The warm ground PBHA's impact report uses between its navy blocks. */
-  --cream: #f6ecdd;
 
   --sans: "Work Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
@@ -793,7 +791,7 @@ footer.site {
 .pull {
   margin: 40px 0 0;
   padding: 44px 5% 40px;
-  background: var(--cream);
+  background: var(--navy);
   border-radius: 28px;
   text-align: center;
 }
@@ -813,10 +811,11 @@ footer.site {
   font-size: clamp(17px, 1.5vw, 21px);
   line-height: 1.62;
   font-weight: 500;
-  color: var(--ink);
+  color: var(--white);
 }
 /* The part the report puts in bold, in the accent — the one line a reader
-   takes away if they take away nothing else. */
+   takes away if they take away nothing else. Orange on this navy is the
+   same pairing PBHA's own logo uses. */
 .pull strong { color: var(--orange); font-weight: 700; }
 /* The carousel around them. */
 .quotes-head {
@@ -871,7 +870,7 @@ footer.site {
   margin-top: 22px;
   font-size: 12px; font-weight: 700;
   letter-spacing: .16em; text-transform: uppercase;
-  color: var(--ink-mute);
+  color: rgba(255, 255, 255, .62);
 }
 
 /* The three components of PBHA's model, and the five ways: both are
