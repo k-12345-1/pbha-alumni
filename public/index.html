@@ -1020,7 +1020,6 @@ footer.site {
    not. */
 .decade-panel[hidden] { display: none; }
 .decade-inner { overflow: hidden; padding: 0 4px 34px; min-width: 0; }
-.decade-none { color: var(--ink-mute); font-size: 14.5px; margin: 0; }
 
 /* The photographs, scrolled sideways. */
 .strip-wrap { position: relative; }
@@ -2568,25 +2567,60 @@ function StudyScreen() {
  * The archive, by decade.
  *
  * 1980s to 2020s, each one collapsed until it is opened, and nothing in
- * it but the photographs. Each sits in the decade it was actually taken:
- * PBHA's Flickr begins in 2012, so the first three decades have none.
+ * it but the photographs.
  *
- * Flickr's search reports nearly 4,000 photos "taken" before 1990, but
- * those are files with no EXIF date, defaulted to an epoch — one is a
- * 2025 summer-programme group shot dated 1 January 1980. Putting them
- * under a decade heading would be inventing a record, which is the one
- * thing an archive cannot do.
+ * Every date here comes from the title of the Flickr album the photo
+ * sits in — "Bike Auction 1980", "SUP 1995" — because a person wrote
+ * those. The EXIF dates on this account cannot be used: Flickr reports
+ * nearly 4,000 photos taken before 1990, and the ones I opened were a
+ * 2025 summer-programme group shot dated 1 January 1980 and a masked
+ * 2025 awards dinner dated 2016. Cameras with unset clocks, uploaded in
+ * bulk years later.
  */
 const DECADES = [
-  { decade: "1980s", photos: [] },
-  { decade: "1990s", photos: [] },
-  { decade: "2000s", photos: [] },
+  {
+    decade: "1980s",
+    photos: [
+      { src: "photos/1980s-bike-auction-a.jpg", caption: "Bike Auction", year: "1980" },
+      { src: "photos/1980s-bike-auction-b.jpg", caption: "Bike Auction", year: "1980" },
+      { src: "photos/1980s-open-house-a.jpg", caption: "Fall Open House, Phillips Brooks House", year: "1980" },
+      { src: "photos/1980s-open-house-b.jpg", caption: "Fall Open House, Phillips Brooks House", year: "1980" },
+      { src: "photos/1980s-retreat.jpg", caption: "Spring Retreat", year: "1981" },
+      { src: "photos/1980s-carnival.jpg", caption: "Spring Carnival, Leverett", year: "1983" },
+    ],
+  },
+  {
+    decade: "1990s",
+    photos: [
+      { src: "photos/1990s-cyep-a.jpg", caption: "Cambridge Youth Enrichment Program", year: "1991" },
+      { src: "photos/1990s-sup-a.jpg", caption: "Summer Urban Program", year: "1995" },
+      { src: "photos/1990s-sup-b.jpg", caption: "Summer Urban Program", year: "1995" },
+      { src: "photos/1990s-sup-c.jpg", caption: "Summer Urban Program", year: "1995" },
+      { src: "photos/1990s-ryse-a.jpg", caption: "RYSE tenth anniversary", year: "1990s" },
+      { src: "photos/1990s-ryse-b.jpg", caption: "RYSE", year: "1990s" },
+    ],
+  },
+  {
+    decade: "2000s",
+    photos: [
+      { src: "photos/2000s-sup-a.jpg", caption: "Summer Urban Program", year: "2001" },
+      { src: "photos/2000s-midsummer-a.jpg", caption: "Midsummer", year: "2005" },
+      { src: "photos/2000s-midsummer-b.jpg", caption: "Midsummer", year: "2005" },
+      { src: "photos/2000s-midsummer-c.jpg", caption: "Midsummer", year: "2005" },
+      { src: "photos/2000s-reunion-1955.jpg", caption: "Reunion reception, Class of 1955", year: "2005" },
+      { src: "photos/2000s-midsummer-d.jpg", caption: "Midsummer", year: "2008" },
+    ],
+  },
   {
     decade: "2010s",
     photos: [
+      { src: "photos/2010s-sup-2014-a.jpg", caption: "Summer Urban Program", year: "2014" },
+      { src: "photos/2010s-sup-2014-b.jpg", caption: "Summer Urban Program", year: "2014" },
+      { src: "photos/2010s-sup-2014-c.jpg", caption: "Summer Urban Program", year: "2014" },
       { src: "photos/buddies-2013-b.jpg", caption: "Alzheimer\u2019s Buddies", year: "2013" },
       { src: "photos/buddies-2013-a.jpg", caption: "Alzheimer\u2019s Buddies", year: "2013" },
       { src: "photos/buddies-2013-c.jpg", caption: "Alzheimer\u2019s Buddies", year: "2013" },
+      { src: "photos/2010s-sup-2017-a.jpg", caption: "Summer Urban Program", year: "2017" },
     ],
   },
   {
@@ -2655,7 +2689,7 @@ function ArchivesScreen() {
       <hr className="rule" style={{ margin: "22px 0 32px" }} />
 
       <p className="statement statement-mid reveal">
-        Four decades of the Phillips Brooks House Association, in photographs.
+        Five decades of the Phillips Brooks House Association, in photographs.
       </p>
 
       <ol className="decades">
@@ -2677,15 +2711,7 @@ function ArchivesScreen() {
                   animated. The inner element needs the overflow. */}
               <div className="decade-panel" id={`decade-${d.decade}`} hidden={!isOpen}>
                 <div className="decade-inner">
-                  {d.photos.length > 0 ? (
-                    <Strip photos={d.photos} />
-                  ) : (
-                    /* Said rather than left blank: an empty panel reads as
-                       something that failed to load. */
-                    <p className="decade-none">
-                      No photographs from these years have been digitised yet.
-                    </p>
-                  )}
+                  <Strip photos={d.photos} />
                 </div>
               </div>
             </li>
