@@ -854,18 +854,53 @@ footer.site {
    grid cell, so fading them at the same time leaves two half-visible
    paragraphs printed over each other for a moment — that overlap is what
    reads as a flash. The outgoing slide clears first; the incoming one
-   waits for it, then rises the last few pixels into place.
+   waits for it.
    visibility carries the same delay as the fade so the outgoing slide is
-   still painted while it fades, instead of being cut halfway. */
+   still painted while it fades, instead of being cut halfway.
+   These two rules are also the resting state: if the animations below
+   never run, the right quote is still the visible one. */
 .quote-slide {
   opacity: 0; visibility: hidden;
-  transform: translateY(10px);
-  transition: opacity .3s ease, transform .3s ease, visibility 0s linear .3s;
+  transition: opacity .3s ease, visibility 0s linear .3s;
 }
 .quote-slide.is-on {
   opacity: 1; visibility: visible;
-  transform: none;
-  transition: opacity .45s ease .32s, transform .5s cubic-bezier(.22,.61,.36,1) .32s, visibility 0s;
+  transition: opacity .45s ease .32s, visibility 0s;
+}
+
+/* Travel, in the direction you asked for: press next and the quote you
+   are leaving exits stage left while its replacement comes in from the
+   right; press back and both reverse. Animations rather than transitions
+   because a transition can only run from where the element already is,
+   and the arriving quote has to start on the far side.
+   The shift is a variable so a narrow screen can use a smaller one —
+   46px past a 20px page margin would put the panel off the side and give
+   the whole page a horizontal scrollbar. */
+.quotes-stage { --shift: 46px; }
+.quotes-stage[data-dir="next"] .quote-slide.is-on {
+  animation: q-in-right .45s cubic-bezier(.22, .61, .36, 1) .32s both;
+}
+.quotes-stage[data-dir="prev"] .quote-slide.is-on {
+  animation: q-in-left .45s cubic-bezier(.22, .61, .36, 1) .32s both;
+}
+.quotes-stage[data-dir="next"] .quote-slide.is-out { animation: q-out-left .3s ease both; }
+.quotes-stage[data-dir="prev"] .quote-slide.is-out { animation: q-out-right .3s ease both; }
+
+@keyframes q-in-right {
+  from { opacity: 0; transform: translateX(var(--shift)); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes q-in-left {
+  from { opacity: 0; transform: translateX(calc(var(--shift) * -1)); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes q-out-left {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateX(calc(var(--shift) * -1)); }
+}
+@keyframes q-out-right {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateX(var(--shift)); }
 }
 
 .quotes-dots { display: flex; gap: 8px; justify-content: center; margin-top: 14px; }
@@ -889,6 +924,7 @@ footer.site {
 @media (prefers-reduced-motion: reduce) {
   .quote-slide, .quote-slide.is-on { transition: none; transform: none; }
   .quotes-stage { transition: none; }
+  .quotes-stage .quote-slide.is-on, .quotes-stage .quote-slide.is-out { animation: none; }
 }
 
 .pull figcaption {
@@ -925,13 +961,19 @@ footer.site {
    reaches the gutter without a 200-character line anywhere in it. */
 .way {
   display: grid;
-  grid-template-columns: 84px minmax(0, 1fr) minmax(0, 1.1fr);
+  /* Two equal content columns, not 1fr/1.1fr. Equal is what lets the one
+     row with no data split its prose into two columns that land on the
+     same edges as everybody else's narrative and data — with an uneven
+     pair the second column starts 27px off and the eye catches it. */
+  grid-template-columns: 84px minmax(0, 1fr) minmax(0, 1fr);
   gap: 20px 40px;
   padding: 48px 0;
   border-top: 1px solid var(--rule);
 }
-.way-solo { grid-template-columns: 76px minmax(0, 1fr); }
-.way-solo .way-text { columns: 2; column-gap: 52px; }
+/* Same skeleton, not a second one: the numeral column stays 84px so the
+   spine of five numbers is straight, and the prose runs across both
+   content columns with the grid's own gutter between them. */
+.way-solo .way-text { grid-column: 2 / -1; columns: 2; column-gap: 40px; }
 .way-solo .way-text .way-title { column-span: all; }
 .way-text > p { margin-top: 0; }
 .way-data { min-width: 0; }
@@ -1008,6 +1050,8 @@ footer.site {
   .way-solo .way-text, .prose-2 { columns: 1; }
   .model-list { grid-template-columns: 1fr; gap: 20px; }
   .pull { padding: 32px 22px 28px; border-radius: 20px; }
+  /* Less than the 20px page margin, so nothing travels off the side. */
+  .quotes-stage { --shift: 18px; }
 }
 
 /* ---------- archives ---------- */
@@ -2358,9 +2402,29 @@ function useReveal(rootSelector) {
  */
 function Quotes() {
   const [at, setAt] = React.useState(0);
+  // Which way the last move went, and which quote is on its way out. The
+  // direction has to survive past the end of the move: it is what keeps
+  // the arriving quote's animation matched to it, and if it were cleared
+  // the rule would stop applying and take the quote's visibility with it.
+  const [dir, setDir] = React.useState(1);
+  const [out, setOut] = React.useState(null);
   const n = STUDY_QUOTES.length;
-  const go = (step) => setAt((c) => (c + step + n) % n);
   const stageRef = React.useRef(null);
+  const outTimer = React.useRef(null);
+
+  const jump = (next, step) => {
+    if (next === at) return;
+    setDir(step);
+    setOut(at);
+    setAt(next);
+    // Long enough for the quote to finish leaving. Held in a ref so a
+    // quick second press retimes the one clock rather than racing it.
+    clearTimeout(outTimer.current);
+    outTimer.current = setTimeout(() => setOut(null), 700);
+  };
+  const go = (step) => jump((at + step + n) % n, step);
+
+  React.useEffect(() => () => clearTimeout(outTimer.current), []);
 
   // The stack's natural height is the tallest quote's, so a short one left
   // a pile of white above the dots. Measure the one on show instead.
@@ -2403,9 +2467,11 @@ function Quotes() {
         </div>
       </div>
 
-      <div className="quotes-stage" ref={stageRef} aria-live="polite">
+      <div className="quotes-stage" ref={stageRef} aria-live="polite"
+        data-dir={dir > 0 ? "next" : "prev"}>
         {STUDY_QUOTES.map((q, i) => (
-          <div key={i} className={`quote-slide ${i === at ? "is-on" : ""}`}>
+          <div key={i}
+            className={`quote-slide ${i === at ? "is-on" : ""} ${i === out ? "is-out" : ""}`}>
             <Pull body={q.body} year={q.year} />
           </div>
         ))}
@@ -2413,7 +2479,7 @@ function Quotes() {
 
       <div className="quotes-dots">
         {STUDY_QUOTES.map((q, i) => (
-          <button type="button" key={i} onClick={() => setAt(i)}
+          <button type="button" key={i} onClick={() => jump(i, i > at ? 1 : -1)}
             className={i === at ? "is-on" : ""}
             aria-current={i === at}
             aria-label={`Quote ${i + 1} of ${n}`} />
