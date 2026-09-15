@@ -841,11 +841,23 @@ footer.site {
    paging through does not make the panel jump. */
 .quotes-stage { display: grid; }
 .quotes-stage > * { grid-area: 1 / 1; }
+/* One quote leaves, then the next arrives. Both slides sit in the same
+   grid cell, so fading them at the same time leaves two half-visible
+   paragraphs printed over each other for a moment — that overlap is what
+   reads as a flash. The outgoing slide clears first; the incoming one
+   waits for it, then rises the last few pixels into place.
+   visibility carries the same delay as the fade so the outgoing slide is
+   still painted while it fades, instead of being cut halfway. */
 .quote-slide {
   opacity: 0; visibility: hidden;
-  transition: opacity .35s ease;
+  transform: translateY(10px);
+  transition: opacity .3s ease, transform .3s ease, visibility 0s linear .3s;
 }
-.quote-slide.is-on { opacity: 1; visibility: visible; }
+.quote-slide.is-on {
+  opacity: 1; visibility: visible;
+  transform: none;
+  transition: opacity .45s ease .32s, transform .5s cubic-bezier(.22,.61,.36,1) .32s, visibility 0s;
+}
 
 .quotes-dots { display: flex; gap: 8px; justify-content: center; margin-top: 22px; }
 /* The carousel is the last thing on the page, so its own bottom padding
@@ -863,7 +875,7 @@ footer.site {
 .quotes-dots button.is-on { background: var(--orange); transform: scale(1.3); }
 
 @media (prefers-reduced-motion: reduce) {
-  .quote-slide { transition: none; }
+  .quote-slide, .quote-slide.is-on { transition: none; transform: none; }
 }
 
 .pull figcaption {
