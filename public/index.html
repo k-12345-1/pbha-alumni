@@ -703,7 +703,11 @@ footer.site {
    Lands near 600px a column at full width, which is where PBHA sets its
    own body text. */
 .prose-2 { columns: 2; column-gap: 56px; }
-.prose-2 p { margin-top: 0; break-inside: avoid-column; }
+/* No break-inside: avoid-column here. It keeps a paragraph whole, which
+   for a block of ONE long paragraph means the whole thing lands in column
+   one and column two is empty. Text flowing across the boundary is what
+   newspaper columns are. */
+.prose-2 p { margin-top: 0; }
 .prose-2 p:last-child { margin-bottom: 0; }
 
 /* A single centred remark under a full-width block. */
@@ -816,6 +820,11 @@ footer.site {
      hundred characters. ch ties the cap to the measure itself rather than
      to a pixel width that means something different at every font size. */
   .way-text > p, .way-text .plain-list { max-width: 68ch; }
+}
+/* Below this, a column is too narrow to read: two columns of 340px are
+   about 42 characters each, which breaks lines more than it helps. */
+@media (max-width: 900px) {
+  .prose-2, .way-solo .way-text { columns: 1; }
 }
 @media (max-width: 720px) {
   .study { font-size: 15.5px; }
