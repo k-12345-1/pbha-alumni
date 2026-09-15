@@ -837,9 +837,15 @@ footer.site {
 }
 .quotes-nav button:hover { border-color: var(--orange); color: var(--orange); }
 
-/* All six in one cell: the stage is as tall as the longest quote, so
-   paging through does not make the panel jump. */
-.quotes-stage { display: grid; }
+/* All six in one cell. Left alone the cell is as tall as the longest
+   quote, which parked the dots up to 130px below a short one; the height
+   is set from script to whichever quote is on show, and eased so the page
+   below slides rather than jumps. The delay lets the outgoing quote clear
+   first, so nothing visible is being resized mid-fade. */
+.quotes-stage {
+  display: grid;
+  transition: height .4s cubic-bezier(.22,.61,.36,1) .28s;
+}
 .quotes-stage > * { grid-area: 1 / 1; }
 /* One quote leaves, then the next arrives. Both slides sit in the same
    grid cell, so fading them at the same time leaves two half-visible
@@ -859,10 +865,13 @@ footer.site {
   transition: opacity .45s ease .32s, transform .5s cubic-bezier(.22,.61,.36,1) .32s, visibility 0s;
 }
 
-.quotes-dots { display: flex; gap: 8px; justify-content: center; margin-top: 22px; }
+.quotes-dots { display: flex; gap: 8px; justify-content: center; margin-top: 14px; }
 /* The carousel is the last thing on the page, so its own bottom padding
    stacks on the page's and left 238px of nothing above the footer. */
 .quotes { padding-bottom: 0; }
+/* The model columns above already end on a lot of white, so the usual
+   64px on top of their 64px read as a hole rather than a break. */
+.quotes { padding-top: 24px; }
 .page.study { padding-bottom: 56px; }
 .quotes-dots button {
   width: 8px; height: 8px; padding: 0;
@@ -876,6 +885,7 @@ footer.site {
 
 @media (prefers-reduced-motion: reduce) {
   .quote-slide, .quote-slide.is-on { transition: none; transform: none; }
+  .quotes-stage { transition: none; }
 }
 
 .pull figcaption {
@@ -2337,16 +2347,33 @@ function useReveal(rootSelector) {
  * The quotes, one at a time, with arrows.
  *
  * Every quote is rendered, stacked in one grid cell, with only the
- * current one visible. That is what keeps the panel from jumping height
- * as you page through six quotes of different lengths — the cell is as
- * tall as the longest, always. visibility:hidden rather than display:none
- * so the hidden ones still take up that space, and still leave the
- * accessibility tree.
+ * current one visible. The cell's height is set from script to whichever
+ * quote is on show and eased between the two, so the panel ends where its
+ * words end without the jump a plain re-layout would give. visibility:
+ * hidden rather than display:none so the hidden ones stay measurable, and
+ * still leave the accessibility tree.
  */
 function Quotes() {
   const [at, setAt] = React.useState(0);
   const n = STUDY_QUOTES.length;
   const go = (step) => setAt((c) => (c + step + n) % n);
+  const stageRef = React.useRef(null);
+
+  // The stack's natural height is the tallest quote's, so a short one left
+  // a pile of white above the dots. Measure the one on show instead. The
+  // ResizeObserver keeps it right when the text rewraps at a new width.
+  React.useLayoutEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const fit = () => {
+      const on = stage.children[at];
+      if (on) stage.style.height = on.offsetHeight + "px";
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    Array.prototype.forEach.call(stage.children, (c) => ro.observe(c));
+    return () => ro.disconnect();
+  }, [at]);
 
   return (
     <section className="part quotes reveal">
@@ -2365,7 +2392,7 @@ function Quotes() {
         </div>
       </div>
 
-      <div className="quotes-stage" aria-live="polite">
+      <div className="quotes-stage" ref={stageRef} aria-live="polite">
         {STUDY_QUOTES.map((q, i) => (
           <div key={i} className={`quote-slide ${i === at ? "is-on" : ""}`}>
             <Pull body={q.body} year={q.year} />
