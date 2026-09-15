@@ -648,12 +648,6 @@ footer.site {
 
 /* ---------- study ---------- */
 
-.stat-band {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 32px;
-  margin-top: 36px;
-}
 /* Ruled, not boxed. A bordered card around every table, chart and tally
    turned the page into a stack of rectangles; hairlines carry the same
    structure without drawing a container around it. */
@@ -2076,12 +2070,6 @@ function WelcomeScreen({ me }) {
  * page adds structure, not findings.
  * ------------------------------------------------------------------ */
 
-const STUDY_HEADLINE = [
-  { n: "1,078", label: "alumni answered the 2022 survey" },
-  { n: "95%", label: "voted in the last two years" },
-  { n: "93%", label: "gave money or goods to a social justice cause" },
-  { n: "91%", label: "came to think of themselves as a leader through PBHA" },
-];
 
 // PBHA's three components of its own model.
 const STUDY_MODEL = [
@@ -2386,15 +2374,6 @@ function StudyScreen() {
         answered, from all but two Harvard classes between <span className="em-n">1948</span> and{" "}
         <span className="em-n">2021</span>.
       </p>
-
-      <div className="stat-band">
-        {STUDY_HEADLINE.map((h, i) => (
-          <div key={h.label} className="reveal" style={{ transitionDelay: `${i * 90}ms` }}>
-            <div className="stat-n">{h.n}</div>
-            <div className="meta" style={{ marginTop: 6 }}>{h.label}</div>
-          </div>
-        ))}
-      </div>
 
       {/* 1 — what PBHA is. Navy, with the heading at the left and the text
           beside it: the page's first change of both ground and alignment,
