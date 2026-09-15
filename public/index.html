@@ -875,7 +875,20 @@ footer.site {
 /* Three abreast rather than stacked: three short paragraphs in one column
    leave two thirds of the band empty. */
 .model-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
-.model-list li { border-top: 3px solid var(--orange); padding-top: 18px; }
+/* The rule lives on .model-body, not on the li, so the photograph sits
+   above it — the rule still reads as the top of the column of text rather
+   than as a line under a picture. */
+.model-list li { padding-top: 0; }
+.model-body { border-top: 3px solid var(--orange); padding-top: 18px; }
+.model-shot {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  background: var(--wash-2);
+}
 .model-list p { font-size: 15px; line-height: 1.6; color: var(--ink-mute); }
 .model-n { font-size: 13px; font-weight: 700; color: var(--orange); letter-spacing: .04em; }
 
@@ -2072,6 +2085,14 @@ function WelcomeScreen({ me }) {
 
 
 // PBHA's three components of its own model.
+// A photograph above each column, over its rule. Cropped to a common
+// 4:3 so three photographs of different shapes still make one row.
+const MODEL_PHOTOS = [
+  { src: "photos/model-keylatch.jpg", alt: "Keylatch Summer Program counsellors and campers" },
+  { src: "photos/model-counselors.jpg", alt: "PBHA summer programme staff" },
+  { src: "photos/model-camp.jpg", alt: "Boston Refugee Youth Enrichment campers and counsellors" },
+];
+
 const STUDY_MODEL = [
   {
     title: "Meaningful service",
@@ -2430,9 +2451,15 @@ function StudyScreen() {
           <ol className="model-list band-body">
             {STUDY_MODEL.map((m, i) => (
               <li key={m.title} className="reveal" style={{ transitionDelay: `${i * 90}ms` }}>
-                <span className="model-n">{String(i + 1).padStart(2, "0")}</span>
-                <div className="h-3" style={{ margin: "8px 0 8px" }}>{m.title}</div>
-                <p style={{ margin: 0 }}>{m.body}</p>
+                <img className="model-shot" src={MODEL_PHOTOS[i].src}
+                  alt={MODEL_PHOTOS[i].alt} loading="lazy" />
+                {/* The rule moves onto this wrapper so the photograph sits
+                    above it rather than under it. */}
+                <div className="model-body">
+                  <span className="model-n">{String(i + 1).padStart(2, "0")}</span>
+                  <div className="h-3" style={{ margin: "8px 0 8px" }}>{m.title}</div>
+                  <p style={{ margin: 0 }}>{m.body}</p>
+                </div>
               </li>
             ))}
           </ol>
