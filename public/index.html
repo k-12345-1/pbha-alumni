@@ -684,22 +684,30 @@ footer.site {
   font-size: clamp(19px, 1.6vw, 23px);
   line-height: 1.55;
   font-weight: 500;
-  margin: 0;
-  /* Large type over a wide measure is fine: the bigger the words, the
-     fewer of them fit on a line. */
-  max-width: 1100px;
+  /* Centred, and capped: large type tolerates a wide measure, but not the
+     full 1,270px of the page. */
+  margin: 0 auto;
+  max-width: 1000px;
+  text-align: center;
 }
 
-/* A heading in its own column at the left, body to its right. Full width,
-   and the body never runs past a readable measure. */
-.band { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 48px; }
-.band-head { margin: 0; align-self: start; position: sticky; top: 96px; }
+/* pbha.org's own alumni-impact page centres its section headings above
+   full-width bodies rather than setting them beside. Matching that means
+   the heading is not a column, so the body has the whole width — which is
+   what .prose-2 is for. */
+.band { display: block; }
+.band-head { margin: 0 0 22px; text-align: center; }
 .band-body { min-width: 0; }
 
-/* Two columns of newspaper text: fills the band, halves the measure. */
-.prose-2 { columns: 2; column-gap: 52px; }
+/* Two columns of newspaper text: fills the page, halves the measure.
+   Lands near 600px a column at full width, which is where PBHA sets its
+   own body text. */
+.prose-2 { columns: 2; column-gap: 56px; }
 .prose-2 p { margin-top: 0; break-inside: avoid-column; }
 .prose-2 p:last-child { margin-bottom: 0; }
+
+/* A single centred remark under a full-width block. */
+.note { max-width: 70ch; text-align: center; }
 
 /* A quote from an alum, set the way the report sets them: full-bleed
    orange, the words large enough to stop on. */
@@ -801,8 +809,6 @@ footer.site {
 .is-armed .is-in .bar-fill { width: var(--w); }
 
 @media (max-width: 1100px) {
-  .band { grid-template-columns: 1fr; gap: 20px; }
-  .band-head { position: static; }
   .way { grid-template-columns: 64px minmax(0, 1fr); }
   .way-data { grid-column: 2; }
   .model-list { grid-template-columns: repeat(2, 1fr); }
@@ -2076,7 +2082,6 @@ function StudyScreen() {
       <h1 className="h-1 accent">Alumni Study</h1>
       <hr className="rule" style={{ margin: "22px 0 32px" }} />
 
-      <div className="eyebrow reveal" style={{ marginBottom: 14 }}>Transforming Generations</div>
       <p className="study-lede reveal">
         In <span className="em-n">2022</span> the Alumni Association asked PBHA alumni what their
         service years did to the rest of their lives. <span className="em-n">1,078</span> people
@@ -2126,7 +2131,7 @@ function StudyScreen() {
       <section className="band" style={{ marginTop: 48 }}>
         <div className="band-head reveal">
           <h2 className="h-2">PBHA&rsquo;s unique model</h2>
-          <p className="meta" style={{ marginTop: 8 }}>
+          <p className="meta note" style={{ margin: "8px auto 0" }}>
             Analysis of the survey results found three components behind the effect on student
             volunteers.
           </p>
@@ -2145,10 +2150,10 @@ function StudyScreen() {
       <hr className="rule" style={{ margin: "48px 0 24px" }} />
 
       <div className="reveal">
-        <h2 className="h-2" style={{ marginBottom: 6 }}>
+        <h2 className="h-2 band-head" style={{ marginBottom: 8 }}>
           Five ways PBHA develops citizens and citizen leaders
         </h2>
-        <p className="meta" style={{ marginBottom: 8 }}>
+        <p className="meta note" style={{ margin: "0 auto 8px" }}>
           Where two figures are given, the first is all respondents and the second is alumni who
           took part in intensive programming.
         </p>
@@ -2272,9 +2277,9 @@ function StudyScreen() {
 
       <hr className="rule" style={{ margin: "48px 0 24px" }} />
 
-      <section className="band reveal">
+      <section className="reveal">
         <h2 className="h-2 band-head">Who did this</h2>
-        <div className="band-body">
+        <div>
           <div className="prose-2">
             <p>
               As is true of most things at PBHA, this summary was fueled by collective efforts.{" "}
@@ -2290,13 +2295,15 @@ function StudyScreen() {
               coordinated meetings.
             </p>
           </div>
-          <p className="meta" style={{ margin: "20px 0 24px" }}>
+          <p className="meta note" style={{ margin: "24px auto 24px" }}>
             The report gives findings rather than methodology: response rate, fielding dates, and
             how &ldquo;intensive programming&rdquo; was defined are not stated in it. Read the
             figures with that in mind.
           </p>
-          <a className="btn btn-primary" href="https://www.pbha.org/alumni-impact"
-            target="_blank" rel="noopener noreferrer">PBHA&rsquo;s impact pages</a>
+          <div style={{ textAlign: "center" }}>
+            <a className="btn btn-primary" href="https://www.pbha.org/alumni-impact"
+              target="_blank" rel="noopener noreferrer">PBHA&rsquo;s impact pages</a>
+          </div>
         </div>
       </section>
     </div>
