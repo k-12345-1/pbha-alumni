@@ -766,16 +766,6 @@ footer.site {
 .band-split .h-2 { text-align: left; margin: 0; }
 .band-split .band-body p:first-child { margin-top: 0; }
 
-/* The credits, under the survey text in the same column: a rule to set
-   them apart, and smaller, because a colophon is not a finding. */
-.band-credits {
-  margin-top: 30px;
-  padding-top: 24px;
-  border-top: 1px solid rgba(255, 255, 255, .22);
-  font-size: 14.5px;
-}
-.band-credits p { margin: 8px 0 0; line-height: 1.6; }
-.band-credits strong { color: var(--white); font-weight: 600; }
 
 /* pbha.org's own alumni-impact page centres its section headings above
    full-width bodies rather than setting them beside. Matching that means
@@ -2329,10 +2319,13 @@ function StudyScreen() {
       <section className="bleed ground-navy wave-out">
         <div className="part band-split reveal">
           <div>
-            <div className="part-label">The organization</div>
-            <h2 className="h-2">What the survey was measuring</h2>
+            <div className="part-label">Background</div>
+            <h2 className="h-2">About PBHA and this study</h2>
           </div>
-          <div className="band-body">
+          {/* One block: what PBHA is, how to read the figures, and who did
+              the work. Two columns because the band is wide — one column
+              of this width runs past a hundred characters a line. */}
+          <div className="band-body prose-2">
           <p>
             For almost 120 years PBHA has been working in communities across Greater Boston. Each
             year 1,500 student volunteers join with PBHA&rsquo;s community partners to run more
@@ -2349,11 +2342,7 @@ function StudyScreen() {
             twice wherever PBHA reported them that way.
           </p>
 
-          {/* The credits belong with this, not alone at the foot of the
-              page: both answer "where did these numbers come from". */}
-          <div className="band-credits">
-            <div className="eyebrow">Who did this</div>
-            <p>
+          <p>
               As is true of most things at PBHA, this summary was fueled by collective efforts.{" "}
               <strong>Christine Tran</strong> and <strong>Sammy Lee</strong> conducted the primary
               analysis of the alumni survey data as part of their Vanderbilt Leadership &amp;
@@ -2365,8 +2354,7 @@ function StudyScreen() {
               PBHA&ndash;Alumni board envisioned the initiative and supported it through all the
               stages, and PBHA students and staff reached out to alumni, coded the responses, and
               coordinated meetings.
-            </p>
-          </div>
+          </p>
           </div>
         </div>
         <Wave side="bottom" fill="var(--white)" />
