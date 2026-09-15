@@ -782,21 +782,23 @@ footer.site {
  * everything is already in its finished state for anyone who has asked
  * their system for less of it.
  */
-.reveal {
+/* Note what is NOT here: a rule hiding .reveal. The hidden state lives
+   under .is-armed, which only script adds — so without script, or with
+   reduced motion, or in a browser with no IntersectionObserver, every
+   block is simply visible. Content must never depend on an animation
+   having run. */
+.bar-fill { width: var(--w); }
+
+.is-armed .reveal {
   opacity: 0;
   transform: translateY(16px);
   transition: opacity .55s ease, transform .55s cubic-bezier(.22, .68, .3, 1);
   will-change: opacity, transform;
 }
-.reveal.is-in { opacity: 1; transform: none; will-change: auto; }
+.is-armed .reveal.is-in { opacity: 1; transform: none; will-change: auto; }
 
-.bar-fill { width: 0; transition: width .95s cubic-bezier(.22, .68, .3, 1); }
-.is-in .bar-fill { width: var(--w); }
-
-@media (prefers-reduced-motion: reduce) {
-  .reveal, .reveal.is-in { opacity: 1; transform: none; transition: none; }
-  .bar-fill, .is-in .bar-fill { width: var(--w); transition: none; }
-}
+.is-armed .bar-fill { width: 0; transition: width .95s cubic-bezier(.22, .68, .3, 1); }
+.is-armed .is-in .bar-fill { width: var(--w); }
 
 @media (max-width: 1100px) {
   .band { grid-template-columns: 1fr; gap: 20px; }
@@ -2004,19 +2006,32 @@ function Pull({ body, year }) {
   );
 }
 
-// One observer for the page rather than one per element. Everything with
-// .reveal fades up as it arrives, and a .bar-fill inside a revealed block
-// runs out to its width. Motion is introduction, not decoration: nothing
-// moves on a loop, nothing moves twice, and anyone who has asked their
-// system for less motion gets the finished state immediately.
-function useReveal(deps) {
-  React.useEffect(() => {
-    const nodes = document.querySelectorAll(".reveal:not(.is-in)");
+/**
+ * Fade blocks up as they arrive, and run the bars out to their widths.
+ *
+ * The hidden starting state is armed here rather than written into the
+ * stylesheet, and that is the important part: a page that starts at
+ * opacity 0 and waits for JavaScript to reveal it is a page that stays
+ * blank when the JavaScript does not run. IntersectionObserver missing,
+ * an observer that never fires, a stylesheet that loads without its
+ * script — any of those and the whole study is gone. Armed from script,
+ * the worst case is simply that nothing animates.
+ *
+ * useLayoutEffect, not useEffect: arming after the browser has painted
+ * would show the content and then hide it again, which is a flash.
+ */
+function useReveal(rootSelector) {
+  React.useLayoutEffect(() => {
+    const root = document.querySelector(rootSelector);
+    if (!root) return;
+    const nodes = Array.from(root.querySelectorAll(".reveal"));
+    if (nodes.length === 0) return;
+
     const still = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (still.matches) {
-      nodes.forEach((el) => el.classList.add("is-in"));
-      return;
-    }
+    if (still.matches || typeof IntersectionObserver !== "function") return;
+
+    root.classList.add("is-armed");
+
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
@@ -2030,14 +2045,27 @@ function useReveal(deps) {
       { rootMargin: "0px 0px -8% 0px", threshold: 0.06 },
     );
     nodes.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, deps || []);
+
+    // A tab opened in the background never paints, so the observer never
+    // fires and nothing is ever shown. This is the floor: after a beat,
+    // reveal whatever is still waiting and stop pretending to animate.
+    const floor = setTimeout(() => {
+      nodes.forEach((el) => el.classList.add("is-in"));
+    }, 2500);
+
+    return () => {
+      clearTimeout(floor);
+      io.disconnect();
+      root.classList.remove("is-armed");
+      nodes.forEach((el) => el.classList.remove("is-in"));
+    };
+  }, [rootSelector]);
 }
 
 function StudyScreen() {
   const maxField = STUDY_FIELDS[0][1];
   const maxRole = STUDY_ROLES[0][1];
-  useReveal();
+  useReveal(".study");
 
   return (
     <div className="wrap page study">
