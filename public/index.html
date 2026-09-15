@@ -1018,6 +1018,12 @@ footer.site {
 .decade.is-open .decade-mark::before { background: var(--orange); }
 
 .decade-panel { display: grid; grid-template-rows: 1fr; }
+/* Any `display` beats the hidden attribute's own display:none, so every
+   panel rendered open however carefully the attribute was set. `hidden`
+   is still what does the hiding — it keeps the closed decades out of the
+   accessibility tree and out of find-in-page, which display alone would
+   not. */
+.decade-panel[hidden] { display: none; }
 .decade-inner { overflow: hidden; padding: 0 4px 34px; min-width: 0; }
 .decade-inner .plain-list { padding-left: 18px; margin: 0 0 26px; max-width: 70ch; }
 .decade-inner .plain-list li { margin-bottom: 10px; }
