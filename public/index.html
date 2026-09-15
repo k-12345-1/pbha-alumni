@@ -972,6 +972,62 @@ footer.site {
 
 /* ---------- archives ---------- */
 
+.archives { font-size: 16px; }
+.archives p { line-height: 1.68; }
+.archives p.statement { line-height: 1.34; }
+
+.eras { list-style: none; margin: 0; padding: 0; }
+.era {
+  display: grid;
+  grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+  gap: 48px;
+  padding: 40px 0;
+  border-top: 1px solid var(--rule);
+}
+.era-when { position: sticky; top: 96px; align-self: start; }
+.era-years { font-size: 26px; font-weight: 700; color: var(--orange); line-height: 1.1; }
+.era-name { font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-mute); margin-top: 8px; }
+.era-what { min-width: 0; }
+.era-what .plain-list { padding-left: 18px; }
+.era-what .plain-list li { margin-bottom: 10px; }
+.era-none { color: var(--ink-mute); font-size: 14.5px; margin: 18px 0 0; }
+
+.era-shots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px; }
+.era-shots figure, .shot-grid figure { margin: 0; }
+.era-shots img, .shot-grid img {
+  width: 100%; aspect-ratio: 3 / 2; object-fit: cover;
+  border-radius: 4px; display: block;
+  background: var(--wash-2);
+}
+.era-shots figcaption {
+  margin-top: 8px;
+  font-size: 12px; color: var(--ink-mute);
+}
+
+.shot-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.shot-grid figcaption {
+  margin-top: 10px;
+  font-size: 12.5px; line-height: 1.45;
+  color: rgba(255, 255, 255, .8);
+}
+.shot-grid figcaption span {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--orange);
+}
+
+@media (max-width: 1000px) {
+  .era { grid-template-columns: 1fr; gap: 14px; }
+  .era-when { position: static; }
+  .shot-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 620px) {
+  .era-shots { grid-template-columns: 1fr; }
+  .shot-grid { grid-template-columns: 1fr; }
+}
+
 .era { border-bottom: 1px solid var(--rule); }
 .era:last-child { border-bottom: 0; }
 .era-head {
@@ -2485,11 +2541,173 @@ function StudyScreen() {
  * are recoverable from git history.
  * ------------------------------------------------------------------ */
 
+const ERAS = [
+  {
+    era: "Origins",
+    years: "1893–1904",
+    items: [
+      "Phillips Brooks House is built in memory of Reverend Phillips Brooks, a Trinity Church preacher, Harvard graduate, and advocate for social service. Plans are completed on his death in 1893.",
+      "The House is dedicated on 23 January 1900, to serve “the ideal of piety, charity, and hospitality.”",
+      "In 1904, six organizations formally organize as the Phillips Brooks House Association.",
+    ],
+  },
+  {
+    era: "The first half-century",
+    years: "1900s–1940s",
+    items: ["By the 1920s every religious group has withdrawn, leaving PBHA a secular service association."],
+  },
+  {
+    era: "Opening up",
+    years: "1950s–1960s",
+    items: [
+      "1954: Radcliffe students are admitted to full participation.",
+      "A Mental Health Committee forms; students organize with the Roosevelt Towers tenants' council.",
+      "1969: PBHA commits the house to being a common meeting ground during the protests, and produces a twelve-page report, The Critique of Harvard Expansion.",
+    ],
+  },
+  {
+    era: "Collapse and rebuilding",
+    years: "1970s",
+    items: [
+      "Membership falls from over 1,000 students to fewer than 200.",
+      "PBHA incorporates in 1973 and hires its first full-time graduate secretary — now the executive director — in 1974.",
+      "The Environmental Action Committee, the Committee on Women's Issues, and Harvard's first women's center are founded, the last on the second floor of Phillips Brooks House.",
+      "Michael Robinson '74: “The approach quickly evolved from arms-length charity to an involved attack on basic social and political problems.”",
+    ],
+  },
+  {
+    era: "Shelter and scale",
+    years: "1980s",
+    items: [
+      "The Harvard Square Homeless Shelter opens at University Lutheran Church.",
+      "A $1 million capital campaign runs in 1986.",
+      "The Summer Urban Program grows into a twelve-camp network serving more than 700 children.",
+    ],
+  },
+  {
+    era: "Independence",
+    years: "1990s–2000s",
+    items: [
+      "1992: the cabinet votes to create a student board of directors.",
+      "November 1995: a cabinet resolution urges “a more rational, autonomous structure.” On 7 December, more than 2,000 people join a rally.",
+      "By-laws are rewritten in spring 1996, a one-year trial agreement follows that summer, and a final agreement is signed in September 1997.",
+      "A $7.25 million Centennial Campaign follows. The Living Wage Campaign runs through PSLM, later SLAM, including a Massachusetts Hall sit-in and a plane over commencement.",
+    ],
+  },
+  {
+    era: "Present day",
+    years: "2004–",
+    items: [
+      "More than 85 programs and over 1,400 volunteers.",
+      "2024: PBHA marks 120 years and begins 120 Stories.",
+      "The Road to the 125th runs toward the anniversary in 2029.",
+    ],
+  },
+];
+
+/**
+ * The photographs.
+ *
+ * PBHA's Flickr begins in 2012, so the earlier decades have no picture
+ * here — deliberately. Flickr's own search reports nearly 4,000 photos
+ * "taken" before 1990, but they are files whose EXIF date is missing and
+ * so defaults to an epoch: one of them is a 2025 summer-programme group
+ * shot dated 1 January 1980. Putting those under a decade heading would
+ * be inventing a record, which is the one thing an archive cannot do.
+ */
+const ERA_PHOTOS = {
+  "1970s": null,
+  "1980s": null,
+  "1990s–2000s": null,
+  "2004–": [
+    { src: "photos/buddies-2013-b.jpg", caption: "Alzheimer's Buddies, 2013" },
+    { src: "photos/buddies-2013-a.jpg", caption: "Alzheimer's Buddies, 2013" },
+    { src: "photos/buddies-2013-c.jpg", caption: "Alzheimer's Buddies, 2013" },
+  ],
+};
+
+// The alumni photographs, which are all recent: PBHA's reunions and the
+// gatherings for the 125th.
+const ALUMNI_PHOTOS = [
+  { src: "photos/reunion-group-2025.jpg", caption: "PBHA 50th–70th Reunion, Classes of 1955–1975", year: "June 2025" },
+  { src: "photos/reunion-hall-2025.jpg", caption: "Alumni Day, Phillips Brooks House", year: "June 2025" },
+  { src: "photos/reunion-friends-2025.jpg", caption: "PBHA 5th–45th Reunion, Classes of 1980–2020", year: "June 2025" },
+  { src: "photos/reunion-balloons-2025.jpg", caption: "Reunion weekend", year: "June 2025" },
+  { src: "photos/reunion-pbha-2025.jpg", caption: "Reunion weekend", year: "June 2025" },
+  { src: "photos/reunion-room-2025.jpg", caption: "Alumni Day public service panel", year: "June 2025" },
+  { src: "photos/gathering-125th-a.jpg", caption: "Road to the 125th, Southern California gathering", year: "2025" },
+  { src: "photos/gathering-125th-b.jpg", caption: "Road to the 125th, Southern California gathering", year: "2025" },
+];
+
 function ArchivesScreen() {
+  useReveal(".archives");
+
   return (
-    <div className="wrap page">
+    <div className="wrap page archives">
       <h1 className="h-1 accent">Archives</h1>
       <hr className="rule" style={{ margin: "22px 0 32px" }} />
+
+      <p className="statement statement-mid reveal">
+        PBHA has been at this since <span className="em-n">1904</span>. What follows is the
+        association&rsquo;s own account of itself, decade by decade.
+      </p>
+
+      <section className="part">
+        <div className="part-label reveal">Since 1904</div>
+        <h2 className="h-2 band-head reveal">The decades</h2>
+
+        <ol className="eras">
+          {ERAS.map((e) => {
+            const shots = ERA_PHOTOS[e.years];
+            return (
+              <li key={e.era} className="era reveal">
+                <div className="era-when">
+                  <div className="era-years">{e.years}</div>
+                  <div className="era-name">{e.era}</div>
+                </div>
+                <div className="era-what">
+                  <ul className="plain-list">
+                    {e.items.map((it) => <li key={it}>{it}</li>)}
+                  </ul>
+                  {shots ? (
+                    <div className="era-shots">
+                      {shots.map((ph) => (
+                        <figure key={ph.src}>
+                          <img src={ph.src} alt={ph.caption} loading="lazy" />
+                          <figcaption>{ph.caption}</figcaption>
+                        </figure>
+                      ))}
+                    </div>
+                  ) : (
+                    /* Said rather than left blank: an empty slot reads as a
+                       page that failed to load, a sentence reads as a gap
+                       someone could still fill. */
+                    <p className="era-none">
+                      No photographs from these years have been digitised yet.
+                    </p>
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      </section>
+
+      <section className="bleed ground-navy wave-out">
+        <div className="part reveal">
+          <div className="part-label">The alumni</div>
+          <h2 className="h-2 band-head">Reunions and gatherings</h2>
+          <div className="shot-grid">
+            {ALUMNI_PHOTOS.map((ph, i) => (
+              <figure key={ph.src} className="reveal" style={{ transitionDelay: `${(i % 4) * 80}ms` }}>
+                <img src={ph.src} alt={ph.caption} loading="lazy" />
+                <figcaption>{ph.caption}<span>{ph.year}</span></figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+        <Wave side="bottom" fill="var(--white)" />
+      </section>
     </div>
   );
 }

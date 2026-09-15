@@ -276,6 +276,16 @@ for (const f of ["pbha-logo.png", "favicon.png"]) {
   fs.copyFileSync(path.join(ROOT, "public", f), path.join(outDir, f));
 }
 
+// The Archives photographs, likewise by relative path.
+const photoSrc = path.join(ROOT, "public/photos");
+if (fs.existsSync(photoSrc)) {
+  const photoOut = path.join(outDir, "photos");
+  fs.mkdirSync(photoOut, { recursive: true });
+  for (const f of fs.readdirSync(photoSrc)) {
+    fs.copyFileSync(path.join(photoSrc, f), path.join(photoOut, f));
+  }
+}
+
 // The map fetches geo/world.json and geo/locations.json by relative path, so
 // they have to sit beside the page in the published output too.
 const geoSrc = path.join(ROOT, "public/geo");
