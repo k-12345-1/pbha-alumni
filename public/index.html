@@ -791,27 +791,41 @@ footer.site {
 .prose-2 p:last-child { margin-bottom: 0; }
 
 
-/* A quote from an alum, set the way the report sets them: full-bleed
-   orange, the words large enough to stop on. */
+/* A quote from an alum: a soft panel with the mark above it and the words
+   centred under it, in PBHA's colours. Set upright rather than italic —
+   at this size a whole italic paragraph is harder work than it is worth,
+   and the panel is already saying "this is someone talking". */
 .pull {
-  margin: 36px 0 0;
-  padding: 30px 34px;
-  background: var(--orange);
-  color: var(--white);
+  margin: 40px 0 0;
+  padding: 44px 7% 40px;
+  background: var(--cream);
+  border-radius: 28px;
+  text-align: center;
 }
-.pull p {
-  margin: 0;
-  font-size: clamp(16px, 1.35vw, 19px);
-  line-height: 1.55;
-  font-weight: 500;
-  font-style: italic;
-}
-.pull cite {
+.pull-mark {
   display: block;
-  margin-top: 14px;
-  font-size: 12px; font-weight: 700; font-style: normal;
-  letter-spacing: .14em; text-transform: uppercase;
-  opacity: .85;
+  font-size: 52px; line-height: .6;
+  font-weight: 700;
+  color: var(--orange);
+  margin-bottom: 26px;
+}
+.pull blockquote { margin: 0; }
+.pull p {
+  margin: 0 auto;
+  max-width: 44ch;
+  font-size: clamp(17px, 1.5vw, 21px);
+  line-height: 1.62;
+  font-weight: 500;
+  color: var(--ink);
+}
+/* The part the report puts in bold, in the accent — the one line a reader
+   takes away if they take away nothing else. */
+.pull strong { color: var(--orange); font-weight: 700; }
+.pull figcaption {
+  margin-top: 22px;
+  font-size: 12px; font-weight: 700;
+  letter-spacing: .16em; text-transform: uppercase;
+  color: var(--ink-mute);
 }
 
 /* The three components of PBHA's model, and the five ways: both are
@@ -924,7 +938,7 @@ footer.site {
   .way-data { grid-column: 1; }
   .way-solo .way-text, .prose-2 { columns: 1; }
   .model-list { grid-template-columns: 1fr; gap: 20px; }
-  .pull { padding: 24px 22px; }
+  .pull { padding: 32px 22px 28px; border-radius: 20px; }
 }
 
 /* ---------- archives ---------- */
@@ -1992,7 +2006,7 @@ const STUDY_WAYS = [
       ["Their PBHA experience strengthened their commitment to addressing social challenges", "80%", "94%"],
     ],
     quote: {
-      body: "PBHA helped to form my personal and professional life after Radcliffe. The skills I learned at PBHA provided the basis for my nonprofit management career. In addition to volunteer activities I have served as director/manager or trustee/board member in every organization I have been involved with over the past 60+ years.",
+      body: "PBHA helped to form my personal and professional life after Radcliffe. The skills I learned at PBHA provided the basis for my nonprofit management career. In addition to volunteer activities **I have served as director/manager or trustee/board member in every organization I have been involved with over the past 60+ years**.",
       year: "'67",
     },
   },
@@ -2009,7 +2023,7 @@ const STUDY_WAYS = [
       ["2,671", "volunteer or pro bono roles filled"],
     ],
     quote: {
-      body: "PBHA is what really started the trajectory of my whole adult life! All of my best friends are from PBHA, and I decided to become a teacher in Boston because of my work in PBHA. It also encouraged me to be a more active voter and community member.",
+      body: "PBHA is what really started the trajectory of my whole adult life! All of my best friends are from PBHA, and **I decided to become a teacher** in Boston because of my work in PBHA. **It also encouraged me to be a more active voter** and community member.",
       year: "'11",
     },
   },
@@ -2030,7 +2044,7 @@ const STUDY_WAYS = [
       ],
     },
     quote: {
-      body: "I've used my PBHA skills every day. I have worked at a non profit since I graduated college and then law school. It helped me see the big picture and contribute to growing my nonprofit and leading a team of public interest lawyers.",
+      body: "**I've used my PBHA skills every day.** I have worked at a non profit since I graduated college and then law school. It helped me see the big picture and contribute to growing my nonprofit and leading a team of public interest lawyers.",
       year: "'07",
     },
   },
@@ -2038,7 +2052,7 @@ const STUDY_WAYS = [
     title: "PBHA facilitates a sense of belonging on campus that encourages diverse leadership, especially for first-generation, BIPOC, and low-income students.",
     body: "Low-income, first-generation, and BIPOC alumni credited PBHA's programs and supports, especially PBHA's community, culture, values, and staff, with providing a deep sense of belonging at Harvard. In the wake of the United States Supreme Court's recent decision regarding affirmative action, the importance of PBHA as a place of belonging for BIPOC students is even more critical.",
     quote: {
-      body: "PBHA provided me with a safe space when I was in college. At PBHA, I found people who shared aspects of my identity (eg being first-gen, growing up low-income) and shared my interests (eg youth work and social justice work). PBHA taught me how to build community with others, how to manage others, and how a non-profit operates. My work in education and non-profits now 100% is a result of the impact PBHA had on me.",
+      body: "PBHA provided me with a safe space when I was in college. At PBHA, I found people who shared aspects of my identity (eg being first-gen, growing up low-income) and shared my interests (eg youth work and social justice work). PBHA taught me how to build community with others, how to manage others, and how a non-profit operates. **My work in education and non-profits now 100% is a result of the impact PBHA had on me**.",
       year: "'16",
     },
   },
@@ -2136,11 +2150,24 @@ function Wave({ side, fill, line }) {
 }
 
 function Pull({ body, year }) {
+  // ** marks the span the report sets in bold. Splitting on it means the
+  // emphasis lives in the quote itself rather than in a second field that
+  // has to be kept lined up with the text.
+  const parts = body.split("**");
   return (
-    <blockquote className="pull">
-      <p>{body}</p>
-      <cite>Class of {year.replace("'", "’")}</cite>
-    </blockquote>
+    <figure className="pull">
+      <span className="pull-mark" aria-hidden="true">&ldquo;</span>
+      <blockquote>
+        <p>
+          {parts.map((t, i) => (
+            i % 2 === 1
+              ? <strong key={i}>{t}</strong>
+              : <React.Fragment key={i}>{t}</React.Fragment>
+          ))}
+        </p>
+      </blockquote>
+      <figcaption>Class of {year.replace("'", "’")}</figcaption>
+    </figure>
   );
 }
 
@@ -2258,7 +2285,7 @@ function StudyScreen() {
 
       <div className="reveal">
         <Pull
-          body="I was really active in PBHA during a time in my life where I was figuring out the person I was going to be. The experiences and opportunities for reflection I had with PBHA made service part of my identity — for the rest of my life, I've asked myself whether what I'm doing makes the world better, and how. This is how I think of who I am."
+          body="I was really active in PBHA during a time in my life where I was figuring out the person I was going to be. **The experiences and opportunities for reflection I had with PBHA made service part of my identity** — for the rest of my life, I've asked myself whether what I'm doing makes the world better, and how. This is how I think of who I am."
           year="'03" />
       </div>
 
@@ -2410,7 +2437,7 @@ function StudyScreen() {
 
       <div className="reveal">
         <Pull
-          body="My time with PBHA was the most powerful learning experience I've ever had. The combination of experiential learning, coaching/mentoring from staff, support and challenge from a community of peers, and leadership development both prepared me for my career as a social worker and educator, and inspired me to continue fighting for social justice in my personal and professional lives."
+          body="**My time with PBHA was the most powerful learning experience I've ever had.** The combination of experiential learning, coaching/mentoring from staff, support and challenge from a community of peers, and leadership development both prepared me for my career as a social worker and educator, and inspired me to continue fighting for social justice in my personal and professional lives."
           year="'11" />
       </div>
 
