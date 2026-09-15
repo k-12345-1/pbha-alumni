@@ -806,6 +806,10 @@ footer.site {
   .way { grid-template-columns: 64px minmax(0, 1fr); }
   .way-data { grid-column: 2; }
   .model-list { grid-template-columns: repeat(2, 1fr); }
+  /* Stacked, the prose has the whole column and would run to about a
+     hundred characters. ch ties the cap to the measure itself rather than
+     to a pixel width that means something different at every font size. */
+  .way-text > p, .way-text .plain-list { max-width: 68ch; }
 }
 @media (max-width: 720px) {
   .study { font-size: 15.5px; }
