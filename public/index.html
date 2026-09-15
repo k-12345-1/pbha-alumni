@@ -44,6 +44,8 @@
   /* PBHA's own navy, sampled from their logo file rather than guessed —
      the report leans on it as heavily as it does on the orange. */
   --navy: #051460;
+  /* The warm ground PBHA's impact report uses between its navy blocks. */
+  --cream: #f6ecdd;
 
   --sans: "Work Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
@@ -735,12 +737,37 @@ footer.site {
   margin-bottom: 56px;
 }
 .ground-navy .h-2 { color: var(--white); }
+.ground-cream .h-2 { color: var(--navy); }
+.ground-cream .model-list li { border-top-color: var(--navy); }
 .ground-navy .part-label { color: var(--orange); }
 .ground-navy .eyebrow { color: rgba(255, 255, 255, .62); }
 .ground-navy .meta { color: rgba(255, 255, 255, .72); }
 .ground-navy .em-n { color: var(--orange); }
 
 .ground-wash { background: var(--wash); margin-top: 56px; }
+.ground-cream { background: var(--cream); }
+
+/* A band with a curved edge needs room for the curve, and the curve has
+   to sit outside the padding so text never lands on it. */
+.wave { display: block; width: 100%; height: 96px; position: absolute; left: 0; }
+.wave-top { top: 0; }
+.wave-bottom { bottom: -1px; }
+.bleed { position: relative; }
+.wave-in { padding-top: 86px; margin-top: 0; }
+.wave-out { padding-bottom: 96px; margin-bottom: 0; }
+
+/* Heading at the left, body beside it. The page was every heading centred
+   over its own text, which is what made one section look like the next;
+   alternating this against the centred bands is most of the variety. */
+.band-split {
+  display: grid;
+  grid-template-columns: minmax(0, 330px) minmax(0, 1fr);
+  gap: 56px;
+  align-items: start;
+}
+.band-split .part-label { text-align: left; margin-bottom: 8px; }
+.band-split .h-2 { text-align: left; margin: 0; }
+.band-split .band-body p:first-child { margin-top: 0; }
 /* Credits are a colophon, not a finding: smaller, and it should look it. */
 .colophon { font-size: 15px; }
 
@@ -878,6 +905,7 @@ footer.site {
 .is-armed .is-in .bar-fill { width: var(--w); }
 
 @media (max-width: 1100px) {
+  .band-split { grid-template-columns: 1fr; gap: 18px; }
   .way { grid-template-columns: 64px minmax(0, 1fr); }
   .way-data { grid-column: 2; }
   .model-list { grid-template-columns: repeat(2, 1fr); }
@@ -2081,6 +2109,34 @@ function Bar({ label, value, max, i }) {
   );
 }
 
+/**
+ * The curved edge between two grounds, the way PBHA's own impact page
+ * cuts one colour into the next. The path is filled with the colour of
+ * whatever comes next, so the band appears to be eaten into rather than
+ * to have a shape sitting on top of it.
+ *
+ * preserveAspectRatio="none" on purpose: the curve should stretch to any
+ * width rather than crop, because it is decoration with no detail to
+ * lose.
+ */
+function Wave({ side, fill, line }) {
+  const d = side === "top"
+    ? "M0,0 L1440,0 L1440,34 C1130,86 880,18 600,44 C380,64 170,96 0,62 Z"
+    : "M0,96 L0,58 C210,96 430,30 700,46 C960,62 1200,104 1440,52 L1440,96 Z";
+  return (
+    <svg className={`wave wave-${side}`} viewBox="0 0 1440 96"
+      preserveAspectRatio="none" aria-hidden="true" focusable="false">
+      <path d={d} fill={fill} />
+      {line && (
+        <path d={side === "top"
+          ? "M0,62 C170,96 380,64 600,44 C880,18 1130,86 1440,34"
+          : "M0,58 C210,96 430,30 700,46 C960,62 1200,104 1440,52"}
+          fill="none" stroke={line} strokeWidth="2" />
+      )}
+    </svg>
+  );
+}
+
 function Pull({ body, year }) {
   return (
     <blockquote className="pull">
@@ -2173,11 +2229,16 @@ function StudyScreen() {
         ))}
       </div>
 
-      {/* 1 — what PBHA is, on white. */}
-      <section className="part reveal">
-        <div className="part-label">The organization</div>
-        <h2 className="h-2 band-head">What the survey was measuring</h2>
-        <div className="band-body prose-2">
+      {/* 1 — what PBHA is. Navy, with the heading at the left and the text
+          beside it: the page's first change of both ground and alignment,
+          and the shape PBHA's own impact page uses for this section. */}
+      <section className="bleed ground-navy wave-out">
+        <div className="part band-split reveal">
+          <div>
+            <div className="part-label">The organization</div>
+            <h2 className="h-2">What the survey was measuring</h2>
+          </div>
+          <div className="band-body">
           <p>
             For almost 120 years PBHA has been working in communities across Greater Boston. Each
             year 1,500 student volunteers join with PBHA&rsquo;s community partners to run more
@@ -2193,7 +2254,9 @@ function StudyScreen() {
             with depth of experience</strong> &mdash; which is why the figures below are given
             twice wherever PBHA reported them that way.
           </p>
+          </div>
         </div>
+        <Wave side="bottom" fill="var(--white)" />
       </section>
 
       <div className="reveal">
@@ -2204,7 +2267,8 @@ function StudyScreen() {
 
       {/* 2 — the model, on PBHA's navy. A different ground is the fastest
           way to say "this is a different kind of thing". */}
-      <section>
+      <section className="bleed ground-cream wave-in wave-out">
+        <Wave side="top" fill="var(--white)" />
         <div className="part reveal">
           <div className="part-label">The model</div>
           <h2 className="h-2 band-head">Three things PBHA does</h2>
@@ -2218,6 +2282,7 @@ function StudyScreen() {
             ))}
           </ol>
         </div>
+        <Wave side="bottom" fill="var(--white)" line="var(--orange)" />
       </section>
 
       {/* 3 — the findings, on white, each one plated so it reads as its
@@ -2320,10 +2385,13 @@ function StudyScreen() {
       </section>
 
       {/* 4 — the annual figures, on navy, the way the report sets them. */}
-      <section className="bleed ground-navy">
-        <div className="part reveal">
-          <div className="part-label">Every year</div>
-          <h2 className="h-2 band-head">PBHA by the numbers</h2>
+      <section className="bleed ground-navy wave-in wave-out">
+        <Wave side="top" fill="var(--white)" />
+        <div className="part band-split reveal">
+          <div>
+            <div className="part-label">Every year</div>
+            <h2 className="h-2">PBHA by the numbers</h2>
+          </div>
           <div className="band-body two-up" style={{ gap: 40 }}>
             {STUDY_ANNUAL.map((col, i) => (
               <div key={col.head} className="reveal" style={{ transitionDelay: `${i * 90}ms` }}>
@@ -2340,6 +2408,7 @@ function StudyScreen() {
             ))}
           </div>
         </div>
+        <Wave side="bottom" fill="var(--white)" />
       </section>
 
       <div className="reveal">
