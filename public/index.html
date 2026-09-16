@@ -976,6 +976,9 @@ footer.site {
    with three blocks sets them in three, the one with two in two, and a
    lone table keeps a sane width instead of stretching the page. */
 .way-data {
+  /* Explicit: with two tracks, auto-placement would drop it into the
+     numeral column on the next row rather than under the prose. */
+  grid-column: 2;
   min-width: 0;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
