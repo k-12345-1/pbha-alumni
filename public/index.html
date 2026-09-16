@@ -1062,14 +1062,6 @@ footer.site {
   .prose-2 { columns: 1; }
 }
 
-/* On a phone the label and the figure took 150px of a 330px row and left
-   the bar shorter than its own caption. The label takes its own line and
-   the bar gets the width. */
-@media (max-width: 560px) {
-  .bar-row { grid-template-columns: minmax(0, 1fr) auto; gap: 3px 10px; }
-  .bar-label { grid-column: 1 / -1; }
-}
-
 @media (max-width: 720px) {
   .study { font-size: 15.5px; }
   .way { grid-template-columns: 1fr; gap: 10px; padding: 32px 0; }
@@ -1205,6 +1197,14 @@ footer.site {
   .link-grid, .story-grid { grid-template-columns: 1fr; }
   .finding { grid-template-columns: 1fr 60px 70px; gap: 10px; }
   .bar-row { grid-template-columns: 110px 1fr 40px; }
+}
+/* Narrower still and the label plus the figure take 150px of a 330px row,
+   leaving the bar shorter than its own caption. The label takes its own
+   line and the bar gets the width. This has to sit after the rule above,
+   not before it: same specificity, so source order decides. */
+@media (max-width: 560px) {
+  .bar-row { grid-template-columns: minmax(0, 1fr) auto; gap: 3px 10px; }
+  .bar-label { grid-column: 1 / -1; }
 }
 
 /* A dropdown that belongs to the site rather than to the OS. */
