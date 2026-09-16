@@ -966,33 +966,26 @@ footer.site {
   padding: 48px 0;
   border-top: 1px solid var(--rule);
 }
-/* Full width, but never a full-width line: two newspaper columns keep the
-   measure at about 70 characters while the block itself reaches the
-   gutter. The title runs across both. */
-.way-text { columns: 2; column-gap: 40px; }
-.way-text .way-title { column-span: all; }
+/* One column, running the full width of the row. */
 .way-text > p { margin-top: 0; }
-/* The evidence, underneath. auto-fit rather than a fixed pair: the one
-   with three blocks sets them in three, the one with two in two, and a
-   lone table keeps a sane width instead of stretching the page. */
+/* The evidence, underneath and centred. One block to a row at a generous
+   width, rather than two or three squeezed side by side: a chart that is
+   880px wide can be read across, and stacking them centred under the
+   prose gives the section a middle to hang on. */
 .way-data {
   /* Explicit: with two tracks, auto-placement would drop it into the
      numeral column on the next row rather than under the prose. */
   grid-column: 2;
   min-width: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
-  gap: 34px 40px;
+  grid-template-columns: min(880px, 100%);
+  justify-content: center;
+  gap: 40px;
   align-items: start;
   margin-top: 36px;
 }
 /* Spacing between the blocks is the grid's job now. */
 .way-data > * { margin-top: 0; }
-/* A table on its own would run the full 1144px, leaving 900px of rule
-   between a finding and its two figures. Held to half the width — the
-   same width the tables that sit two-up already have, so a lone one
-   looks like one of a pair rather than a stretched thing. */
-.way-data > .table:only-child { max-width: calc((100% - 40px) / 2); }
 .chart-body { padding-top: 4px; }
 
 
@@ -1055,19 +1048,13 @@ footer.site {
 @media (max-width: 900px) {
   .prose-2 { columns: 1; }
 }
-/* The five ways give up their second column earlier than the background
-   band does, because they lose 124px to the numeral and its gutter first:
-   at 1000px their columns are already down to about 46 characters while
-   the band's are still comfortable. */
-@media (max-width: 1080px) {
-  .way-text { columns: 1; }
-}
+
 @media (max-width: 720px) {
   .study { font-size: 15.5px; }
   .way { grid-template-columns: 1fr; gap: 10px; padding: 32px 0; }
   .way-n { font-size: 38px; position: static; }
   .way-data { grid-column: 1; }
-  .way-text, .prose-2 { columns: 1; }
+  .prose-2 { columns: 1; }
   .model-list { grid-template-columns: 1fr; gap: 20px; }
   .pull { padding: 32px 22px 28px; border-radius: 20px; }
   /* Less than the 20px page margin, so nothing travels off the side. */
