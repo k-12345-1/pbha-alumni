@@ -1053,7 +1053,14 @@ footer.site {
 /* Below this, a column is too narrow to read: two columns of 340px are
    about 42 characters each, which breaks lines more than it helps. */
 @media (max-width: 900px) {
-  .prose-2, .way-text { columns: 1; }
+  .prose-2 { columns: 1; }
+}
+/* The five ways give up their second column earlier than the background
+   band does, because they lose 124px to the numeral and its gutter first:
+   at 1000px their columns are already down to about 46 characters while
+   the band's are still comfortable. */
+@media (max-width: 1080px) {
+  .way-text { columns: 1; }
 }
 @media (max-width: 720px) {
   .study { font-size: 15.5px; }
