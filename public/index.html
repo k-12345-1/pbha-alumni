@@ -966,7 +966,9 @@ footer.site {
   padding: 48px 0;
   border-top: 1px solid var(--rule);
 }
-/* One column, running the full width of the row. */
+/* One column, held to the same 880px as the blocks below it and centred
+   on the same axis, so the words and the evidence share two edges. */
+.way-text { max-width: min(880px, 100%); margin-inline: auto; }
 .way-text > p { margin-top: 0; }
 /* The evidence, underneath and centred. One block to a row at a generous
    width, rather than two or three squeezed side by side: a chart that is
@@ -1033,15 +1035,22 @@ footer.site {
 .is-armed .bar-fill { width: 0; transition: width .95s cubic-bezier(.22, .68, .3, 1); }
 .is-armed [data-in] .bar-fill { width: var(--w); }
 
+/* Scroll-driven instead: the bar is a fraction of its own length, and the
+   fraction is how far the chart has climbed the window. Script sets --p,
+   so these rules only apply once it has. Written twice because the timed
+   rule above carries an attribute selector and would otherwise outrank
+   the first of them. */
+.bars-scrolled .bar-fill {
+  width: calc(var(--w) * var(--p, 0));
+  transition: none;
+}
+.is-armed.bars-scrolled [data-in] .bar-fill { width: calc(var(--w) * var(--p, 0)); }
+
 @media (max-width: 1100px) {
   .band-split { grid-template-columns: 1fr; gap: 18px; }
   .way { grid-template-columns: 64px minmax(0, 1fr); }
   .way-data { grid-column: 2; }
   .model-list { grid-template-columns: repeat(2, 1fr); }
-  /* Stacked, the prose has the whole column and would run to about a
-     hundred characters. ch ties the cap to the measure itself rather than
-     to a pixel width that means something different at every font size. */
-  .way-text > p, .way-text .plain-list { max-width: 68ch; }
 }
 /* Below this, a column is too narrow to read: two columns of 340px are
    about 42 characters each, which breaks lines more than it helps. */
@@ -2279,9 +2288,79 @@ function Bar({ label, value, max, i }) {
         <span className="bar-fill"
           style={{ "--w": `${(value / max) * 100}%`, transitionDelay: `${(i || 0) * 70}ms` }} />
       </span>
-      <span className="bar-value">{value}</span>
+      {/* The figure is also the counter's target: script reads data-v and
+          writes the running number into the same span. */}
+      <span className="bar-value" data-v={value}>{value}</span>
     </div>
   );
+}
+
+/**
+ * Bars that fill as you scroll to them, and figures that count up with
+ * them, rather than a timed animation that runs once on arrival.
+ *
+ * Progress is the chart's own travel up the window: nothing at all until
+ * its top edge is near the bottom of the glass, complete by the time it
+ * has reached a little above the middle. Scrolling back up empties them
+ * again, which is what makes it read as driven by the scroll rather than
+ * triggered by it.
+ *
+ * Reduced motion keeps the finished figures and full bars: the rules only
+ * bite once this has added its class.
+ */
+function useScrollBars(rootSelector) {
+  React.useEffect(() => {
+    const root = document.querySelector(rootSelector);
+    if (!root) return;
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (still.matches) return;
+
+    const charts = Array.from(root.querySelectorAll(".chart-body")).map((el) => ({
+      el,
+      vals: Array.from(el.querySelectorAll(".bar-value")),
+    }));
+    if (charts.length === 0) return;
+
+    root.classList.add("bars-scrolled");
+
+    let frame = 0;
+    const paint = () => {
+      frame = 0;
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const from = vh * 0.92;
+      const to = vh * 0.42;
+      charts.forEach((c) => {
+        const top = c.el.getBoundingClientRect().top;
+        let p = (from - top) / (from - to);
+        p = p < 0 ? 0 : p > 1 ? 1 : p;
+        c.el.style.setProperty("--p", String(p));
+        c.vals.forEach((v) => {
+          const target = Number(v.getAttribute("data-v"));
+          if (!target) return;
+          const now = String(Math.round(target * p));
+          // Only when it changes: this runs on every frame of every
+          // scroll, and writing the same string still costs layout.
+          if (v.textContent !== now) v.textContent = now;
+        });
+      });
+    };
+    const onScroll = () => { if (!frame) frame = requestAnimationFrame(paint); };
+
+    paint();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+      root.classList.remove("bars-scrolled");
+      charts.forEach((c) => {
+        c.el.style.removeProperty("--p");
+        // Put the real figures back for whatever renders next.
+        c.vals.forEach((v) => { v.textContent = v.getAttribute("data-v"); });
+      });
+    };
+  }, [rootSelector]);
 }
 
 /**
@@ -2509,6 +2588,7 @@ function StudyScreen() {
   const maxField = STUDY_FIELDS[0][1];
   const maxRole = STUDY_ROLES[0][1];
   useReveal(".study");
+  useScrollBars(".study");
 
   return (
     <div className="wrap page study">
