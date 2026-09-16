@@ -1203,7 +1203,10 @@ footer.site {
    line and the bar gets the width. This has to sit after the rule above,
    not before it: same specificity, so source order decides. */
 @media (max-width: 560px) {
-  .bar-row { grid-template-columns: minmax(0, 1fr) auto; gap: 3px 10px; }
+  /* A fixed figure column, not auto: the number counts up from 0 to 450
+     as you scroll, and an auto track would resize under it and jitter the
+     bar on every frame. */
+  .bar-row { grid-template-columns: minmax(0, 1fr) 42px; gap: 3px 10px; }
   .bar-label { grid-column: 1 / -1; }
 }
 
