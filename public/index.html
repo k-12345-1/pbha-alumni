@@ -1483,6 +1483,16 @@ footer.site {
    default right-anchor plus a 220px min-width pushes them off the left of
    the page, because the rail column is narrower than the menu. */
 
+/* Sort pill plus Grid/List/Map comes to 395px, so on a phone the row
+   wraps under the count instead of running off the side. */
+@media (max-width: 560px) {
+  .dir-tools {
+    flex-wrap: wrap;
+    margin-left: 0 !important;
+    width: 100%;
+  }
+}
+
 .year-range { display: flex; align-items: center; gap: 8px; }
 /* min-width: 0 or the two pills are floored at the width of their own
    text and the rail cannot narrow past the pair of them. */
@@ -4173,7 +4183,8 @@ function DirectoryScreen({ onOpenProfile, onMessage }) {
                 <button key={f.label} className="chip is-on" onClick={f.clear}>{f.label} ✕</button>
               ))}
             </div>
-            <div style={{ display: "flex", gap: 8, marginLeft: "auto", alignItems: "center" }}>
+            <div className="dir-tools"
+              style={{ display: "flex", gap: 8, marginLeft: "auto", alignItems: "center" }}>
               <Select value={sort} onChange={setSort} label="Sort the directory"
                 options={[
                   { value: "recent", label: "Recently joined" },
