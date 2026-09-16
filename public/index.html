@@ -988,6 +988,11 @@ footer.site {
 }
 /* Spacing between the blocks is the grid's job now. */
 .way-data > * { margin-top: 0; }
+/* A table on its own would run the full 1144px, leaving 900px of rule
+   between a finding and its two figures. Held to half the width — the
+   same width the tables that sit two-up already have, so a lone one
+   looks like one of a pair rather than a stretched thing. */
+.way-data > .table:only-child { max-width: calc((100% - 40px) / 2); }
 .chart-body { padding-top: 4px; }
 
 
