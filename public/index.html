@@ -956,30 +956,35 @@ footer.site {
 .model-list p { font-size: 15px; line-height: 1.6; color: var(--ink-mute); }
 .model-n { font-size: 13px; font-weight: 700; color: var(--orange); letter-spacing: .04em; }
 
-/* Number, narrative, data. The prose column is the readable measure; the
-   data column carries the tables and charts, and between them the section
-   reaches the gutter without a 200-character line anywhere in it. */
+/* Number, then the whole width. Each of the five reads as a short piece
+   of writing with its evidence set out under it, rather than as prose
+   squeezed into half the page with a table holding the other half. */
 .way {
   display: grid;
-  /* Two equal content columns, not 1fr/1.1fr. Equal is what lets the one
-     row with no data split its prose into two columns that land on the
-     same edges as everybody else's narrative and data — with an uneven
-     pair the second column starts 27px off and the eye catches it. */
-  grid-template-columns: 84px minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: 84px minmax(0, 1fr);
   gap: 20px 40px;
   padding: 48px 0;
   border-top: 1px solid var(--rule);
 }
-/* Same skeleton, not a second one: the numeral column stays 84px so the
-   spine of five numbers is straight, and the prose runs across both
-   content columns with the grid's own gutter between them. */
-.way-solo .way-text { grid-column: 2 / -1; columns: 2; column-gap: 40px; }
-.way-solo .way-text .way-title { column-span: all; }
+/* Full width, but never a full-width line: two newspaper columns keep the
+   measure at about 70 characters while the block itself reaches the
+   gutter. The title runs across both. */
+.way-text { columns: 2; column-gap: 40px; }
+.way-text .way-title { column-span: all; }
 .way-text > p { margin-top: 0; }
-.way-data { min-width: 0; }
-/* Every chart, not just a chart after a chart: the first one sat flush
-   against the findings table above it. */
-.chart { margin-top: 34px; }
+/* The evidence, underneath. auto-fit rather than a fixed pair: the one
+   with three blocks sets them in three, the one with two in two, and a
+   lone table keeps a sane width instead of stretching the page. */
+.way-data {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  gap: 34px 40px;
+  align-items: start;
+  margin-top: 36px;
+}
+/* Spacing between the blocks is the grid's job now. */
+.way-data > * { margin-top: 0; }
 .chart-body { padding-top: 4px; }
 
 
@@ -1040,14 +1045,14 @@ footer.site {
 /* Below this, a column is too narrow to read: two columns of 340px are
    about 42 characters each, which breaks lines more than it helps. */
 @media (max-width: 900px) {
-  .prose-2, .way-solo .way-text { columns: 1; }
+  .prose-2, .way-text { columns: 1; }
 }
 @media (max-width: 720px) {
   .study { font-size: 15.5px; }
   .way { grid-template-columns: 1fr; gap: 10px; padding: 32px 0; }
   .way-n { font-size: 38px; position: static; }
   .way-data { grid-column: 1; }
-  .way-solo .way-text, .prose-2 { columns: 1; }
+  .way-text, .prose-2 { columns: 1; }
   .model-list { grid-template-columns: 1fr; gap: 20px; }
   .pull { padding: 32px 22px 28px; border-radius: 20px; }
   /* Less than the 20px page margin, so nothing travels off the side. */
@@ -2602,7 +2607,7 @@ function StudyScreen() {
         {STUDY_WAYS.map((w, i) => {
           const hasData = w.rows || w.tallies || i === 0;
           return (
-            <section key={w.title} className={`way ${hasData ? "" : "way-solo"}`}>
+            <section key={w.title} className="way">
               <div className="way-n reveal">{i + 1}</div>
 
               <div className="way-text reveal">
