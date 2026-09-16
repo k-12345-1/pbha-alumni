@@ -435,11 +435,14 @@ footer.site {
 }
 .footer-links { display: flex; flex-direction: column; gap: 18px; align-items: flex-start; font-size: 15px; font-weight: 500; }
 
+/* minmax(0, 1fr), not 1fr: a bare fr track is floored by its content's
+   min-content width, and the 370px search box inside sets that floor —
+   which pushed the whole page 18px sideways on a phone. */
 @media (max-width: 1240px) {
-  .footer-grid { grid-template-columns: 1fr 1fr; gap: 48px; }
+  .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; }
 }
 @media (max-width: 700px) {
-  .footer-grid { grid-template-columns: 1fr; gap: 36px; }
+  .footer-grid { grid-template-columns: minmax(0, 1fr); gap: 36px; }
 }
 
 /* ---------- responsive ---------- */
@@ -449,12 +452,13 @@ footer.site {
 }
 @media (max-width: 860px) {
   .gate-layout { grid-template-columns: 1fr !important; gap: 40px !important; }
-  .directory-layout { grid-template-columns: 1fr !important; }
+  .directory-layout { grid-template-columns: minmax(0, 1fr) !important; }
   .directory-rail {
     position: static;
     max-height: none;
     overflow: visible;
     padding-right: 0;
+    min-width: 0;
   }
   .grid-people { grid-template-columns: 1fr; }
   .row-person { grid-template-columns: 46px 1fr; }
@@ -1058,6 +1062,14 @@ footer.site {
   .prose-2 { columns: 1; }
 }
 
+/* On a phone the label and the figure took 150px of a 330px row and left
+   the bar shorter than its own caption. The label takes its own line and
+   the bar gets the width. */
+@media (max-width: 560px) {
+  .bar-row { grid-template-columns: minmax(0, 1fr) auto; gap: 3px 10px; }
+  .bar-label { grid-column: 1 / -1; }
+}
+
 @media (max-width: 720px) {
   .study { font-size: 15.5px; }
   .way { grid-template-columns: 1fr; gap: 10px; padding: 32px 0; }
@@ -1472,7 +1484,9 @@ footer.site {
    the page, because the rail column is narrower than the menu. */
 
 .year-range { display: flex; align-items: center; gap: 8px; }
-.year-range > div { flex: 1; }
+/* min-width: 0 or the two pills are floored at the width of their own
+   text and the rail cannot narrow past the pair of them. */
+.year-range > div { flex: 1; min-width: 0; }
 .year-range .pill-select { width: 100%; justify-content: space-between; padding: 8px 12px; }
 /* Year lists run to 126 entries, so the menu has to scroll. */
 .pill-menu { max-height: 280px; overflow-y: auto; }
